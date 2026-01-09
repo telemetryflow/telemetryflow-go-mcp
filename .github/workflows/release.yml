@@ -100,7 +100,7 @@ jobs:
           cache: true
 
       - name: Download dependencies
-        run: make deps
+        run: make deps-refresh
 
       - name: Build binary
         run: make ci-build
@@ -139,7 +139,7 @@ jobs:
           cache: true
 
       - name: Download dependencies
-        run: make deps
+        run: make deps-refresh
 
       - name: Build binary
         run: make ci-build
@@ -181,7 +181,7 @@ jobs:
           cache: true
 
       - name: Download dependencies
-        run: make deps
+        run: make deps-refresh
 
       - name: Build binary
         run: make ci-build
