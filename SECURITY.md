@@ -35,7 +35,7 @@ We recommend always using the latest version for the best security.
 Instead, please report them via one of the following methods:
 
 1. **Email**: security@devopscorner.id
-2. **GitHub Security Advisories**: [Create a security advisory](https://github.com/devopscorner/telemetryflow/security/advisories/new)
+2. **GitHub Security Advisories**: [Create a security advisory](https://github.com/telemetryflow/telemetryflow-mcp/security/advisories/new)
 
 ### What to Include
 
@@ -336,7 +336,7 @@ security:
 For security concerns, please contact:
 
 - **Security Email**: security@devopscorner.id
-- **GitHub Security**: [Security Advisories](https://github.com/devopscorner/telemetryflow/security/advisories)
+- **GitHub Security**: [Security Advisories](https://github.com/telemetryflow/telemetryflow-mcp/security/advisories)
 
 ---
 

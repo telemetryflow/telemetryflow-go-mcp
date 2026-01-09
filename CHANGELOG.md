@@ -155,7 +155,7 @@ No breaking changes. Update your binary and restart the server.
 
 ```bash
 # Download new version
-curl -LO https://github.com/devopscorner/telemetryflow/releases/download/v1.1.2/tfo-mcp_$(uname -s)_$(uname -m).tar.gz
+curl -LO https://github.com/telemetryflow/telemetryflow-mcp/releases/download/v1.1.2/tfo-mcp_$(uname -s)_$(uname -m).tar.gz
 
 # Extract and install
 tar -xzf tfo-mcp_*.tar.gz
@@ -169,11 +169,11 @@ tfo-mcp version
 
 ## Links
 
-- [GitHub Repository](https://github.com/devopscorner/telemetryflow)
+- [GitHub Repository](https://github.com/telemetryflow/telemetryflow-mcp)
 - [Documentation](docs/README.md)
-- [Issue Tracker](https://github.com/devopscorner/telemetryflow/issues)
+- [Issue Tracker](https://github.com/telemetryflow/telemetryflow-mcp/issues)
 
-[Unreleased]: https://github.com/devopscorner/telemetryflow/compare/v1.1.2...HEAD
-[1.1.2]: https://github.com/devopscorner/telemetryflow/compare/v1.1.1...v1.1.2
-[1.1.1]: https://github.com/devopscorner/telemetryflow/compare/v1.1.0...v1.1.1
-[1.1.0]: https://github.com/devopscorner/telemetryflow/releases/tag/v1.1.0
+[Unreleased]: https://github.com/telemetryflow/telemetryflow-mcp/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/telemetryflow/telemetryflow-mcp/compare/v1.1.1...v1.1.2
+[1.1.1]: https://github.com/telemetryflow/telemetryflow-mcp/compare/v1.1.0...v1.1.1
+[1.1.0]: https://github.com/telemetryflow/telemetryflow-mcp/releases/tag/v1.1.0

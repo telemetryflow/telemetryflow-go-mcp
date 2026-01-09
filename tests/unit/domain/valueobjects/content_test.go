@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	vo "github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain/valueobjects"
+	vo "github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/valueobjects"
 )
 
 func TestContentType_IsValid(t *testing.T) {

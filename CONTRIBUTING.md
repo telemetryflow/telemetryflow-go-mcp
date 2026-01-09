@@ -376,7 +376,7 @@ import (
 
     "github.com/google/uuid"
 
-    "github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain"
+    "github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain"
 )
 
 // Constants
@@ -549,8 +549,8 @@ When making changes:
 ### Getting Help
 
 - **Documentation**: [docs/README.md](docs/README.md)
-- **Issues**: [GitHub Issues](https://github.com/devopscorner/telemetryflow/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/devopscorner/telemetryflow/discussions)
+- **Issues**: [GitHub Issues](https://github.com/telemetryflow/telemetryflow-mcp/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/telemetryflow/telemetryflow-mcp/discussions)
 
 ### Recognition
 

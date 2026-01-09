@@ -4,9 +4,9 @@ package repositories
 import (
 	"context"
 
-	"github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain/aggregates"
-	"github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain/entities"
-	vo "github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain/valueobjects"
+	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/aggregates"
+	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/entities"
+	vo "github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/valueobjects"
 )
 
 // ISessionRepository defines the interface for session persistence

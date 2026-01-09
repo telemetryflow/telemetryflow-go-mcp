@@ -21,7 +21,7 @@ BINARY_NAME="tfo-mcp"
 VERSION="${VERSION:-1.1.2}"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 CONFIG_DIR="${CONFIG_DIR:-$HOME/.tfo-mcp}"
-GITHUB_REPO="devopscorner/telemetryflow"
+GITHUB_REPO="telemetryflow/telemetryflow-mcp"
 DOWNLOAD_URL="https://github.com/${GITHUB_REPO}/releases/download"
 
 # ==============================================================================

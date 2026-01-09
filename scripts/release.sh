@@ -21,7 +21,7 @@ BINARY_NAME="tfo-mcp"
 VERSION="${VERSION:-}"
 DIST_DIR="${DIST_DIR:-dist}"
 RELEASE_DIR="${DIST_DIR}/release"
-GITHUB_REPO="devopscorner/telemetryflow"
+GITHUB_REPO="telemetryflow/telemetryflow-mcp"
 DRY_RUN="${DRY_RUN:-false}"
 
 # ==============================================================================

@@ -4,8 +4,8 @@ package events
 import (
 	"time"
 
-	vo "github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain/valueobjects"
 	"github.com/google/uuid"
+	vo "github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/valueobjects"
 )
 
 // DomainEvent is the interface for all domain events

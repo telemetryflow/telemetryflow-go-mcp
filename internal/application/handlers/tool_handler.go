@@ -6,12 +6,12 @@ import (
 	"errors"
 	"time"
 
-	"github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/application/commands"
-	"github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/application/queries"
-	"github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain/entities"
-	"github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain/events"
-	"github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain/repositories"
-	vo "github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain/valueobjects"
+	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/application/commands"
+	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/application/queries"
+	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/entities"
+	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/events"
+	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/repositories"
+	vo "github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/valueobjects"
 )
 
 // Tool handler errors

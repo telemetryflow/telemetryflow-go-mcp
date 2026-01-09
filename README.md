@@ -553,7 +553,7 @@ graph TD
 
 ```bash
 # Clone the repository
-git clone https://github.com/devopscorner/telemetryflow.git
+git clone https://github.com/telemetryflow/telemetryflow-mcp.git
 cd telemetryflow/telemetryflow-mcp
 
 # Download dependencies
@@ -569,7 +569,7 @@ make install
 ### Using Go Install
 
 ```bash
-go install github.com/devopscorner/telemetryflow/telemetryflow-mcp/cmd/mcp@latest
+go install github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/cmd/mcp@latest
 ```
 
 ### Docker
@@ -1073,8 +1073,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 - **Documentation**: [TelemetryFlow Docs](https://docs.telemetryflow.id)
-- **Issues**: [GitHub Issues](https://github.com/devopscorner/telemetryflow/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/devopscorner/telemetryflow/discussions)
+- **Issues**: [GitHub Issues](https://github.com/telemetryflow/telemetryflow-mcp/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/telemetryflow/telemetryflow-mcp/discussions)
 
 ---
 

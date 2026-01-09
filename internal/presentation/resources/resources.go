@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	vo "github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain/valueobjects"
+	vo "github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/valueobjects"
 )
 
 // ResourceHandler handles MCP resource operations

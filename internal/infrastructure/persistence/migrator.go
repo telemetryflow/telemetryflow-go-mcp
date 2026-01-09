@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/infrastructure/persistence/models"
 	"github.com/rs/zerolog/log"
+	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/infrastructure/persistence/models"
 	"gorm.io/gorm"
 )
 

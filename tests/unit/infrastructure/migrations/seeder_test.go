@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/infrastructure/persistence"
-	"github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/infrastructure/persistence/models"
 	"github.com/google/uuid"
+	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/infrastructure/persistence"
+	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/infrastructure/persistence/models"
 	"gorm.io/gorm"
 )
 

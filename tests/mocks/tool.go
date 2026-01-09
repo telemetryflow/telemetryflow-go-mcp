@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain/entities"
-	vo "github.com/devopscorner/telemetryflow/telemetryflow-mcp/internal/domain/valueobjects"
+	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/entities"
+	vo "github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/valueobjects"
 )
 
 // MockToolHandler is a mock tool handler for testing
