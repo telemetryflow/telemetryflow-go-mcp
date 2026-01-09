@@ -5,7 +5,7 @@ All notable changes to TelemetryFlow MCP Server (TFO-MCP) will be documented in 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.2] - 2025-01-09
 
 ### Added
 - PostgreSQL database support with GORM ORM
@@ -24,6 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Tool usage statistics with percentiles
   - Request/token/latency time series
   - Error rate tracking
+- Redis caching infrastructure
+  - Cache service with TTL support
+  - Session and conversation caching
+  - Cache invalidation strategies
+- NATS JetStream queue infrastructure
+  - Durable message queuing
+  - Publisher/subscriber pattern
+  - Task acknowledgment with retry support
 - Comprehensive test suite
   - Session aggregate tests
   - Conversation aggregate tests
@@ -32,13 +40,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Benchmarks for performance testing
 - Additional test coverage
 - Performance benchmarks
+- GitHub Actions CI/CD workflows
+  - Lint, test, build pipeline
+  - Multi-platform build support
+  - Security scanning with Gosec and govulncheck
+  - Coverage reporting
 
 ### Changed
-- Updated go.mod with GORM and ClickHouse dependencies
-- Enhanced configuration with database settings
+- **BREAKING**: Refactored all environment variable keys from `TFO_*` to `TELEMETRYFLOW_*`
+  - `TFO_CLAUDE_API_KEY` → `TELEMETRYFLOW_MCP_CLAUDE_API_KEY`
+  - `TFO_LOG_LEVEL` → `TELEMETRYFLOW_MCP_LOG_LEVEL`
+  - `TFO_SERVER_HOST` → `TELEMETRYFLOW_MCP_SERVER_HOST`
+  - `TFO_SERVER_PORT` → `TELEMETRYFLOW_MCP_SERVER_PORT`
+  - All other `TFO_*` variables follow the same pattern
+- Updated go.mod with GORM, ClickHouse, Redis, and NATS dependencies
+- Enhanced configuration with database, cache, and queue settings
+- Updated Viper SetEnvPrefix from `TFO_MCP` to `TELEMETRYFLOW_MCP`
 
 ### Fixed
 - Minor bug fixes
+- Fixed anthropic SDK API compatibility in client.go
+- Fixed observability.go StartSpan return type
 
 ---
 

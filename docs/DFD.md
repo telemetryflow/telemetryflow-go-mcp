@@ -1,4 +1,4 @@
-# TFO-MCP Data Flow Diagrams
+# TelemetryFlow MCP Data Flow Diagrams
 
 > Data Flow Diagrams for TelemetryFlow MCP Server
 
@@ -19,7 +19,7 @@
 
 ## Overview
 
-This document provides Data Flow Diagrams (DFD), State Diagrams, and Sequence Diagrams that describe how data moves through the TFO-MCP Server system.
+This document provides Data Flow Diagrams (DFD), State Diagrams, and Sequence Diagrams that describe how data moves through the TelemetryFlow MCP Server system.
 
 ```mermaid
 flowchart LR
@@ -50,7 +50,7 @@ flowchart TB
         OTEL["TelemetryFlow<br/>Collector"]
     end
 
-    subgraph TFO_MCP["TFO-MCP Server"]
+    subgraph TFO_MCP["TelemetryFlow MCP Server"]
         SYSTEM["MCP Server<br/>Process"]
     end
 
@@ -75,7 +75,7 @@ flowchart TB
         C3["Custom Client"]
     end
 
-    subgraph TFO_MCP["TFO-MCP Server"]
+    subgraph TFO_MCP["TelemetryFlow MCP Server"]
         subgraph Presentation["1.0 Presentation"]
             P1["1.1 Request Parser"]
             P2["1.2 Response Builder"]
@@ -105,7 +105,7 @@ flowchart TB
 
     subgraph External["External Services"]
         CLAUDE["Claude API"]
-        OTLP["TFO Collector"]
+        OTLP["TelemetryFlow Collector"]
         REDIS["Redis"]
     end
 
@@ -426,7 +426,7 @@ stateDiagram-v2
 ```mermaid
 sequenceDiagram
     participant Client as MCP Client
-    participant Server as TFO-MCP Server
+    participant Server as TelemetryFlow MCP Server
     participant Session as Session Aggregate
     participant Repo as Repository
     participant Events as Event Publisher

@@ -274,7 +274,7 @@ setup_vscode() {
     "editor.defaultFormatter": "golang.go"
   },
   "go.testEnvVars": {
-    "TFO_CLAUDE_API_KEY": "${env:TFO_CLAUDE_API_KEY}"
+    "TELEMETRYFLOW_MCP_CLAUDE_API_KEY": "${env:TELEMETRYFLOW_MCP_CLAUDE_API_KEY}"
   }
 }
 EOF
@@ -364,7 +364,7 @@ print_next_steps() {
     echo "Next steps:"
     echo ""
     echo "  1. Set your Claude API key:"
-    echo "     export TFO_CLAUDE_API_KEY=\"your-api-key\""
+    echo "     export TELEMETRYFLOW_MCP_CLAUDE_API_KEY=\"your-api-key\""
     echo ""
     echo "  2. Build the project:"
     echo "     make build"

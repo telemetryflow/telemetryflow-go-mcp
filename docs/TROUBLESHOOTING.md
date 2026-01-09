@@ -1,4 +1,4 @@
-# TFO-MCP Troubleshooting Guide
+# TelemetryFlow MCP Troubleshooting Guide
 
 > Complete troubleshooting guide for TelemetryFlow MCP Server
 
@@ -23,7 +23,7 @@
 
 ## Overview
 
-This guide helps diagnose and resolve common issues with TFO-MCP.
+This guide helps diagnose and resolve common issues with TelemetryFlow MCP.
 
 ### Troubleshooting Approach
 
@@ -68,7 +68,7 @@ flowchart TB
 ```mermaid
 flowchart TB
     subgraph Checklist["Diagnostic Checklist"]
-        C1["✓ Check TFO-MCP version"]
+        C1["✓ Check TelemetryFlow MCP version"]
         C2["✓ Validate configuration"]
         C3["✓ Verify API key"]
         C4["✓ Check network connectivity"]
@@ -89,14 +89,14 @@ tfo-mcp version
 tfo-mcp validate --verbose
 
 # 3. Check API key is set
-echo $TFO_CLAUDE_API_KEY | head -c 20
+echo $TELEMETRYFLOW_MCP_CLAUDE_API_KEY | head -c 20
 
 # 4. Run with debug logging
 tfo-mcp run --log-level debug
 
 # 5. Test Claude API connectivity
 curl -X POST https://api.anthropic.com/v1/messages \
-  -H "x-api-key: $TFO_CLAUDE_API_KEY" \
+  -H "x-api-key: $TELEMETRYFLOW_MCP_CLAUDE_API_KEY" \
   -H "anthropic-version: 2023-06-01" \
   -H "content-type: application/json" \
   -d '{"model":"claude-3-haiku-20240307","max_tokens":10,"messages":[{"role":"user","content":"Hi"}]}'
@@ -149,7 +149,7 @@ flowchart TB
 |-------|-----------|
 | Command not found | Add to PATH: `export PATH=$PATH:/usr/local/bin` |
 | Permission denied | Set executable: `chmod +x tfo-mcp` |
-| API key error | Set env var: `export TFO_CLAUDE_API_KEY="..."` |
+| API key error | Set env var: `export TELEMETRYFLOW_MCP_CLAUDE_API_KEY="..."` |
 | Config not found | Create config: `tfo-mcp validate --verbose` |
 | Connection timeout | Check network and retry |
 
@@ -162,7 +162,7 @@ flowchart TB
 ```mermaid
 sequenceDiagram
     participant Client
-    participant TFO as TFO-MCP
+    participant TFO as TelemetryFlow MCP
     participant Claude as Claude API
 
     Client->>TFO: JSON-RPC Request
@@ -337,7 +337,7 @@ server:
 tfo-mcp validate --verbose
 
 # Ensure API key is set via environment variable
-export TFO_CLAUDE_API_KEY="sk-ant-api03-..."
+export TELEMETRYFLOW_MCP_CLAUDE_API_KEY="sk-ant-api03-..."
 
 # Or in config file (not recommended)
 claude:
@@ -354,10 +354,10 @@ claude:
 
 ```bash
 # Verify environment variable is set
-echo $TFO_CLAUDE_API_KEY
+echo $TELEMETRYFLOW_MCP_CLAUDE_API_KEY
 
 # Check variable in current shell
-env | grep TFO_
+env | grep TELEMETRYFLOW_
 
 # Source environment file
 source .env
@@ -365,7 +365,7 @@ source .env
 # For systemd services, add to unit file
 # /etc/systemd/system/tfo-mcp.service
 [Service]
-Environment="TFO_CLAUDE_API_KEY=your-key"
+Environment="TELEMETRYFLOW_MCP_CLAUDE_API_KEY=your-key"
 ```
 
 ---
@@ -415,11 +415,11 @@ flowchart TB
 ```bash
 # Verify API key format
 # Should start with "sk-ant-api03-"
-echo $TFO_CLAUDE_API_KEY | head -c 15
+echo $TELEMETRYFLOW_MCP_CLAUDE_API_KEY | head -c 15
 
 # Test API key directly
 curl -X POST https://api.anthropic.com/v1/messages \
-  -H "x-api-key: $TFO_CLAUDE_API_KEY" \
+  -H "x-api-key: $TELEMETRYFLOW_MCP_CLAUDE_API_KEY" \
   -H "anthropic-version: 2023-06-01" \
   -H "content-type: application/json" \
   -d '{"model":"claude-3-haiku-20240307","max_tokens":10,"messages":[{"role":"user","content":"Hi"}]}'
@@ -714,7 +714,7 @@ flowchart LR
 tfo-mcp run --log-level debug
 
 # Via environment variable
-export TFO_LOG_LEVEL=debug
+export TELEMETRYFLOW_MCP_LOG_LEVEL=debug
 tfo-mcp run
 
 # Via config file
@@ -824,7 +824,7 @@ docker pull devopscorner/tfo-mcp:latest
 **Q: How do I check the API key is valid?**
 ```bash
 curl -X POST https://api.anthropic.com/v1/messages \
-  -H "x-api-key: $TFO_CLAUDE_API_KEY" \
+  -H "x-api-key: $TELEMETRYFLOW_MCP_CLAUDE_API_KEY" \
   -H "anthropic-version: 2023-06-01" \
   -H "content-type: application/json" \
   -d '{"model":"claude-3-haiku-20240307","max_tokens":10,"messages":[{"role":"user","content":"Hi"}]}'
@@ -886,7 +886,7 @@ When creating a GitHub issue, include:
 
 ```markdown
 ## Environment
-- TFO-MCP Version: `tfo-mcp version`
+- TelemetryFlow MCP Version: `tfo-mcp version`
 - OS: macOS 14.0 / Ubuntu 22.04 / Windows 11
 - Go Version: go1.24
 

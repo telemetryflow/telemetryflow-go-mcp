@@ -20,8 +20,10 @@
 9. [Session Management](#session-management)
 10. [Cache and Queue](#cache-and-queue)
 11. [Configuration Architecture](#configuration-architecture)
-12. [Observability](#observability)
-13. [Package Structure](#package-structure)
+12. [Database Layer](#database-layer)
+13. [Migrations and Seeding](#migrations-and-seeding)
+14. [Observability](#observability)
+15. [Package Structure](#package-structure)
 
 ---
 
@@ -944,7 +946,7 @@ flowchart TD
     subgraph "Configuration Sources"
         DEFAULT[Default Values]
         FILE[Config File<br/>config.yaml]
-        ENV[Environment Variables<br/>ANTHROPIC_API_KEY, TFO_MCP_*]
+        ENV[Environment Variables<br/>ANTHROPIC_API_KEY, TELEMETRYFLOW_MCP_*]
     end
 
     subgraph "Viper Processing"
@@ -1032,6 +1034,343 @@ graph TD
     TEL --> TEL_OTLP[otlp_endpoint]
 
     style CFG fill:#FFE0B2,stroke:#F57C00,stroke-width:2px
+```
+
+---
+
+## Database Layer
+
+### Database Architecture
+
+TelemetryFlow MCP uses a polyglot persistence strategy with specialized databases for different workloads:
+
+```mermaid
+graph TB
+    subgraph "Application Layer"
+        MCP[TFO-MCP Server]
+        GORM[GORM ORM]
+    end
+
+    subgraph "Transactional Storage"
+        PG[(PostgreSQL)]
+        PG_SESSIONS[Sessions]
+        PG_CONV[Conversations]
+        PG_MSG[Messages]
+        PG_TOOLS[Tools]
+        PG_RES[Resources]
+        PG_PROMPTS[Prompts]
+    end
+
+    subgraph "Analytics Storage"
+        CH[(ClickHouse)]
+        CH_TOOL[Tool Analytics]
+        CH_API[API Analytics]
+        CH_SESSION[Session Analytics]
+        CH_ERROR[Error Analytics]
+    end
+
+    subgraph "Caching Layer"
+        REDIS[(Redis)]
+        REDIS_CACHE[Response Cache]
+        REDIS_SESSION[Session Cache]
+    end
+
+    MCP --> GORM
+    GORM --> PG
+    MCP --> CH
+    MCP --> REDIS
+
+    PG --> PG_SESSIONS
+    PG --> PG_CONV
+    PG --> PG_MSG
+    PG --> PG_TOOLS
+    PG --> PG_RES
+    PG --> PG_PROMPTS
+
+    CH --> CH_TOOL
+    CH --> CH_API
+    CH --> CH_SESSION
+    CH --> CH_ERROR
+
+    REDIS --> REDIS_CACHE
+    REDIS --> REDIS_SESSION
+
+    style PG fill:#336791,stroke:#1A365D,color:#fff
+    style CH fill:#FFCC00,stroke:#CC9900
+    style REDIS fill:#DC382D,stroke:#A52A2A,color:#fff
+```
+
+### PostgreSQL Schema
+
+Primary transactional database for MCP session state and metadata:
+
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `sessions` | MCP session state | id, state, client_name, capabilities |
+| `conversations` | Claude conversations | id, session_id, model, status |
+| `messages` | Conversation messages | id, conversation_id, role, content |
+| `tools` | Registered tools | id, name, input_schema, is_enabled |
+| `resources` | Available resources | id, uri, name, mime_type |
+| `prompts` | Prompt templates | id, name, arguments, template |
+| `resource_subscriptions` | Resource watchers | id, session_id, resource_uri |
+| `tool_executions` | Tool execution log | id, session_id, tool_name, duration_ms |
+| `api_keys` | API authentication | id, key_hash, scopes, rate_limits |
+| `schema_migrations` | Migration tracking | version, applied_at |
+
+### ClickHouse Analytics Schema
+
+High-performance analytics for operational intelligence:
+
+| Table | Purpose | Engine |
+|-------|---------|--------|
+| `tool_call_analytics` | Tool execution metrics | MergeTree |
+| `api_request_analytics` | Claude API usage | MergeTree |
+| `session_analytics` | Session lifecycle events | MergeTree |
+| `error_analytics` | Error tracking | MergeTree |
+| `token_usage_hourly` | Aggregated token usage | SummingMergeTree |
+| `tool_usage_hourly` | Aggregated tool usage | SummingMergeTree |
+| `latency_percentiles_hourly` | Response time percentiles | ReplacingMergeTree |
+
+### GORM Models
+
+Domain models with GORM annotations for PostgreSQL:
+
+```mermaid
+classDiagram
+    class Session {
+        +UUID ID
+        +string State
+        +string ClientName
+        +string ClientVersion
+        +string ProtocolVersion
+        +JSONB Capabilities
+        +JSONB ServerInfo
+        +string LogLevel
+        +time.Time CreatedAt
+        +time.Time UpdatedAt
+        +time.Time ClosedAt
+    }
+
+    class Conversation {
+        +UUID ID
+        +UUID SessionID
+        +string Model
+        +string SystemPrompt
+        +string Status
+        +int MaxTokens
+        +float64 Temperature
+        +int TotalInputTokens
+        +int TotalOutputTokens
+        +JSONB Metadata
+        +time.Time CreatedAt
+        +time.Time UpdatedAt
+    }
+
+    class Message {
+        +UUID ID
+        +UUID ConversationID
+        +string Role
+        +JSONBArray Content
+        +int InputTokens
+        +int OutputTokens
+        +string StopReason
+        +JSONB Metadata
+        +time.Time CreatedAt
+    }
+
+    class Tool {
+        +UUID ID
+        +string Name
+        +string Description
+        +JSONB InputSchema
+        +string Category
+        +StringArray Tags
+        +bool IsEnabled
+        +int TimeoutSeconds
+        +JSONB Metadata
+        +time.Time CreatedAt
+        +time.Time UpdatedAt
+    }
+
+    Session "1" --> "*" Conversation
+    Conversation "1" --> "*" Message
+    Session "1" --> "*" Tool
+```
+
+### Custom GORM Types
+
+```go
+// JSONB handles PostgreSQL JSONB columns
+type JSONB map[string]interface{}
+
+// JSONBArray handles PostgreSQL JSONB arrays
+type JSONBArray []interface{}
+
+// StringArray handles PostgreSQL text[] arrays
+type StringArray []string
+```
+
+---
+
+## Migrations and Seeding
+
+### Migration Architecture
+
+```mermaid
+flowchart TD
+    subgraph "Migration Sources"
+        PG_UP[PostgreSQL Up Migrations]
+        PG_DOWN[PostgreSQL Down Migrations]
+        CH_UP[ClickHouse Up Migrations]
+        CH_DOWN[ClickHouse Down Migrations]
+    end
+
+    subgraph "Migrator"
+        MIGRATOR[Migration Runner]
+        STATUS[Migration Status]
+        AUTO[GORM AutoMigrate]
+    end
+
+    subgraph "Operations"
+        UP[Up - Apply All]
+        DOWN[Down - Rollback One]
+        DOWN_TO[DownTo - Rollback To Version]
+        RESET[Reset - Rollback All]
+        FRESH[Fresh - Reset + Up]
+    end
+
+    PG_UP --> MIGRATOR
+    PG_DOWN --> MIGRATOR
+    CH_UP --> MIGRATOR
+    CH_DOWN --> MIGRATOR
+
+    MIGRATOR --> UP
+    MIGRATOR --> DOWN
+    MIGRATOR --> DOWN_TO
+    MIGRATOR --> RESET
+    MIGRATOR --> FRESH
+    MIGRATOR --> STATUS
+    MIGRATOR --> AUTO
+
+    style MIGRATOR fill:#FFE0B2,stroke:#F57C00,stroke-width:2px
+```
+
+### Migration Files
+
+Migrations follow a versioned naming convention:
+
+```
+migrations/
+├── postgres/
+│   ├── 000001_init_schema.up.sql    # Create all tables
+│   └── 000001_init_schema.down.sql  # Drop all tables
+└── clickhouse/
+    ├── 000001_init_analytics.up.sql  # Create analytics tables
+    └── 000001_init_analytics.down.sql # Drop analytics tables
+```
+
+### Migration Commands
+
+| Command | Description |
+|---------|-------------|
+| `migrate up` | Apply all pending migrations |
+| `migrate down` | Rollback the last migration |
+| `migrate down-to VERSION` | Rollback to a specific version |
+| `migrate reset` | Rollback all migrations |
+| `migrate fresh` | Reset and re-run all migrations |
+| `migrate status` | Show migration status |
+
+### Seeding Architecture
+
+```mermaid
+flowchart TD
+    subgraph "Seeders"
+        TOOLS[SeedTools<br/>8 default tools]
+        RESOURCES[SeedResources<br/>3 default resources]
+        PROMPTS[SeedPrompts<br/>3 default prompts]
+        API_KEYS[SeedAPIKeys<br/>Development key]
+        DEMO[SeedDemoSession<br/>Demo data]
+    end
+
+    subgraph "Operations"
+        ALL[SeedAll<br/>All seeders]
+        PROD[SeedProduction<br/>Tools, Resources, Prompts only]
+    end
+
+    subgraph "Strategy"
+        FIRST_OR_CREATE[FirstOrCreate<br/>Idempotent]
+        UNIQUE[Unique Constraints<br/>No duplicates]
+    end
+
+    TOOLS --> ALL
+    RESOURCES --> ALL
+    PROMPTS --> ALL
+    API_KEYS --> ALL
+    DEMO --> ALL
+
+    TOOLS --> PROD
+    RESOURCES --> PROD
+    PROMPTS --> PROD
+
+    ALL --> FIRST_OR_CREATE
+    PROD --> FIRST_OR_CREATE
+    FIRST_OR_CREATE --> UNIQUE
+
+    style ALL fill:#C8E6C9,stroke:#388E3C
+    style PROD fill:#BBDEFB,stroke:#1976D2
+```
+
+### Default Seed Data
+
+**Tools (8 default):**
+| Name | Category | Description |
+|------|----------|-------------|
+| `echo` | utility | Echo input back |
+| `read_file` | filesystem | Read file contents |
+| `write_file` | filesystem | Write to file |
+| `list_directory` | filesystem | List directory contents |
+| `execute_command` | system | Execute shell command |
+| `search_files` | filesystem | Search files by pattern |
+| `system_info` | system | Get system information |
+| `claude_conversation` | ai | Have conversation with Claude |
+
+**Resources (3 default):**
+| URI | Name | Type |
+|-----|------|------|
+| `config://server` | Server Configuration | Static |
+| `status://health` | Health Status | Static |
+| `file:///{path}` | File Resource | Template |
+
+**Prompts (3 default):**
+| Name | Arguments |
+|------|-----------|
+| `code_review` | language, code, focus_areas |
+| `explain_code` | language, code, detail_level |
+| `debug_help` | language, code, error_message |
+
+### Docker Initialization
+
+The Docker Compose setup uses initialization scripts for database setup:
+
+```mermaid
+sequenceDiagram
+    participant DC as Docker Compose
+    participant PG as PostgreSQL
+    participant CH as ClickHouse
+    participant INIT as Init Scripts
+
+    DC->>PG: Start container
+    DC->>CH: Start container
+
+    PG->>INIT: Run init-db.sql
+    INIT->>PG: Create schema
+    INIT->>PG: Create indexes
+    INIT->>PG: Insert seed data
+
+    CH->>INIT: Run init-clickhouse.sql
+    INIT->>CH: Create database
+    INIT->>CH: Create tables
+    INIT->>CH: Create materialized views
 ```
 
 ---
@@ -1246,14 +1585,35 @@ telemetryflow-mcp/
 │   │   │   ├── nats.go             # NATS JetStream queue implementation
 │   │   │   └── tasks.go            # Predefined task types
 │   │   └── persistence/
-│   │       └── memory_repositories.go
+│   │       ├── memory_repositories.go
+│   │       ├── migrator.go         # Database migration runner
+│   │       ├── seeder.go           # Database seeder
+│   │       └── models/
+│   │           └── models.go       # GORM models
 │   └── presentation/               # Presentation Layer
 │       ├── server/
 │       │   └── server.go           # MCP server
 │       └── tools/
 │           └── builtin_tools.go    # Built-in tools
+├── migrations/                     # Database migrations
+│   ├── postgres/
+│   │   ├── 000001_init_schema.up.sql
+│   │   └── 000001_init_schema.down.sql
+│   └── clickhouse/
+│       ├── 000001_init_analytics.up.sql
+│       └── 000001_init_analytics.down.sql
+├── scripts/                        # Initialization scripts
+│   ├── init-db.sql                 # PostgreSQL Docker init
+│   └── init-clickhouse.sql         # ClickHouse Docker init
 ├── configs/
 │   └── config.yaml                 # Default configuration
+├── tests/
+│   └── unit/
+│       └── infrastructure/
+│           └── migrations/
+│               ├── migrator_test.go
+│               ├── seeder_test.go
+│               └── models_test.go
 ├── docs/                           # Documentation
 └── .kiro/                          # Specifications
 ```

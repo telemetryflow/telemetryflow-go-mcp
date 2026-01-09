@@ -492,7 +492,7 @@ stateDiagram-v2
 ```mermaid
 graph TD
     subgraph "Configuration Sources"
-        ENV[Environment Variables<br/>ANTHROPIC_API_KEY<br/>TFO_MCP_*]
+        ENV[Environment Variables<br/>ANTHROPIC_API_KEY<br/>TELEMETRYFLOW_MCP_*]
         FILE[Config File<br/>config.yaml]
         DEFAULT[Default Values]
     end
@@ -530,13 +530,13 @@ graph TD
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `ANTHROPIC_API_KEY` | Claude API key (required) | - |
-| `TFO_MCP_SERVER_TRANSPORT` | Transport type | `stdio` |
-| `TFO_MCP_SERVER_PORT` | Server port (SSE/WS) | `8080` |
-| `TFO_MCP_LOG_LEVEL` | Log level | `info` |
-| `TFO_MCP_LOG_FORMAT` | Log format | `json` |
-| `TFO_MCP_DEBUG` | Debug mode | `false` |
-| `TFO_MCP_CLAUDE_DEFAULT_MODEL` | Default Claude model | `claude-sonnet-4-20250514` |
-| `TFO_MCP_OTLP_ENDPOINT` | OTEL collector endpoint | `localhost:4317` |
+| `TELEMETRYFLOW_MCP_SERVER_TRANSPORT` | Transport type | `stdio` |
+| `TELEMETRYFLOW_MCP_SERVER_PORT` | Server port (SSE/WS) | `8080` |
+| `TELEMETRYFLOW_MCP_LOG_LEVEL` | Log level | `info` |
+| `TELEMETRYFLOW_MCP_LOG_FORMAT` | Log format | `json` |
+| `TELEMETRYFLOW_MCP_DEBUG` | Debug mode | `false` |
+| `TELEMETRYFLOW_MCP_CLAUDE_DEFAULT_MODEL` | Default Claude model | `claude-sonnet-4-20250514` |
+| `TELEMETRYFLOW_MCP_OTLP_ENDPOINT` | OTEL collector endpoint | `localhost:4317` |
 
 ---
 

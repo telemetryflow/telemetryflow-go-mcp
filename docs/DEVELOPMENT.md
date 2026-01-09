@@ -679,7 +679,7 @@ flowchart TB
       "program": "${workspaceFolder}/cmd/mcp",
       "args": ["run", "--log-level", "debug"],
       "env": {
-        "TFO_CLAUDE_API_KEY": "your-api-key"
+        "TELEMETRYFLOW_MCP_CLAUDE_API_KEY": "your-api-key"
       }
     },
     {

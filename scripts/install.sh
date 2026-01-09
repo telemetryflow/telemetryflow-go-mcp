@@ -157,7 +157,7 @@ server:
   timeout: 30s
 
 claude:
-  # Set API key via environment variable: TFO_CLAUDE_API_KEY
+  # Set API key via environment variable: TELEMETRYFLOW_MCP_CLAUDE_API_KEY
   api_key: ""
   model: "claude-sonnet-4-20250514"
   max_tokens: 4096
@@ -286,7 +286,7 @@ print_post_install() {
     echo "Next steps:"
     echo ""
     echo "  1. Set your Claude API key:"
-    echo "     export TFO_CLAUDE_API_KEY=\"your-api-key\""
+    echo "     export TELEMETRYFLOW_MCP_CLAUDE_API_KEY=\"your-api-key\""
     echo ""
     echo "  2. Edit configuration (optional):"
     echo "     ${CONFIG_DIR}/config.yaml"

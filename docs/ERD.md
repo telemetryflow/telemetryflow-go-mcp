@@ -301,136 +301,272 @@ erDiagram
 
 ## Database Schema
 
-### PostgreSQL Schema
+### PostgreSQL Schema (GORM Models)
+
+The PostgreSQL database stores transactional data for MCP sessions, conversations, and registered components.
 
 ```mermaid
 erDiagram
     sessions ||--o{ conversations : has
-    sessions ||--o{ session_tools : has
-    sessions ||--o{ session_resources : has
-    sessions ||--o{ session_prompts : has
+    sessions ||--o{ resource_subscriptions : has
+    sessions ||--o{ tool_executions : logs
     conversations ||--o{ messages : contains
-    messages ||--o{ content_blocks : contains
+    conversations ||--o{ tool_executions : logs
 
     sessions {
         uuid id PK
-        string client_name
-        string client_version
-        string protocol_version
-        string state
+        varchar(20) state
+        varchar(255) client_name
+        varchar(50) client_version
+        varchar(20) protocol_version
         jsonb capabilities
-        timestamp created_at
-        timestamp updated_at
-        timestamp closed_at
+        jsonb server_info
+        varchar(20) log_level
+        timestamptz created_at
+        timestamptz updated_at
+        timestamptz closed_at
     }
 
     conversations {
         uuid id PK
         uuid session_id FK
-        string model
+        varchar(50) model
         text system_prompt
-        string status
+        varchar(20) status
         int max_tokens
         decimal temperature
-        timestamp created_at
-        timestamp updated_at
+        int total_input_tokens
+        int total_output_tokens
+        jsonb metadata
+        timestamptz created_at
+        timestamptz updated_at
+        timestamptz closed_at
     }
 
     messages {
         uuid id PK
         uuid conversation_id FK
-        string role
+        varchar(20) role
+        jsonb content
+        int input_tokens
+        int output_tokens
+        varchar(50) stop_reason
         jsonb metadata
-        timestamp created_at
+        timestamptz created_at
     }
 
-    content_blocks {
+    tools {
         uuid id PK
-        uuid message_id FK
-        string type
-        text text_content
-        bytea blob_content
-        string mime_type
-        int sequence
-    }
-
-    session_tools {
-        uuid id PK
-        uuid session_id FK
-        string tool_name
+        varchar(255) name UK
         text description
         jsonb input_schema
-        boolean enabled
-        timestamp registered_at
+        varchar(50) category
+        text[] tags
+        boolean is_enabled
+        int timeout_seconds
+        jsonb metadata
+        timestamptz created_at
+        timestamptz updated_at
     }
 
-    session_resources {
+    resources {
         uuid id PK
-        uuid session_id FK
-        string uri
-        string name
+        varchar(2048) uri UK
+        varchar(2048) uri_template
+        varchar(255) name
         text description
-        string mime_type
-        timestamp registered_at
+        varchar(255) mime_type
+        boolean is_template
+        jsonb metadata
+        timestamptz created_at
+        timestamptz updated_at
     }
 
-    session_prompts {
+    prompts {
         uuid id PK
-        uuid session_id FK
-        string name
+        varchar(255) name UK
         text description
         jsonb arguments
-        timestamp registered_at
+        text template
+        jsonb metadata
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    resource_subscriptions {
+        uuid id PK
+        uuid session_id FK
+        varchar(2048) resource_uri
+        timestamptz created_at
+    }
+
+    tool_executions {
+        uuid id PK
+        uuid session_id FK
+        uuid conversation_id FK
+        varchar(255) tool_name
+        jsonb input_params
+        jsonb result
+        boolean is_error
+        varchar(255) error_message
+        int duration_ms
+        timestamptz executed_at
+    }
+
+    api_keys {
+        uuid id PK
+        varchar(255) key_hash UK
+        varchar(255) name
+        text description
+        text[] scopes
+        boolean is_active
+        int rate_limit_per_minute
+        int rate_limit_per_hour
+        timestamptz last_used_at
+        timestamptz expires_at
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    schema_migrations {
+        varchar(255) version PK
+        timestamptz applied_at
     }
 ```
 
 ### ClickHouse Analytics Schema
 
+The ClickHouse database stores high-volume analytics data with time-series optimizations.
+
 ```mermaid
 erDiagram
-    mcp_requests {
-        uuid request_id PK
+    tool_call_analytics {
+        datetime64 timestamp
         uuid session_id
-        string method
-        datetime timestamp
-        int duration_ms
-        boolean success
-        string error_message
-    }
-
-    tool_executions {
-        uuid execution_id PK
-        uuid session_id
+        uuid conversation_id
         string tool_name
-        datetime timestamp
-        int duration_ms
-        boolean success
-        jsonb input_params
-        jsonb result
+        uint64 duration_ms
+        uint8 is_error
+        string error_message
+        uint32 input_size
+        uint32 output_size
+        string metadata
     }
 
-    claude_api_calls {
-        uuid call_id PK
+    api_request_analytics {
+        datetime64 timestamp
+        uuid request_id
         uuid session_id
         uuid conversation_id
         string model
-        datetime timestamp
-        int duration_ms
-        int input_tokens
-        int output_tokens
-        float cost
-        boolean success
+        uint32 input_tokens
+        uint32 output_tokens
+        uint32 total_tokens
+        uint64 duration_ms
+        uint16 status_code
+        uint8 is_error
+        uint8 is_streaming
+        string stop_reason
+        string metadata
     }
 
-    session_metrics {
-        uuid session_id PK
-        datetime start_time
-        datetime end_time
-        int total_requests
-        int total_tools_called
-        int total_api_calls
-        int total_tokens
+    session_analytics {
+        datetime64 timestamp
+        uuid session_id
+        string event_type
+        string client_name
+        string client_version
+        string protocol_version
+        uint64 duration_ms
+        uint32 message_count
+        uint32 tool_call_count
+        uint64 total_tokens
+        uint32 error_count
+        string metadata
     }
+
+    error_analytics {
+        datetime64 timestamp
+        uuid session_id
+        uuid conversation_id
+        string error_type
+        string error_code
+        string error_message
+        string stack_trace
+        string context
+        string metadata
+    }
+
+    token_usage_hourly {
+        datetime hour
+        string model
+        uint64 input_tokens
+        uint64 output_tokens
+        uint64 total_tokens
+        uint64 request_count
+    }
+
+    tool_usage_hourly {
+        datetime hour
+        string tool_name
+        uint64 call_count
+        uint64 error_count
+        uint64 total_duration_ms
+        uint64 min_duration_ms
+        uint64 max_duration_ms
+    }
+
+    latency_percentiles_hourly {
+        datetime hour
+        string model
+        float64 p50_ms
+        float64 p90_ms
+        float64 p95_ms
+        float64 p99_ms
+        float64 avg_ms
+        uint64 request_count
+    }
+```
+
+### ClickHouse Table Engines
+
+| Table | Engine | Partitioning | TTL |
+|-------|--------|--------------|-----|
+| `tool_call_analytics` | MergeTree | Monthly | 90 days |
+| `api_request_analytics` | MergeTree | Monthly | 90 days |
+| `session_analytics` | MergeTree | Monthly | 180 days |
+| `error_analytics` | MergeTree | Monthly | 30 days |
+| `token_usage_hourly` | SummingMergeTree | Monthly | - |
+| `tool_usage_hourly` | SummingMergeTree | Monthly | - |
+| `latency_percentiles_hourly` | ReplacingMergeTree | Monthly | - |
+
+### Materialized Views
+
+```mermaid
+flowchart LR
+    subgraph "Source Tables"
+        API[api_request_analytics]
+        TOOL[tool_call_analytics]
+    end
+
+    subgraph "Materialized Views"
+        MV_TOKEN[mv_token_usage_hourly]
+        MV_TOOL[mv_tool_usage_hourly]
+    end
+
+    subgraph "Aggregation Tables"
+        TOKEN[token_usage_hourly]
+        TOOL_AGG[tool_usage_hourly]
+    end
+
+    API --> MV_TOKEN
+    MV_TOKEN --> TOKEN
+
+    TOOL --> MV_TOOL
+    MV_TOOL --> TOOL_AGG
+
+    style MV_TOKEN fill:#E1BEE7,stroke:#7B1FA2
+    style MV_TOOL fill:#E1BEE7,stroke:#7B1FA2
 ```
 
 ---

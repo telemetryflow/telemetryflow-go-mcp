@@ -61,11 +61,9 @@ func (h *SessionHandler) HandleInitializeSession(ctx context.Context, cmd *comma
 		return nil, err
 	}
 
-	// Publish events
+	// Publish events (best-effort, don't fail on publish errors)
 	for _, event := range session.Events() {
-		if err := h.eventPublisher.Publish(ctx, event); err != nil {
-			// Log error but don't fail
-		}
+		_ = h.eventPublisher.Publish(ctx, event)
 	}
 
 	return session, nil
@@ -87,11 +85,9 @@ func (h *SessionHandler) HandleCloseSession(ctx context.Context, cmd *commands.C
 		return err
 	}
 
-	// Publish events
+	// Publish events (best-effort, don't fail on publish errors)
 	for _, event := range session.Events() {
-		if err := h.eventPublisher.Publish(ctx, event); err != nil {
-			// Log error but don't fail
-		}
+		_ = h.eventPublisher.Publish(ctx, event)
 	}
 
 	return nil

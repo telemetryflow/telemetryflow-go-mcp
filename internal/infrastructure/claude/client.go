@@ -3,6 +3,7 @@ package claude
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -29,7 +30,7 @@ var (
 
 // Client implements the Claude API client
 type Client struct {
-	client *anthropic.Client
+	client anthropic.Client
 	config *config.ClaudeConfig
 	logger zerolog.Logger
 }
@@ -151,14 +152,16 @@ func (c *Client) CountTokens(ctx context.Context, request *services.ClaudeReques
 	messages := c.buildMessages(request.Messages)
 
 	params := anthropic.MessageCountTokensParams{
-		Model:    anthropic.F(anthropic.Model(request.Model.String())),
-		Messages: anthropic.F(messages),
+		Model:    anthropic.Model(request.Model.String()),
+		Messages: messages,
 	}
 
 	if !request.SystemPrompt.IsEmpty() {
-		params.System = anthropic.F([]anthropic.TextBlockParam{
-			{Text: request.SystemPrompt.String()},
-		})
+		params.System = anthropic.MessageCountTokensParamsSystemUnion{
+			OfMessageCountTokenssSystemArray: []anthropic.TextBlockParam{
+				{Text: request.SystemPrompt.String()},
+			},
+		}
 	}
 
 	result, err := c.client.Messages.CountTokens(ctx, params)
@@ -195,41 +198,41 @@ func (c *Client) buildMessageParams(request *services.ClaudeRequest) anthropic.M
 	messages := c.buildMessages(request.Messages)
 
 	params := anthropic.MessageNewParams{
-		Model:     anthropic.F(anthropic.Model(request.Model.String())),
-		MaxTokens: anthropic.F(int64(request.MaxTokens)),
-		Messages:  anthropic.F(messages),
+		Model:     anthropic.Model(request.Model.String()),
+		MaxTokens: int64(request.MaxTokens),
+		Messages:  messages,
 	}
 
 	// System prompt
 	if !request.SystemPrompt.IsEmpty() {
-		params.System = anthropic.F([]anthropic.TextBlockParam{
+		params.System = []anthropic.TextBlockParam{
 			{Text: request.SystemPrompt.String()},
-		})
+		}
 	}
 
 	// Temperature (only set if not default)
 	if request.Temperature > 0 && request.Temperature != 1.0 {
-		params.Temperature = anthropic.F(request.Temperature)
+		params.Temperature = anthropic.Float(request.Temperature)
 	}
 
 	// Top P
 	if request.TopP > 0 && request.TopP < 1.0 {
-		params.TopP = anthropic.F(request.TopP)
+		params.TopP = anthropic.Float(request.TopP)
 	}
 
 	// Top K
 	if request.TopK > 0 {
-		params.TopK = anthropic.F(int64(request.TopK))
+		params.TopK = anthropic.Int(int64(request.TopK))
 	}
 
 	// Stop sequences
 	if len(request.StopSequences) > 0 {
-		params.StopSequences = anthropic.F(request.StopSequences)
+		params.StopSequences = request.StopSequences
 	}
 
 	// Tools
 	if len(request.Tools) > 0 {
-		params.Tools = anthropic.F(c.buildTools(request.Tools))
+		params.Tools = c.buildTools(request.Tools)
 	}
 
 	return params
@@ -249,14 +252,11 @@ func (c *Client) buildMessages(messages []services.ClaudeMessage) []anthropic.Me
 
 			case vo.ContentTypeToolUse:
 				// Tool use blocks are only in assistant responses
-				content = append(content, anthropic.ContentBlockParamUnion{
-					OfToolUse: &anthropic.ToolUseBlockParam{
-						Type:  anthropic.F(anthropic.ToolUseBlockParamTypeToolUse),
-						ID:    anthropic.F(block.ID),
-						Name:  anthropic.F(block.Name),
-						Input: anthropic.F(block.Input),
-					},
-				})
+				content = append(content, anthropic.ContentBlockParamOfRequestToolUseBlock(
+					block.ID,
+					block.Input,
+					block.Name,
+				))
 
 			case vo.ContentTypeToolResult:
 				content = append(content, anthropic.NewToolResultBlock(
@@ -268,8 +268,8 @@ func (c *Client) buildMessages(messages []services.ClaudeMessage) []anthropic.Me
 		}
 
 		result[i] = anthropic.MessageParam{
-			Role:    anthropic.F(anthropic.MessageParamRole(msg.Role.String())),
-			Content: anthropic.F(content),
+			Role:    anthropic.MessageParamRole(msg.Role.String()),
+			Content: content,
 		}
 	}
 
@@ -277,17 +277,17 @@ func (c *Client) buildMessages(messages []services.ClaudeMessage) []anthropic.Me
 }
 
 // buildTools builds API tools from domain tools
-func (c *Client) buildTools(tools []services.ClaudeTool) []anthropic.ToolParam {
-	result := make([]anthropic.ToolParam, len(tools))
+func (c *Client) buildTools(tools []services.ClaudeTool) []anthropic.ToolUnionParam {
+	result := make([]anthropic.ToolUnionParam, len(tools))
 
 	for i, tool := range tools {
 		inputSchema := c.convertJSONSchema(tool.InputSchema)
 
-		result[i] = anthropic.ToolParam{
-			Name:        anthropic.F(tool.Name),
-			Description: anthropic.F(tool.Description),
-			InputSchema: anthropic.F(inputSchema),
+		toolParam := anthropic.ToolUnionParamOfTool(inputSchema, tool.Name)
+		if toolParam.OfTool != nil {
+			toolParam.OfTool.Description = anthropic.String(tool.Description)
 		}
+		result[i] = toolParam
 	}
 
 	return result
@@ -296,9 +296,7 @@ func (c *Client) buildTools(tools []services.ClaudeTool) []anthropic.ToolParam {
 // convertJSONSchema converts domain JSON schema to API format
 func (c *Client) convertJSONSchema(schema *entities.JSONSchema) anthropic.ToolInputSchemaParam {
 	if schema == nil {
-		return anthropic.ToolInputSchemaParam{
-			Type: anthropic.F(anthropic.ToolInputSchemaTypeObject),
-		}
+		return anthropic.ToolInputSchemaParam{}
 	}
 
 	properties := make(map[string]interface{})
@@ -307,8 +305,7 @@ func (c *Client) convertJSONSchema(schema *entities.JSONSchema) anthropic.ToolIn
 	}
 
 	return anthropic.ToolInputSchemaParam{
-		Type:       anthropic.F(anthropic.ToolInputSchemaTypeObject),
-		Properties: anthropic.F(properties),
+		Properties: properties,
 	}
 }
 
@@ -339,19 +336,17 @@ func (c *Client) convertResponse(msg *anthropic.Message) *services.ClaudeRespons
 
 	for _, block := range msg.Content {
 		switch block.Type {
-		case anthropic.ContentBlockTypeText:
+		case "text":
 			content = append(content, entities.ContentBlock{
 				Type: vo.ContentTypeText,
 				Text: block.Text,
 			})
 
-		case anthropic.ContentBlockTypeToolUse:
+		case "tool_use":
 			input := make(map[string]interface{})
-			if block.Input != nil {
-				// The Input is already a map
-				if m, ok := block.Input.(map[string]interface{}); ok {
-					input = m
-				}
+			if len(block.Input) > 0 {
+				// Parse JSON from RawMessage
+				_ = json.Unmarshal(block.Input, &input)
 			}
 			content = append(content, entities.ContentBlock{
 				Type:  vo.ContentTypeToolUse,
@@ -377,12 +372,12 @@ func (c *Client) convertResponse(msg *anthropic.Message) *services.ClaudeRespons
 }
 
 // convertStreamEvent converts a streaming event
-func (c *Client) convertStreamEvent(event anthropic.MessageStreamEvent) *services.ClaudeStreamEvent {
+func (c *Client) convertStreamEvent(event anthropic.MessageStreamEventUnion) *services.ClaudeStreamEvent {
 	switch event.Type {
-	case anthropic.MessageStreamEventTypeMessageStart:
+	case "message_start":
 		if event.Message.ID != "" {
 			return &services.ClaudeStreamEvent{
-				Type: string(event.Type),
+				Type: event.Type,
 				Message: &services.ClaudeResponse{
 					ID:    event.Message.ID,
 					Model: string(event.Message.Model),
@@ -391,20 +386,21 @@ func (c *Client) convertStreamEvent(event anthropic.MessageStreamEvent) *service
 			}
 		}
 
-	case anthropic.MessageStreamEventTypeContentBlockStart:
+	case "content_block_start":
 		block := event.ContentBlock
-		if block.Type == anthropic.ContentBlockTypeText {
+		switch block.Type {
+		case "text":
 			return &services.ClaudeStreamEvent{
-				Type:  string(event.Type),
+				Type:  event.Type,
 				Index: int(event.Index),
 				ContentBlock: &entities.ContentBlock{
 					Type: vo.ContentTypeText,
 					Text: block.Text,
 				},
 			}
-		} else if block.Type == anthropic.ContentBlockTypeToolUse {
+		case "tool_use":
 			return &services.ClaudeStreamEvent{
-				Type:  string(event.Type),
+				Type:  event.Type,
 				Index: int(event.Index),
 				ContentBlock: &entities.ContentBlock{
 					Type: vo.ContentTypeToolUse,
@@ -414,20 +410,20 @@ func (c *Client) convertStreamEvent(event anthropic.MessageStreamEvent) *service
 			}
 		}
 
-	case anthropic.MessageStreamEventTypeContentBlockDelta:
+	case "content_block_delta":
 		delta := event.Delta
 		return &services.ClaudeStreamEvent{
-			Type:  string(event.Type),
+			Type:  event.Type,
 			Index: int(event.Index),
 			Delta: &services.ClaudeDelta{
-				Type: string(delta.Type),
+				Type: delta.Type,
 				Text: delta.Text,
 			},
 		}
 
-	case anthropic.MessageStreamEventTypeMessageDelta:
+	case "message_delta":
 		return &services.ClaudeStreamEvent{
-			Type: string(event.Type),
+			Type: event.Type,
 			Delta: &services.ClaudeDelta{
 				StopReason: string(event.Delta.StopReason),
 			},
@@ -436,9 +432,9 @@ func (c *Client) convertStreamEvent(event anthropic.MessageStreamEvent) *service
 			},
 		}
 
-	case anthropic.MessageStreamEventTypeMessageStop:
+	case "message_stop":
 		return &services.ClaudeStreamEvent{
-			Type: string(event.Type),
+			Type: event.Type,
 		}
 	}
 

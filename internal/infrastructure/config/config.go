@@ -215,7 +215,7 @@ func Load(configPath string) (*Config, error) {
 	}
 
 	// Environment variable settings
-	v.SetEnvPrefix("TFO_MCP")
+	v.SetEnvPrefix("TELEMETRYFLOW_MCP")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.AutomaticEnv()
 
@@ -239,7 +239,7 @@ func Load(configPath string) (*Config, error) {
 	if apiKey := os.Getenv("ANTHROPIC_API_KEY"); apiKey != "" {
 		config.Claude.APIKey = apiKey
 	}
-	if apiKey := os.Getenv("TFO_MCP_CLAUDE_API_KEY"); apiKey != "" {
+	if apiKey := os.Getenv("TELEMETRYFLOW_MCP_CLAUDE_API_KEY"); apiKey != "" {
 		config.Claude.APIKey = apiKey
 	}
 
@@ -253,25 +253,25 @@ func Load(configPath string) (*Config, error) {
 
 // bindEnvVars binds environment variables to config keys
 func bindEnvVars(v *viper.Viper) {
-	// Claude API
-	v.BindEnv("claude.api_key", "ANTHROPIC_API_KEY", "TFO_MCP_CLAUDE_API_KEY")
-	v.BindEnv("claude.base_url", "TFO_MCP_CLAUDE_BASE_URL")
-	v.BindEnv("claude.default_model", "TFO_MCP_CLAUDE_DEFAULT_MODEL")
+	// Claude API (errors ignored as BindEnv only fails on empty key names)
+	_ = v.BindEnv("claude.api_key", "ANTHROPIC_API_KEY", "TELEMETRYFLOW_MCP_CLAUDE_API_KEY")
+	_ = v.BindEnv("claude.base_url", "TELEMETRYFLOW_MCP_CLAUDE_BASE_URL")
+	_ = v.BindEnv("claude.default_model", "TELEMETRYFLOW_MCP_CLAUDE_DEFAULT_MODEL")
 
 	// Server
-	v.BindEnv("server.host", "TFO_MCP_SERVER_HOST")
-	v.BindEnv("server.port", "TFO_MCP_SERVER_PORT")
-	v.BindEnv("server.transport", "TFO_MCP_SERVER_TRANSPORT")
-	v.BindEnv("server.debug", "TFO_MCP_DEBUG")
+	_ = v.BindEnv("server.host", "TELEMETRYFLOW_MCP_SERVER_HOST")
+	_ = v.BindEnv("server.port", "TELEMETRYFLOW_MCP_SERVER_PORT")
+	_ = v.BindEnv("server.transport", "TELEMETRYFLOW_MCP_SERVER_TRANSPORT")
+	_ = v.BindEnv("server.debug", "TELEMETRYFLOW_MCP_DEBUG")
 
 	// Logging
-	v.BindEnv("logging.level", "TFO_MCP_LOG_LEVEL")
-	v.BindEnv("logging.format", "TFO_MCP_LOG_FORMAT")
+	_ = v.BindEnv("logging.level", "TELEMETRYFLOW_MCP_LOG_LEVEL")
+	_ = v.BindEnv("logging.format", "TELEMETRYFLOW_MCP_LOG_FORMAT")
 
 	// Telemetry
-	v.BindEnv("telemetry.enabled", "TFO_MCP_TELEMETRY_ENABLED")
-	v.BindEnv("telemetry.otlp_endpoint", "TFO_MCP_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_ENDPOINT")
-	v.BindEnv("telemetry.service_name", "TFO_MCP_SERVICE_NAME", "OTEL_SERVICE_NAME")
+	_ = v.BindEnv("telemetry.enabled", "TELEMETRYFLOW_MCP_TELEMETRY_ENABLED")
+	_ = v.BindEnv("telemetry.otlp_endpoint", "TELEMETRYFLOW_MCP_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_ENDPOINT")
+	_ = v.BindEnv("telemetry.service_name", "TELEMETRYFLOW_MCP_SERVICE_NAME", "OTEL_SERVICE_NAME")
 }
 
 // Validate validates the configuration

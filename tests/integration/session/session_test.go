@@ -26,7 +26,7 @@ func TestSessionLifecycle(t *testing.T) {
 		// Create session
 		session := aggregates.NewSession()
 		require.NotNil(t, session)
-		assert.Equal(t, vo.SessionStateCreated, session.State())
+		assert.Equal(t, aggregates.SessionStateCreated, session.State())
 
 		// Initialize session
 		clientInfo := &aggregates.ClientInfo{
@@ -35,40 +35,35 @@ func TestSessionLifecycle(t *testing.T) {
 		}
 		err := session.Initialize(clientInfo, "2024-11-05")
 		require.NoError(t, err)
-		assert.Equal(t, vo.SessionStateInitializing, session.State())
+		assert.Equal(t, aggregates.SessionStateInitializing, session.State())
 
 		// Mark ready
 		session.MarkReady()
-		assert.Equal(t, vo.SessionStateReady, session.State())
+		assert.Equal(t, aggregates.SessionStateReady, session.State())
 
 		// Register tools
 		tool := createIntegrationTool(t, "test_tool", "Integration test tool")
-		err = session.RegisterTool(tool)
-		require.NoError(t, err)
-		assert.Len(t, session.Tools(), 1)
+		session.RegisterTool(tool)
+		assert.Len(t, session.ListTools(), 1)
 
 		// Register resources
 		uri, _ := vo.NewResourceURI("file:///integration/test")
 		resource, _ := entities.NewResource(uri, "Integration Resource")
-		err = session.RegisterResource(resource)
-		require.NoError(t, err)
-		assert.Len(t, session.Resources(), 1)
+		session.RegisterResource(resource)
+		assert.Len(t, session.ListResources(), 1)
 
 		// Create conversation
-		conv := aggregates.NewConversation(session.ID(), vo.ModelClaude4Sonnet)
-		err = session.AddConversation(conv)
+		conv, err := session.CreateConversation(vo.ModelClaude4Sonnet)
 		require.NoError(t, err)
-		assert.Len(t, session.Conversations(), 1)
+		assert.Len(t, session.ListConversations(), 1)
 
 		// Close conversation
-		err = conv.Close()
-		require.NoError(t, err)
-		assert.Equal(t, vo.ConversationStatusClosed, conv.Status())
+		conv.Close()
+		assert.Equal(t, aggregates.ConversationStatusClosed, conv.Status())
 
 		// Close session
-		err = session.Close()
-		require.NoError(t, err)
-		assert.Equal(t, vo.SessionStateClosed, session.State())
+		session.Close()
+		assert.Equal(t, aggregates.SessionStateClosed, session.State())
 	})
 
 	t.Run("session with multiple conversations", func(t *testing.T) {
@@ -82,22 +77,20 @@ func TestSessionLifecycle(t *testing.T) {
 		}
 
 		for _, model := range models {
-			conv := aggregates.NewConversation(session.ID(), model)
-			err := session.AddConversation(conv)
+			conv, err := session.CreateConversation(model)
 			require.NoError(t, err)
+			require.NotNil(t, conv)
 		}
 
-		assert.Len(t, session.Conversations(), 3)
+		assert.Len(t, session.ListConversations(), 3)
 
 		// Close all conversations
-		for _, conv := range session.Conversations() {
-			err := conv.Close()
-			require.NoError(t, err)
+		for _, conv := range session.ListConversations() {
+			conv.Close()
 		}
 
 		// Close session
-		err := session.Close()
-		require.NoError(t, err)
+		session.Close()
 	})
 
 	t.Run("session with tool registration and unregistration", func(t *testing.T) {
@@ -107,19 +100,19 @@ func TestSessionLifecycle(t *testing.T) {
 		tools := []string{"read_file", "write_file", "execute_command", "echo"}
 		for _, name := range tools {
 			tool := createIntegrationTool(t, name, "Tool: "+name)
-			err := session.RegisterTool(tool)
-			require.NoError(t, err)
+			session.RegisterTool(tool)
 		}
-		assert.Len(t, session.Tools(), 4)
+		assert.Len(t, session.ListTools(), 4)
 
 		// Unregister a tool
-		err := session.UnregisterTool("echo")
-		require.NoError(t, err)
-		assert.Len(t, session.Tools(), 3)
+		session.UnregisterTool("echo")
+		assert.Len(t, session.ListTools(), 3)
 
 		// Verify tool was removed
-		assert.Nil(t, session.GetTool("echo"))
-		assert.NotNil(t, session.GetTool("read_file"))
+		_, ok := session.GetTool("echo")
+		assert.False(t, ok)
+		_, ok = session.GetTool("read_file")
+		assert.True(t, ok)
 	})
 }
 
@@ -130,24 +123,25 @@ func TestConversationLifecycle(t *testing.T) {
 
 	t.Run("complete conversation lifecycle", func(t *testing.T) {
 		session := createReadySession(t)
-		conv := aggregates.NewConversation(session.ID(), vo.ModelClaude4Sonnet)
-
-		// Add to session
-		err := session.AddConversation(conv)
+		conv, err := session.CreateConversation(vo.ModelClaude4Sonnet)
 		require.NoError(t, err)
 
 		// Set system prompt
-		err = conv.SetSystemPrompt("You are a helpful assistant for integration testing.")
+		systemPrompt, err := vo.NewSystemPrompt("You are a helpful assistant for integration testing.")
+		require.NoError(t, err)
+		err = conv.SetSystemPrompt(systemPrompt)
 		require.NoError(t, err)
 
 		// Add user message
-		userContent := []entities.Content{entities.NewTextContent("Hello, this is an integration test.")}
-		err = conv.AddMessage(vo.RoleUser, userContent)
+		userMsg, err := entities.NewTextMessage(vo.RoleUser, "Hello, this is an integration test.")
+		require.NoError(t, err)
+		err = conv.AddMessage(userMsg)
 		require.NoError(t, err)
 
 		// Add assistant response
-		assistantContent := []entities.Content{entities.NewTextContent("Hello! I'm ready to help with testing.")}
-		err = conv.AddMessage(vo.RoleAssistant, assistantContent)
+		assistantMsg, err := entities.NewTextMessage(vo.RoleAssistant, "Hello! I'm ready to help with testing.")
+		require.NoError(t, err)
+		err = conv.AddMessage(assistantMsg)
 		require.NoError(t, err)
 
 		// Verify messages
@@ -157,45 +151,41 @@ func TestConversationLifecycle(t *testing.T) {
 		assert.Equal(t, vo.RoleAssistant, messages[1].Role())
 
 		// Close conversation
-		err = conv.Close()
-		require.NoError(t, err)
+		conv.Close()
 	})
 
 	t.Run("conversation with tool use", func(t *testing.T) {
 		session := createReadySession(t)
-		conv := aggregates.NewConversation(session.ID(), vo.ModelClaude4Sonnet)
+		conv, err := session.CreateConversation(vo.ModelClaude4Sonnet)
+		require.NoError(t, err)
 
 		// Register tool in conversation
 		tool := createIntegrationTool(t, "get_weather", "Get weather for a location")
-		err := conv.RegisterTool(tool)
-		require.NoError(t, err)
+		conv.AddTool(tool)
 
 		// Add user message requesting tool use
-		userContent := []entities.Content{entities.NewTextContent("What's the weather in San Francisco?")}
-		err = conv.AddMessage(vo.RoleUser, userContent)
+		userMsg, err := entities.NewTextMessage(vo.RoleUser, "What's the weather in Jakarta?")
+		require.NoError(t, err)
+		err = conv.AddMessage(userMsg)
 		require.NoError(t, err)
 
 		// Simulate assistant response with tool use
 		// In real integration, this would come from Claude API
 
 		// Close conversation
-		err = conv.Close()
-		require.NoError(t, err)
+		conv.Close()
 	})
 
 	t.Run("conversation settings persistence", func(t *testing.T) {
 		session := createReadySession(t)
-		conv := aggregates.NewConversation(session.ID(), vo.ModelClaude4Sonnet)
+		conv, err := session.CreateConversation(vo.ModelClaude4Sonnet)
+		require.NoError(t, err)
 
 		// Set various settings
-		err := conv.SetMaxTokens(2048)
-		require.NoError(t, err)
-		err = conv.SetTemperature(0.7)
-		require.NoError(t, err)
-		err = conv.SetTopP(0.95)
-		require.NoError(t, err)
-		err = conv.SetTopK(50)
-		require.NoError(t, err)
+		conv.SetMaxTokens(2048)
+		conv.SetTemperature(0.7)
+		conv.SetTopP(0.95)
+		conv.SetTopK(50)
 
 		// Verify settings
 		assert.Equal(t, 2048, conv.MaxTokens())
@@ -219,7 +209,7 @@ func TestConcurrentSessionOperations(t *testing.T) {
 			go func(idx int) {
 				name := "concurrent_tool_" + string(rune('0'+idx))
 				tool := createIntegrationTool(t, name, "Concurrent tool")
-				_ = session.RegisterTool(tool)
+				session.RegisterTool(tool)
 				done <- true
 			}(i)
 		}
@@ -230,23 +220,24 @@ func TestConcurrentSessionOperations(t *testing.T) {
 		}
 
 		// Verify some tools were registered (may have duplicates blocked)
-		assert.NotEmpty(t, session.Tools())
+		assert.NotEmpty(t, session.ListTools())
 	})
 
 	t.Run("concurrent message addition", func(t *testing.T) {
 		session := createReadySession(t)
-		conv := aggregates.NewConversation(session.ID(), vo.ModelClaude4Sonnet)
+		conv, err := session.CreateConversation(vo.ModelClaude4Sonnet)
+		require.NoError(t, err)
 
 		// Add messages concurrently
 		done := make(chan bool, 20)
 		for i := 0; i < 20; i++ {
 			go func(idx int) {
-				content := []entities.Content{entities.NewTextContent("Message " + string(rune('0'+idx%10)))}
 				role := vo.RoleUser
 				if idx%2 == 1 {
 					role = vo.RoleAssistant
 				}
-				_ = conv.AddMessage(role, content)
+				msg, _ := entities.NewTextMessage(role, "Message "+string(rune('0'+idx%10)))
+				_ = conv.AddMessage(msg)
 				done <- true
 			}(i)
 		}
@@ -274,8 +265,7 @@ func TestSessionTimeout(t *testing.T) {
 
 		// Operations should complete before timeout
 		tool := createIntegrationTool(t, "timeout_tool", "Timeout test tool")
-		err := session.RegisterTool(tool)
-		require.NoError(t, err)
+		session.RegisterTool(tool)
 
 		// Simulate some work
 		select {

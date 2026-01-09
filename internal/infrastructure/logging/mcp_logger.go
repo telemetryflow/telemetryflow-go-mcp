@@ -319,9 +319,8 @@ func MCPNotificationHandler(sender func(ctx context.Context, method string, para
 			}
 		}
 
-		if err := sender(ctx, "notifications/message", params); err != nil {
-			// Silently ignore send errors to avoid infinite loops
-		}
+		// Silently ignore send errors to avoid infinite loops
+		_ = sender(ctx, "notifications/message", params)
 	}
 }
 

@@ -129,7 +129,7 @@ func NewLogger(opts ...LoggerOption) *Logger {
 	zerolog.TimeFieldFormat = cfg.timeFormat
 
 	// Configure output
-	var output io.Writer = cfg.output
+	var output = cfg.output
 	if cfg.prettyPrint {
 		output = zerolog.ConsoleWriter{
 			Out:        cfg.output,

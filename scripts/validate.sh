@@ -129,11 +129,11 @@ validate_env_vars() {
 
     local warnings=0
 
-    if [[ -z "${TFO_CLAUDE_API_KEY:-}" ]]; then
-        log_warning "TFO_CLAUDE_API_KEY is not set"
+    if [[ -z "${TELEMETRYFLOW_MCP_CLAUDE_API_KEY:-}" ]]; then
+        log_warning "TELEMETRYFLOW_MCP_CLAUDE_API_KEY is not set"
         warnings=$((warnings + 1))
     else
-        log_success "TFO_CLAUDE_API_KEY is set"
+        log_success "TELEMETRYFLOW_MCP_CLAUDE_API_KEY is set"
     fi
 
     if [[ ${warnings} -gt 0 ]]; then
@@ -144,13 +144,13 @@ validate_env_vars() {
 validate_api_key() {
     log_info "Validating Claude API key format..."
 
-    if [[ -z "${TFO_CLAUDE_API_KEY:-}" ]]; then
-        log_warning "TFO_CLAUDE_API_KEY not set, skipping validation"
+    if [[ -z "${TELEMETRYFLOW_MCP_CLAUDE_API_KEY:-}" ]]; then
+        log_warning "TELEMETRYFLOW_MCP_CLAUDE_API_KEY not set, skipping validation"
         return 0
     fi
 
-    if [[ ! "${TFO_CLAUDE_API_KEY}" =~ ^sk-ant-api[0-9]+-[A-Za-z0-9_-]+$ ]]; then
-        log_warning "TFO_CLAUDE_API_KEY format may be invalid"
+    if [[ ! "${TELEMETRYFLOW_MCP_CLAUDE_API_KEY}" =~ ^sk-ant-api[0-9]+-[A-Za-z0-9_-]+$ ]]; then
+        log_warning "TELEMETRYFLOW_MCP_CLAUDE_API_KEY format may be invalid"
         return 0
     fi
 
@@ -160,8 +160,8 @@ validate_api_key() {
 validate_api_connectivity() {
     log_info "Validating Claude API connectivity..."
 
-    if [[ -z "${TFO_CLAUDE_API_KEY:-}" ]]; then
-        log_warning "TFO_CLAUDE_API_KEY not set, skipping API test"
+    if [[ -z "${TELEMETRYFLOW_MCP_CLAUDE_API_KEY:-}" ]]; then
+        log_warning "TELEMETRYFLOW_MCP_CLAUDE_API_KEY not set, skipping API test"
         return 0
     fi
 
@@ -171,7 +171,7 @@ validate_api_connectivity() {
     fi
 
     local response=$(curl -s -o /dev/null -w "%{http_code}" \
-        -H "x-api-key: ${TFO_CLAUDE_API_KEY}" \
+        -H "x-api-key: ${TELEMETRYFLOW_MCP_CLAUDE_API_KEY}" \
         -H "anthropic-version: 2023-06-01" \
         "https://api.anthropic.com/v1/messages" \
         --max-time 10 2>/dev/null || echo "000")

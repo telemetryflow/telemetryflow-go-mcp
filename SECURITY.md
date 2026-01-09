@@ -126,10 +126,10 @@ flowchart TB
 
 ```bash
 # DO: Use environment variables
-export TFO_CLAUDE_API_KEY="your-api-key"
+export TELEMETRYFLOW_MCP_CLAUDE_API_KEY="your-api-key"
 
 # DO: Use secret managers in production
-TFO_CLAUDE_API_KEY=$(aws secretsmanager get-secret-value --secret-id tfo-mcp/api-key)
+TELEMETRYFLOW_MCP_CLAUDE_API_KEY=$(aws secretsmanager get-secret-value --secret-id telemetryflow-mcp/api-key)
 
 # DON'T: Put keys in config files
 # DON'T: Commit keys to version control
@@ -200,7 +200,7 @@ govulncheck ./...
 const apiKey = "sk-ant-api..."  // NEVER DO THIS
 
 // DO: Use environment variables
-apiKey := os.Getenv("TFO_CLAUDE_API_KEY")
+apiKey := os.Getenv("TELEMETRYFLOW_MCP_CLAUDE_API_KEY")
 ```
 
 ---
@@ -340,4 +340,4 @@ For security concerns, please contact:
 
 ---
 
-Thank you for helping keep TFO-MCP and its users secure!
+Thank you for helping keep TelemetryFlow MCP and its users secure!

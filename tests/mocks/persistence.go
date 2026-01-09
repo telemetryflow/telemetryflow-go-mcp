@@ -123,7 +123,7 @@ func (r *InMemorySessionRepository) ListActive(ctx context.Context) ([]*aggregat
 
 	var active []*aggregates.Session
 	for _, session := range r.sessions {
-		if session.State() == vo.SessionStateReady {
+		if session.State() == aggregates.SessionStateReady {
 			active = append(active, session)
 		}
 	}
@@ -198,7 +198,7 @@ func (r *InMemoryConversationRepository) ListActive(ctx context.Context) ([]*agg
 
 	var active []*aggregates.Conversation
 	for _, conv := range r.conversations {
-		if conv.Status() == vo.ConversationStatusActive {
+		if conv.Status() == aggregates.ConversationStatusActive {
 			active = append(active, conv)
 		}
 	}

@@ -343,13 +343,13 @@ docker images devopscorner/tfo-mcp
 ```bash
 # Basic run
 docker run -it --rm \
-  -e TFO_CLAUDE_API_KEY="your-api-key" \
+  -e TELEMETRYFLOW_MCP_CLAUDE_API_KEY="your-api-key" \
   devopscorner/tfo-mcp:latest
 
 # With custom config
 docker run -it --rm \
   -v $(pwd)/config.yaml:/app/config.yaml \
-  -e TFO_CLAUDE_API_KEY="your-api-key" \
+  -e TELEMETRYFLOW_MCP_CLAUDE_API_KEY="your-api-key" \
   devopscorner/tfo-mcp:latest \
   run --config /app/config.yaml
 
@@ -357,7 +357,7 @@ docker run -it --rm \
 docker run -it --rm \
   -v $(pwd)/config.yaml:/app/config.yaml \
   -v $(pwd)/resources:/app/resources \
-  -e TFO_CLAUDE_API_KEY="your-api-key" \
+  -e TELEMETRYFLOW_MCP_CLAUDE_API_KEY="your-api-key" \
   devopscorner/tfo-mcp:latest
 ```
 
@@ -455,7 +455,7 @@ flowchart TB
       "command": "/usr/local/bin/tfo-mcp",
       "args": ["run"],
       "env": {
-        "TFO_CLAUDE_API_KEY": "your-api-key"
+        "TELEMETRYFLOW_MCP_CLAUDE_API_KEY": "your-api-key"
       }
     }
   }
@@ -471,7 +471,7 @@ flowchart TB
       "command": "C:\\Program Files\\TFO-MCP\\tfo-mcp.exe",
       "args": ["run"],
       "env": {
-        "TFO_CLAUDE_API_KEY": "your-api-key"
+        "TELEMETRYFLOW_MCP_CLAUDE_API_KEY": "your-api-key"
       }
     }
   }
@@ -487,7 +487,7 @@ flowchart TB
       "command": "/usr/local/bin/tfo-mcp",
       "args": ["run"],
       "env": {
-        "TFO_CLAUDE_API_KEY": "your-api-key"
+        "TELEMETRYFLOW_MCP_CLAUDE_API_KEY": "your-api-key"
       }
     }
   }
@@ -504,7 +504,7 @@ flowchart TB
       "command": "tfo-mcp",
       "args": ["run", "--log-level", "debug"],
       "env": {
-        "TFO_CLAUDE_API_KEY": "${env:TFO_CLAUDE_API_KEY}"
+        "TELEMETRYFLOW_MCP_CLAUDE_API_KEY": "${env:TELEMETRYFLOW_MCP_CLAUDE_API_KEY}"
       }
     }
   }
@@ -557,7 +557,7 @@ tfo-mcp run --help
 
 ```bash
 # Set API key
-export TFO_CLAUDE_API_KEY="sk-ant-api03-..."
+export TELEMETRYFLOW_MCP_CLAUDE_API_KEY="sk-ant-api03-..."
 
 # Run server
 tfo-mcp run
@@ -725,7 +725,7 @@ go clean -modcache
 |-------|-------|----------|
 | Permission denied | Missing execute permission | `chmod +x tfo-mcp` |
 | Command not found | Not in PATH | Add to PATH or use full path |
-| API key error | Missing/invalid key | Set `TFO_CLAUDE_API_KEY` |
+| API key error | Missing/invalid key | Set `TELEMETRYFLOW_MCP_CLAUDE_API_KEY` |
 | Config not found | Wrong path | Check config location |
 
 ### Getting Help

@@ -77,7 +77,7 @@ func (r *AnalyticsRepository) GetTokenUsageByModel(ctx context.Context, since, u
 	if err != nil {
 		return nil, fmt.Errorf("failed to query token usage: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var stats []TokenUsageStats
 	for rows.Next() {
@@ -121,7 +121,7 @@ func (r *AnalyticsRepository) GetToolUsageStats(ctx context.Context, since, unti
 	if err != nil {
 		return nil, fmt.Errorf("failed to query tool usage: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var stats []ToolUsageStats
 	for rows.Next() {
@@ -163,7 +163,7 @@ func (r *AnalyticsRepository) GetSessionStats(ctx context.Context, since, until 
 	if err != nil {
 		return nil, fmt.Errorf("failed to query session stats: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	if rows.Next() {
 		if err := rows.Scan(

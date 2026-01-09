@@ -343,6 +343,6 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 	@echo ""
 	@echo "Environment Variables:"
-	@echo "  ANTHROPIC_API_KEY    - Claude API key (required for running)"
-	@echo "  TFO_MCP_DEBUG        - Enable debug mode"
-	@echo "  TFO_MCP_LOG_LEVEL    - Log level (debug, info, warn, error)"
+	@echo "  ANTHROPIC_API_KEY              - Claude API key (required for running)"
+	@echo "  TELEMETRYFLOW_MCP_DEBUG        - Enable debug mode"
+	@echo "  TELEMETRYFLOW_MCP_LOG_LEVEL    - Log level (debug, info, warn, error)"

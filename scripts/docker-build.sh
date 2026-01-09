@@ -178,8 +178,8 @@ run_container() {
     local tag=$(get_image_tag)
 
     docker run --rm -it \
-        -e TFO_CLAUDE_API_KEY="${TFO_CLAUDE_API_KEY:-}" \
-        -e TFO_LOG_LEVEL="${TFO_LOG_LEVEL:-info}" \
+        -e TELEMETRYFLOW_MCP_CLAUDE_API_KEY="${TELEMETRYFLOW_MCP_CLAUDE_API_KEY:-}" \
+        -e TELEMETRYFLOW_MCP_LOG_LEVEL="${TELEMETRYFLOW_MCP_LOG_LEVEL:-info}" \
         "${tag}" \
         "$@"
 }

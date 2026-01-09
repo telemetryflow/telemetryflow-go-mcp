@@ -15,45 +15,45 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        VERSION: ${TFO_MCP_VERSION:-1.1.2}
-        COMMIT: ${TFO_MCP_COMMIT:-unknown}
-        BUILD_DATE: ${TFO_MCP_BUILD_DATE:-unknown}
-    image: telemetryflow/tfo-mcp:${TFO_MCP_VERSION:-1.1.2}
+        VERSION: ${TELEMETRYFLOW_MCP_VERSION:-1.1.2}
+        COMMIT: ${TELEMETRYFLOW_MCP_COMMIT:-unknown}
+        BUILD_DATE: ${TELEMETRYFLOW_MCP_BUILD_DATE:-unknown}
+    image: telemetryflow/tfo-mcp:${TELEMETRYFLOW_MCP_VERSION:-1.1.2}
     container_name: tfo-mcp
     restart: unless-stopped
     ports:
-      - "${TFO_MCP_PORT:-8080}:8080"
+      - "${TELEMETRYFLOW_MCP_PORT:-8080}:8080"
     environment:
       # Claude API Configuration
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - TFO_MCP_CLAUDE_BASE_URL=${TFO_MCP_CLAUDE_BASE_URL:-https://api.anthropic.com}
-      - TFO_MCP_CLAUDE_DEFAULT_MODEL=${TFO_MCP_CLAUDE_DEFAULT_MODEL:-claude-sonnet-4-20250514}
+      - TELEMETRYFLOW_MCP_CLAUDE_BASE_URL=${TELEMETRYFLOW_MCP_CLAUDE_BASE_URL:-https://api.anthropic.com}
+      - TELEMETRYFLOW_MCP_CLAUDE_DEFAULT_MODEL=${TELEMETRYFLOW_MCP_CLAUDE_DEFAULT_MODEL:-claude-sonnet-4-20250514}
       # Server Configuration
-      - TFO_MCP_SERVER_HOST=0.0.0.0
-      - TFO_MCP_SERVER_PORT=8080
-      - TFO_MCP_SERVER_TRANSPORT=${TFO_MCP_SERVER_TRANSPORT:-sse}
-      - TFO_MCP_DEBUG=${TFO_MCP_DEBUG:-false}
+      - TELEMETRYFLOW_MCP_SERVER_HOST=0.0.0.0
+      - TELEMETRYFLOW_MCP_SERVER_PORT=8080
+      - TELEMETRYFLOW_MCP_SERVER_TRANSPORT=${TELEMETRYFLOW_MCP_SERVER_TRANSPORT:-sse}
+      - TELEMETRYFLOW_MCP_DEBUG=${TELEMETRYFLOW_MCP_DEBUG:-false}
       # Logging
-      - TFO_MCP_LOG_LEVEL=${TFO_MCP_LOG_LEVEL:-info}
-      - TFO_MCP_LOG_FORMAT=${TFO_MCP_LOG_FORMAT:-json}
-      # TelemetryFlow Observability (TFO SDK)
-      - TFO_API_KEY=${TFO_API_KEY}
-      - TFO_ENDPOINT=${TFO_ENDPOINT:-https://api.telemetryflow.io}
-      - TFO_SERVICE_NAME=${TFO_SERVICE_NAME:-telemetryflow-mcp}
-      - TFO_SERVICE_VERSION=${TFO_MCP_VERSION:-1.1.2}
-      - TFO_ENVIRONMENT=${TFO_ENVIRONMENT:-development}
-      # OpenTelemetry (fallback if TFO SDK not configured)
+      - TELEMETRYFLOW_MCP_LOG_LEVEL=${TELEMETRYFLOW_MCP_LOG_LEVEL:-info}
+      - TELEMETRYFLOW_MCP_LOG_FORMAT=${TELEMETRYFLOW_MCP_LOG_FORMAT:-json}
+      # TelemetryFlow Observability (TELEMETRYFLOW SDK)
+      - TELEMETRYFLOW_API_KEY=${TELEMETRYFLOW_API_KEY}
+      - TELEMETRYFLOW_ENDPOINT=${TELEMETRYFLOW_ENDPOINT:-https://api.telemetryflow.io}
+      - TELEMETRYFLOW_SERVICE_NAME=${TELEMETRYFLOW_SERVICE_NAME:-telemetryflow-mcp}
+      - TELEMETRYFLOW_SERVICE_VERSION=${TELEMETRYFLOW_MCP_VERSION:-1.1.2}
+      - TELEMETRYFLOW_ENVIRONMENT=${TELEMETRYFLOW_ENVIRONMENT:-development}
+      # OpenTelemetry (fallback if TELEMETRYFLOW SDK not configured)
       - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-otel-collector:4317}
       - OTEL_SERVICE_NAME=${OTEL_SERVICE_NAME:-telemetryflow-mcp}
       # Redis Configuration (for caching)
-      - TFO_MCP_REDIS_URL=${TFO_MCP_REDIS_URL:-redis://redis:6379}
-      - TFO_MCP_CACHE_ENABLED=${TFO_MCP_CACHE_ENABLED:-true}
+      - TELEMETRYFLOW_MCP_REDIS_URL=${TELEMETRYFLOW_MCP_REDIS_URL:-redis://redis:6379}
+      - TELEMETRYFLOW_MCP_CACHE_ENABLED=${TELEMETRYFLOW_MCP_CACHE_ENABLED:-true}
       # NATS Configuration (for queue)
-      - TFO_MCP_NATS_URL=${TFO_MCP_NATS_URL:-nats://nats:4222}
-      - TFO_MCP_QUEUE_ENABLED=${TFO_MCP_QUEUE_ENABLED:-true}
+      - TELEMETRYFLOW_MCP_NATS_URL=${TELEMETRYFLOW_MCP_NATS_URL:-nats://nats:4222}
+      - TELEMETRYFLOW_MCP_QUEUE_ENABLED=${TELEMETRYFLOW_MCP_QUEUE_ENABLED:-true}
       # Database Configuration
-      - TFO_MCP_POSTGRES_URL=${TFO_MCP_POSTGRES_URL:-postgres://postgres:postgres@postgres:5432/tfo_mcp?sslmode=disable}
-      - TFO_MCP_CLICKHOUSE_URL=${TFO_MCP_CLICKHOUSE_URL:-clickhouse://clickhouse:9000/tfo_mcp}
+      - TELEMETRYFLOW_MCP_POSTGRES_URL=${TELEMETRYFLOW_MCP_POSTGRES_URL:-postgres://postgres:postgres@postgres:5432/telemetryflow_mcp?sslmode=disable}
+      - TELEMETRYFLOW_MCP_CLICKHOUSE_URL=${TELEMETRYFLOW_MCP_CLICKHOUSE_URL:-clickhouse://clickhouse:9000/telemetryflow_mcp}
     volumes:
       - ./configs:/app/configs:ro
     depends_on:
@@ -128,7 +128,7 @@ services:
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - POSTGRES_DB=${POSTGRES_DB:-tfo_mcp}
+      - POSTGRES_DB=${POSTGRES_DB:-telemetryflow_mcp}
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
@@ -151,7 +151,7 @@ services:
       - "${CLICKHOUSE_HTTP_PORT:-8123}:8123"
       - "${CLICKHOUSE_NATIVE_PORT:-9000}:9000"
     environment:
-      - CLICKHOUSE_DB=${CLICKHOUSE_DB:-tfo_mcp}
+      - CLICKHOUSE_DB=${CLICKHOUSE_DB:-telemetryflow_mcp}
       - CLICKHOUSE_USER=${CLICKHOUSE_USER:-default}
       - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-}
     volumes:

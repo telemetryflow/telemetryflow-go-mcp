@@ -40,24 +40,24 @@ const (
 
 // Event types
 const (
-	EventTypeSessionCreated       = "session.created"
-	EventTypeSessionClosed        = "session.closed"
-	EventTypeConversationCreated  = "conversation.created"
-	EventTypeConversationClosed   = "conversation.closed"
-	EventTypeMessageSent          = "message.sent"
-	EventTypeToolExecuted         = "tool.executed"
-	EventTypeResourceRead         = "resource.read"
-	EventTypePromptGenerated      = "prompt.generated"
-	EventTypeAPIRequestCompleted  = "api.request.completed"
-	EventTypeAPIRequestFailed     = "api.request.failed"
+	EventTypeSessionCreated      = "session.created"
+	EventTypeSessionClosed       = "session.closed"
+	EventTypeConversationCreated = "conversation.created"
+	EventTypeConversationClosed  = "conversation.closed"
+	EventTypeMessageSent         = "message.sent"
+	EventTypeToolExecuted        = "tool.executed"
+	EventTypeResourceRead        = "resource.read"
+	EventTypePromptGenerated     = "prompt.generated"
+	EventTypeAPIRequestCompleted = "api.request.completed"
+	EventTypeAPIRequestFailed    = "api.request.failed"
 )
 
 // Telemetry types
 const (
-	TelemetryTypeSpan    = "span"
-	TelemetryTypeMetric  = "metric"
-	TelemetryTypeLog     = "log"
-	TelemetryTypeTrace   = "trace"
+	TelemetryTypeSpan   = "span"
+	TelemetryTypeMetric = "metric"
+	TelemetryTypeLog    = "log"
+	TelemetryTypeTrace  = "trace"
 )
 
 // ClaudeRequestPayload represents a Claude API request task payload.

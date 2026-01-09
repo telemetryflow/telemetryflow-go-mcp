@@ -18,38 +18,38 @@ import (
 
 func TestNewConversation(t *testing.T) {
 	t.Run("should create conversation with unique ID", func(t *testing.T) {
-		sessionID, _ := vo.NewSessionID()
+		sessionID := vo.GenerateSessionID()
 		conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
 		require.NotNil(t, conv)
 		assert.NotEmpty(t, conv.ID().String())
 	})
 
 	t.Run("should create conversation with specified session ID", func(t *testing.T) {
-		sessionID, _ := vo.NewSessionID()
+		sessionID := vo.GenerateSessionID()
 		conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
 		assert.Equal(t, sessionID, conv.SessionID())
 	})
 
 	t.Run("should create conversation with specified model", func(t *testing.T) {
-		sessionID, _ := vo.NewSessionID()
+		sessionID := vo.GenerateSessionID()
 		conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Opus)
 		assert.Equal(t, vo.ModelClaude4Opus, conv.Model())
 	})
 
 	t.Run("should create conversation in active status", func(t *testing.T) {
-		sessionID, _ := vo.NewSessionID()
+		sessionID := vo.GenerateSessionID()
 		conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
-		assert.Equal(t, vo.ConversationStatusActive, conv.Status())
+		assert.Equal(t, aggregates.ConversationStatusActive, conv.Status())
 	})
 
 	t.Run("should have empty message list initially", func(t *testing.T) {
-		sessionID, _ := vo.NewSessionID()
+		sessionID := vo.GenerateSessionID()
 		conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
 		assert.Empty(t, conv.Messages())
 	})
 
 	t.Run("should generate unique IDs for different conversations", func(t *testing.T) {
-		sessionID, _ := vo.NewSessionID()
+		sessionID := vo.GenerateSessionID()
 		conv1 := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
 		conv2 := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
 		assert.NotEqual(t, conv1.ID().String(), conv2.ID().String())
@@ -59,30 +59,35 @@ func TestNewConversation(t *testing.T) {
 func TestConversationMessages(t *testing.T) {
 	t.Run("should add user message", func(t *testing.T) {
 		conv := createTestConversation(t)
-		content := createTextContent("Hello, Claude!")
+		msg := createTextMessage(t, vo.RoleUser, "Hello, Claude!")
 
-		err := conv.AddMessage(vo.RoleUser, content)
+		err := conv.AddMessage(msg)
 		require.NoError(t, err)
 		assert.Len(t, conv.Messages(), 1)
 	})
 
 	t.Run("should add assistant message", func(t *testing.T) {
 		conv := createTestConversation(t)
-		content := createTextContent("Hello! How can I help you?")
-
-		err := conv.AddMessage(vo.RoleAssistant, content)
+		// First add user message
+		userMsg := createTextMessage(t, vo.RoleUser, "Hello!")
+		err := conv.AddMessage(userMsg)
 		require.NoError(t, err)
-		assert.Len(t, conv.Messages(), 1)
+
+		// Then add assistant message
+		msg := createTextMessage(t, vo.RoleAssistant, "Hello! How can I help you?")
+		err = conv.AddMessage(msg)
+		require.NoError(t, err)
+		assert.Len(t, conv.Messages(), 2)
 	})
 
 	t.Run("should add multiple messages in order", func(t *testing.T) {
 		conv := createTestConversation(t)
 
-		err := conv.AddMessage(vo.RoleUser, createTextContent("First"))
+		err := conv.AddMessage(createTextMessage(t, vo.RoleUser, "First"))
 		require.NoError(t, err)
-		err = conv.AddMessage(vo.RoleAssistant, createTextContent("Second"))
+		err = conv.AddMessage(createTextMessage(t, vo.RoleAssistant, "Second"))
 		require.NoError(t, err)
-		err = conv.AddMessage(vo.RoleUser, createTextContent("Third"))
+		err = conv.AddMessage(createTextMessage(t, vo.RoleUser, "Third"))
 		require.NoError(t, err)
 
 		messages := conv.Messages()
@@ -94,10 +99,9 @@ func TestConversationMessages(t *testing.T) {
 
 	t.Run("should not add message to closed conversation", func(t *testing.T) {
 		conv := createTestConversation(t)
-		err := conv.Close()
-		require.NoError(t, err)
+		conv.Close()
 
-		err = conv.AddMessage(vo.RoleUser, createTextContent("Should fail"))
+		err := conv.AddMessage(createTextMessage(t, vo.RoleUser, "Should fail"))
 		assert.Error(t, err)
 	})
 
@@ -105,7 +109,11 @@ func TestConversationMessages(t *testing.T) {
 		conv := createTestConversation(t)
 
 		for i := 0; i < 10; i++ {
-			_ = conv.AddMessage(vo.RoleUser, createTextContent("Message"))
+			if i%2 == 0 {
+				_ = conv.AddMessage(createTextMessage(t, vo.RoleUser, "Message"))
+			} else {
+				_ = conv.AddMessage(createTextMessage(t, vo.RoleAssistant, "Response"))
+			}
 		}
 
 		assert.Equal(t, 10, conv.MessageCount())
@@ -114,8 +122,8 @@ func TestConversationMessages(t *testing.T) {
 	t.Run("should get last message", func(t *testing.T) {
 		conv := createTestConversation(t)
 
-		_ = conv.AddMessage(vo.RoleUser, createTextContent("First"))
-		_ = conv.AddMessage(vo.RoleAssistant, createTextContent("Last"))
+		_ = conv.AddMessage(createTextMessage(t, vo.RoleUser, "First"))
+		_ = conv.AddMessage(createTextMessage(t, vo.RoleAssistant, "Last"))
 
 		lastMsg := conv.LastMessage()
 		require.NotNil(t, lastMsg)
@@ -132,27 +140,32 @@ func TestConversationMessages(t *testing.T) {
 func TestConversationSystemPrompt(t *testing.T) {
 	t.Run("should set system prompt", func(t *testing.T) {
 		conv := createTestConversation(t)
-		systemPrompt := "You are a helpful assistant."
+		systemPrompt, err := vo.NewSystemPrompt("You are a helpful assistant.")
+		require.NoError(t, err)
 
-		err := conv.SetSystemPrompt(systemPrompt)
+		err = conv.SetSystemPrompt(systemPrompt)
 		require.NoError(t, err)
 		assert.Equal(t, systemPrompt, conv.SystemPrompt())
 	})
 
-	t.Run("should update system prompt", func(t *testing.T) {
+	t.Run("should update system prompt before user messages", func(t *testing.T) {
 		conv := createTestConversation(t)
 
-		_ = conv.SetSystemPrompt("First prompt")
-		err := conv.SetSystemPrompt("Updated prompt")
+		firstPrompt, _ := vo.NewSystemPrompt("First prompt")
+		_ = conv.SetSystemPrompt(firstPrompt)
+
+		updatedPrompt, _ := vo.NewSystemPrompt("Updated prompt")
+		err := conv.SetSystemPrompt(updatedPrompt)
 		require.NoError(t, err)
-		assert.Equal(t, "Updated prompt", conv.SystemPrompt())
+		assert.Equal(t, "Updated prompt", conv.SystemPrompt().String())
 	})
 
-	t.Run("should not set system prompt on closed conversation", func(t *testing.T) {
+	t.Run("should not set system prompt after user message", func(t *testing.T) {
 		conv := createTestConversation(t)
-		_ = conv.Close()
+		_ = conv.AddMessage(createTextMessage(t, vo.RoleUser, "Hello"))
 
-		err := conv.SetSystemPrompt("Should fail")
+		failPrompt, _ := vo.NewSystemPrompt("Should fail")
+		err := conv.SetSystemPrompt(failPrompt)
 		assert.Error(t, err)
 	})
 }
@@ -165,15 +178,8 @@ func TestConversationSettings(t *testing.T) {
 
 	t.Run("should set max tokens", func(t *testing.T) {
 		conv := createTestConversation(t)
-		err := conv.SetMaxTokens(2048)
-		require.NoError(t, err)
+		conv.SetMaxTokens(2048)
 		assert.Equal(t, 2048, conv.MaxTokens())
-	})
-
-	t.Run("should not set invalid max tokens", func(t *testing.T) {
-		conv := createTestConversation(t)
-		err := conv.SetMaxTokens(-100)
-		assert.Error(t, err)
 	})
 
 	t.Run("should have default temperature", func(t *testing.T) {
@@ -183,28 +189,25 @@ func TestConversationSettings(t *testing.T) {
 
 	t.Run("should set temperature", func(t *testing.T) {
 		conv := createTestConversation(t)
-		err := conv.SetTemperature(0.7)
-		require.NoError(t, err)
+		conv.SetTemperature(0.7)
 		assert.InDelta(t, 0.7, conv.Temperature(), 0.01)
 	})
 
-	t.Run("should not set temperature out of range", func(t *testing.T) {
+	t.Run("should clamp temperature to valid range", func(t *testing.T) {
 		conv := createTestConversation(t)
-		err := conv.SetTemperature(2.5)
-		assert.Error(t, err)
+		conv.SetTemperature(2.5)
+		assert.InDelta(t, 2.0, conv.Temperature(), 0.01)
 	})
 
 	t.Run("should set top P", func(t *testing.T) {
 		conv := createTestConversation(t)
-		err := conv.SetTopP(0.9)
-		require.NoError(t, err)
+		conv.SetTopP(0.9)
 		assert.InDelta(t, 0.9, conv.TopP(), 0.01)
 	})
 
 	t.Run("should set top K", func(t *testing.T) {
 		conv := createTestConversation(t)
-		err := conv.SetTopK(40)
-		require.NoError(t, err)
+		conv.SetTopK(40)
 		assert.Equal(t, 40, conv.TopK())
 	})
 }
@@ -213,110 +216,107 @@ func TestConversationClose(t *testing.T) {
 	t.Run("should close active conversation", func(t *testing.T) {
 		conv := createTestConversation(t)
 
-		err := conv.Close()
-		require.NoError(t, err)
-		assert.Equal(t, vo.ConversationStatusClosed, conv.Status())
+		conv.Close()
+		assert.Equal(t, aggregates.ConversationStatusClosed, conv.Status())
 	})
 
 	t.Run("should set closed time", func(t *testing.T) {
 		conv := createTestConversation(t)
 		beforeClose := time.Now()
 
-		err := conv.Close()
-		require.NoError(t, err)
+		conv.Close()
 
 		closedAt := conv.ClosedAt()
 		require.NotNil(t, closedAt)
 		assert.True(t, closedAt.After(beforeClose) || closedAt.Equal(beforeClose))
 	})
 
-	t.Run("should not close already closed conversation", func(t *testing.T) {
+	t.Run("should not change status on double close", func(t *testing.T) {
 		conv := createTestConversation(t)
 
-		err := conv.Close()
-		require.NoError(t, err)
+		conv.Close()
+		firstClosedAt := conv.ClosedAt()
 
-		err = conv.Close()
-		assert.Error(t, err)
+		conv.Close()
+		// Should remain closed with same timestamp
+		assert.Equal(t, aggregates.ConversationStatusClosed, conv.Status())
+		assert.Equal(t, firstClosedAt, conv.ClosedAt())
 	})
 
 	t.Run("should preserve messages after close", func(t *testing.T) {
 		conv := createTestConversation(t)
-		_ = conv.AddMessage(vo.RoleUser, createTextContent("Test message"))
+		_ = conv.AddMessage(createTextMessage(t, vo.RoleUser, "Test message"))
 
-		err := conv.Close()
-		require.NoError(t, err)
+		conv.Close()
 
 		assert.Len(t, conv.Messages(), 1)
 	})
 }
 
 func TestConversationTools(t *testing.T) {
-	t.Run("should register available tool", func(t *testing.T) {
+	t.Run("should add tool", func(t *testing.T) {
 		conv := createTestConversation(t)
 		tool := createTestTool(t, "test_tool", "Test description")
 
-		err := conv.RegisterTool(tool)
-		require.NoError(t, err)
-		assert.Len(t, conv.AvailableTools(), 1)
+		conv.AddTool(tool)
+		assert.Len(t, conv.Tools(), 1)
 	})
 
-	t.Run("should get registered tool by name", func(t *testing.T) {
+	t.Run("should get tool by name", func(t *testing.T) {
 		conv := createTestConversation(t)
 		tool := createTestTool(t, "my_tool", "My description")
 
-		err := conv.RegisterTool(tool)
-		require.NoError(t, err)
+		conv.AddTool(tool)
 
-		retrievedTool := conv.GetTool("my_tool")
+		toolName, _ := vo.NewToolName("my_tool")
+		retrievedTool := conv.GetTool(toolName)
 		assert.NotNil(t, retrievedTool)
 	})
 
 	t.Run("should return nil for non-existent tool", func(t *testing.T) {
 		conv := createTestConversation(t)
-		tool := conv.GetTool("non_existent")
+		toolName, _ := vo.NewToolName("non_existent")
+		tool := conv.GetTool(toolName)
 		assert.Nil(t, tool)
 	})
 
-	t.Run("should not register duplicate tool", func(t *testing.T) {
+	t.Run("should remove tool", func(t *testing.T) {
 		conv := createTestConversation(t)
-		tool1 := createTestTool(t, "dup_tool", "First")
-		tool2 := createTestTool(t, "dup_tool", "Second")
+		tool := createTestTool(t, "removable_tool", "To remove")
 
-		err := conv.RegisterTool(tool1)
-		require.NoError(t, err)
+		conv.AddTool(tool)
+		assert.Len(t, conv.Tools(), 1)
 
-		err = conv.RegisterTool(tool2)
-		assert.Error(t, err)
+		toolName, _ := vo.NewToolName("removable_tool")
+		conv.RemoveTool(toolName)
+		assert.Empty(t, conv.Tools())
 	})
 }
 
 func TestConversationMetadata(t *testing.T) {
 	t.Run("should set metadata", func(t *testing.T) {
 		conv := createTestConversation(t)
-		metadata := map[string]interface{}{
-			"key1": "value1",
-			"key2": 123,
-		}
+		conv.SetMetadata("key1", "value1")
+		conv.SetMetadata("key2", 123)
 
-		conv.SetMetadata(metadata)
-		assert.Equal(t, metadata, conv.Metadata())
+		metadata := conv.Metadata()
+		assert.Equal(t, "value1", metadata["key1"])
+		assert.Equal(t, 123, metadata["key2"])
 	})
 
 	t.Run("should get metadata value", func(t *testing.T) {
 		conv := createTestConversation(t)
-		conv.SetMetadata(map[string]interface{}{
-			"test_key": "test_value",
-		})
+		conv.SetMetadata("test_key", "test_value")
 
-		value := conv.GetMetadataValue("test_key")
+		value, ok := conv.GetMetadata("test_key")
+		assert.True(t, ok)
 		assert.Equal(t, "test_value", value)
 	})
 
-	t.Run("should return nil for non-existent metadata key", func(t *testing.T) {
+	t.Run("should return false for non-existent metadata key", func(t *testing.T) {
 		conv := createTestConversation(t)
-		value := conv.GetMetadataValue("non_existent")
-		assert.Nil(t, value)
+		_, ok := conv.GetMetadata("non_existent")
+		assert.False(t, ok)
 	})
 }
 
@@ -343,27 +343,26 @@ func TestConversationModels(t *testing.T) {
 
 	for _, model := range models {
 		t.Run("should create conversation with model "+string(model), func(t *testing.T) {
-			sessionID, _ := vo.NewSessionID()
+			sessionID := vo.GenerateSessionID()
 			conv := aggregates.NewConversation(sessionID, model)
 			assert.Equal(t, model, conv.Model())
 		})
 	}
 }
 
-func TestConversationTokenTracking(t *testing.T) {
-	t.Run("should track total tokens", func(t *testing.T) {
+func TestConversationMessageContent(t *testing.T) {
+	t.Run("should get text content from message", func(t *testing.T) {
 		conv := createTestConversation(t)
 
-		// Add messages with token counts
-		msg := entities.NewMessage(vo.RoleUser, createTextContent("Hello"))
-		msg.SetTokenCount(5)
-		conv.AddMessageEntity(msg)
+		msg := createTextMessage(t, vo.RoleUser, "Hello, Claude!")
+		err := conv.AddMessage(msg)
+		require.NoError(t, err)
 
-		msg2 := entities.NewMessage(vo.RoleAssistant, createTextContent("Hi there!"))
-		msg2.SetTokenCount(3)
-		conv.AddMessageEntity(msg2)
-
-		assert.Equal(t, 8, conv.TotalTokens())
+		messages := conv.Messages()
+		require.Len(t, messages, 1)
+		content := messages[0].Content()
+		require.Len(t, content, 1)
+		assert.Equal(t, "Hello, Claude!", content[0].Text)
 	})
 }
 
@@ -371,15 +370,15 @@ func TestConversationTokenTracking(t *testing.T) {
 
 func createTestConversation(t *testing.T) *aggregates.Conversation {
 	t.Helper()
-	sessionID, err := vo.NewSessionID()
-	require.NoError(t, err)
+	sessionID := vo.GenerateSessionID()
 	return aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
 }
 
-func createTextContent(text string) []entities.Content {
-	return []entities.Content{
-		entities.NewTextContent(text),
-	}
+func createTextMessage(t *testing.T, role vo.Role, text string) *entities.Message {
+	t.Helper()
+	msg, err := entities.NewTextMessage(role, text)
+	require.NoError(t, err)
+	return msg
 }
 
 func createTestTool(t *testing.T, name, description string) *entities.Tool {
@@ -396,7 +395,7 @@ func createTestTool(t *testing.T, name, description string) *entities.Tool {
 // Benchmarks
 
 func BenchmarkNewConversation(b *testing.B) {
-	sessionID, _ := vo.NewSessionID()
+	sessionID := vo.GenerateSessionID()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
@@ -404,24 +403,29 @@ func BenchmarkNewConversation(b *testing.B) {
 }
 
 func BenchmarkConversationAddMessage(b *testing.B) {
-	sessionID, _ := vo.NewSessionID()
+	sessionID := vo.GenerateSessionID()
 	conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
-	content := createTextContent("Benchmark message")
+	msg, _ := entities.NewTextMessage(vo.RoleUser, "Benchmark message")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = conv.AddMessage(vo.RoleUser, content)
+		_ = conv.AddMessage(msg)
 	}
 }
 
 func BenchmarkConversationGetMessages(b *testing.B) {
-	sessionID, _ := vo.NewSessionID()
+	sessionID := vo.GenerateSessionID()
 	conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
 
-	// Add 100 messages
+	// Add 100 messages alternating roles
 	for i := 0; i < 100; i++ {
-		content := createTextContent("Message")
-		_ = conv.AddMessage(vo.RoleUser, content)
+		var msg *entities.Message
+		if i%2 == 0 {
+			msg, _ = entities.NewTextMessage(vo.RoleUser, "Message")
+		} else {
+			msg, _ = entities.NewTextMessage(vo.RoleAssistant, "Response")
+		}
+		_ = conv.AddMessage(msg)
 	}
 
 	b.ResetTimer()

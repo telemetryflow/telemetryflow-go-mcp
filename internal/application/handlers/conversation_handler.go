@@ -93,9 +93,9 @@ func (h *ConversationHandler) HandleCreateConversation(ctx context.Context, cmd 
 		return nil, err
 	}
 
-	// Publish events
+	// Publish events (best-effort, don't fail on publish errors)
 	for _, event := range conversation.Events() {
-		h.eventPublisher.Publish(ctx, event)
+		_ = h.eventPublisher.Publish(ctx, event)
 	}
 
 	return conversation, nil
@@ -162,9 +162,9 @@ func (h *ConversationHandler) HandleSendMessage(ctx context.Context, cmd *comman
 		return nil, err
 	}
 
-	// Publish events
+	// Publish events (best-effort, don't fail on publish errors)
 	for _, event := range conversation.Events() {
-		h.eventPublisher.Publish(ctx, event)
+		_ = h.eventPublisher.Publish(ctx, event)
 	}
 
 	// Check for tool use
@@ -217,9 +217,9 @@ func (h *ConversationHandler) HandleAddToolResult(ctx context.Context, cmd *comm
 		return err
 	}
 
-	// Publish events
+	// Publish events (best-effort, don't fail on publish errors)
 	for _, event := range conversation.Events() {
-		h.eventPublisher.Publish(ctx, event)
+		_ = h.eventPublisher.Publish(ctx, event)
 	}
 
 	return nil

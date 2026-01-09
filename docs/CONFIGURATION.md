@@ -235,7 +235,7 @@ server:
 
 # Claude API Configuration
 claude:
-  api_key: ""  # Use TFO_CLAUDE_API_KEY environment variable
+  api_key: ""  # Use TELEMETRYFLOW_MCP_CLAUDE_API_KEY environment variable
   base_url: "https://api.anthropic.com"
   model: "claude-sonnet-4-20250514"
   max_tokens: 4096
@@ -300,11 +300,11 @@ security:
 ```mermaid
 flowchart LR
     subgraph EnvVars["Environment Variables"]
-        E1["TFO_CLAUDE_API_KEY"]
-        E2["TFO_CLAUDE_MODEL"]
-        E3["TFO_LOG_LEVEL"]
-        E4["TFO_TELEMETRY_ENABLED"]
-        E5["TFO_SERVER_TIMEOUT"]
+        E1["TELEMETRYFLOW_MCP_CLAUDE_API_KEY"]
+        E2["TELEMETRYFLOW_MCP_CLAUDE_MODEL"]
+        E3["TELEMETRYFLOW_MCP_LOG_LEVEL"]
+        E4["TELEMETRYFLOW_MCP_TELEMETRY_ENABLED"]
+        E5["TELEMETRYFLOW_MCP_SERVER_TIMEOUT"]
     end
 
     subgraph Config["Configuration Fields"]
@@ -329,40 +329,40 @@ flowchart LR
 
 | Variable | Config Path | Type | Default | Description |
 |----------|-------------|------|---------|-------------|
-| `TFO_CLAUDE_API_KEY` | `claude.api_key` | string | "" | Claude API key (required) |
-| `TFO_CLAUDE_BASE_URL` | `claude.base_url` | string | "https://api.anthropic.com" | Claude API base URL |
-| `TFO_CLAUDE_MODEL` | `claude.model` | string | "claude-sonnet-4-20250514" | Default Claude model |
-| `TFO_CLAUDE_MAX_TOKENS` | `claude.max_tokens` | int | 4096 | Maximum response tokens |
-| `TFO_CLAUDE_TEMPERATURE` | `claude.temperature` | float | 0.7 | Response temperature |
-| `TFO_SERVER_NAME` | `server.name` | string | "tfo-mcp" | Server name |
-| `TFO_SERVER_TIMEOUT` | `server.timeout` | duration | "30s" | Request timeout |
-| `TFO_LOG_LEVEL` | `logging.level` | string | "info" | Log level |
-| `TFO_LOG_FORMAT` | `logging.format` | string | "json" | Log format |
-| `TFO_TELEMETRY_ENABLED` | `telemetry.enabled` | bool | false | Enable telemetry |
-| `TFO_TELEMETRY_ENDPOINT` | `telemetry.endpoint` | string | "localhost:4317" | OTLP endpoint |
-| `TFO_RATE_LIMIT_ENABLED` | `security.rate_limit.enabled` | bool | true | Enable rate limiting |
-| `TFO_RATE_LIMIT_RPM` | `security.rate_limit.requests_per_minute` | int | 60 | Requests per minute |
+| `TELEMETRYFLOW_MCP_CLAUDE_API_KEY` | `claude.api_key` | string | "" | Claude API key (required) |
+| `TELEMETRYFLOW_MCP_CLAUDE_BASE_URL` | `claude.base_url` | string | "https://api.anthropic.com" | Claude API base URL |
+| `TELEMETRYFLOW_MCP_CLAUDE_MODEL` | `claude.model` | string | "claude-sonnet-4-20250514" | Default Claude model |
+| `TELEMETRYFLOW_MCP_CLAUDE_MAX_TOKENS` | `claude.max_tokens` | int | 4096 | Maximum response tokens |
+| `TELEMETRYFLOW_MCP_CLAUDE_TEMPERATURE` | `claude.temperature` | float | 0.7 | Response temperature |
+| `TELEMETRYFLOW_MCP_SERVER_NAME` | `server.name` | string | "tfo-mcp" | Server name |
+| `TELEMETRYFLOW_MCP_SERVER_TIMEOUT` | `server.timeout` | duration | "30s" | Request timeout |
+| `TELEMETRYFLOW_MCP_LOG_LEVEL` | `logging.level` | string | "info" | Log level |
+| `TELEMETRYFLOW_MCP_LOG_FORMAT` | `logging.format` | string | "json" | Log format |
+| `TELEMETRYFLOW_MCP_TELEMETRY_ENABLED` | `telemetry.enabled` | bool | false | Enable telemetry |
+| `TELEMETRYFLOW_MCP_TELEMETRY_ENDPOINT` | `telemetry.endpoint` | string | "localhost:4317" | OTLP endpoint |
+| `TELEMETRYFLOW_MCP_RATE_LIMIT_ENABLED` | `security.rate_limit.enabled` | bool | true | Enable rate limiting |
+| `TELEMETRYFLOW_MCP_RATE_LIMIT_RPM` | `security.rate_limit.requests_per_minute` | int | 60 | Requests per minute |
 
 ### Setting Environment Variables
 
 ```bash
 # Required - Claude API Key
-export TFO_CLAUDE_API_KEY="sk-ant-api03-..."
+export TELEMETRYFLOW_MCP_CLAUDE_API_KEY="sk-ant-api03-..."
 
 # Optional - Model selection
-export TFO_CLAUDE_MODEL="claude-sonnet-4-20250514"
+export TELEMETRYFLOW_MCP_CLAUDE_MODEL="claude-sonnet-4-20250514"
 
 # Optional - Logging
-export TFO_LOG_LEVEL="debug"
-export TFO_LOG_FORMAT="text"
+export TELEMETRYFLOW_MCP_LOG_LEVEL="debug"
+export TELEMETRYFLOW_MCP_LOG_FORMAT="text"
 
 # Optional - Telemetry
-export TFO_TELEMETRY_ENABLED="true"
-export TFO_TELEMETRY_ENDPOINT="otel-collector:4317"
+export TELEMETRYFLOW_MCP_TELEMETRY_ENABLED="true"
+export TELEMETRYFLOW_MCP_TELEMETRY_ENDPOINT="otel-collector:4317"
 
 # Optional - Rate limiting
-export TFO_RATE_LIMIT_ENABLED="true"
-export TFO_RATE_LIMIT_RPM="120"
+export TELEMETRYFLOW_MCP_RATE_LIMIT_ENABLED="true"
+export TELEMETRYFLOW_MCP_RATE_LIMIT_RPM="120"
 ```
 
 ---
@@ -504,7 +504,7 @@ flowchart LR
 
 ```yaml
 claude:
-  api_key: ""  # Use TFO_CLAUDE_API_KEY env var
+  api_key: ""  # Use TELEMETRYFLOW_MCP_CLAUDE_API_KEY env var
   base_url: "https://api.anthropic.com"
   model: "claude-sonnet-4-20250514"
   max_tokens: 4096
@@ -656,7 +656,7 @@ logging:
 
 ```mermaid
 flowchart TB
-    subgraph TFO_MCP["TFO-MCP"]
+    subgraph TFO_MCP["TelemetryFlow MCP"]
         TRACES["Traces"]
         METRICS["Metrics"]
         LOGS["Logs"]
@@ -931,7 +931,7 @@ security:
 ```yaml
 # Minimal configuration - only required settings
 claude:
-  api_key: ""  # Set via TFO_CLAUDE_API_KEY
+  api_key: ""  # Set via TELEMETRYFLOW_MCP_CLAUDE_API_KEY
 ```
 
 ### Docker Configuration
@@ -1004,13 +1004,13 @@ flowchart TB
 
 2. **Use environment variables for secrets**
    ```bash
-   export TFO_CLAUDE_API_KEY="sk-ant-api03-..."
+   export TELEMETRYFLOW_MCP_CLAUDE_API_KEY="sk-ant-api03-..."
    ```
 
 3. **Use secret managers in production**
    ```bash
    # AWS Secrets Manager
-   TFO_CLAUDE_API_KEY=$(aws secretsmanager get-secret-value --secret-id tfo-mcp/api-key --query SecretString --output text)
+   TELEMETRYFLOW_MCP_CLAUDE_API_KEY=$(aws secretsmanager get-secret-value --secret-id tfo-mcp/api-key --query SecretString --output text)
    ```
 
 4. **Enable rate limiting in production**

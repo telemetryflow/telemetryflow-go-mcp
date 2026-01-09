@@ -1,4 +1,4 @@
-# Contributing to TFO-MCP
+# Contributing to TelemetryFlow MCP
 
 Thank you for your interest in contributing to TelemetryFlow MCP Server! This document provides guidelines and information for contributors.
 
@@ -100,11 +100,11 @@ cp .env.example .env
 
 ```bash
 # Required for full functionality
-export TFO_CLAUDE_API_KEY="your-api-key"
+export TELEMETRYFLOW_MCP_CLAUDE_API_KEY="your-api-key"
 
 # Optional
-export TFO_LOG_LEVEL="debug"
-export TFO_TELEMETRY_ENABLED="false"
+export TELEMETRYFLOW_MCP_LOG_LEVEL="debug"
+export TELEMETRYFLOW_MCP_TELEMETRY_ENABLED="false"
 ```
 
 ---
@@ -536,8 +536,8 @@ Contributors will be recognized in:
 
 ## License
 
-By contributing to TFO-MCP, you agree that your contributions will be licensed under the Apache License 2.0.
+By contributing to TelemetryFlow MCP, you agree that your contributions will be licensed under the Apache License 2.0.
 
 ---
 
-Thank you for contributing to TFO-MCP!
+Thank you for contributing to TelemetryFlow MCP!

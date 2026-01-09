@@ -50,8 +50,8 @@ const (
 
 // Stream names
 const (
-	StreamTasks    = "TASKS"
-	StreamEvents   = "EVENTS"
+	StreamTasks     = "TASKS"
+	StreamEvents    = "EVENTS"
 	StreamTelemetry = "TELEMETRY"
 )
 
@@ -638,11 +638,11 @@ func (q *NATSQueue) Stats(ctx context.Context) (map[string]interface{}, error) {
 			continue
 		}
 		streamStats[name] = map[string]interface{}{
-			"messages":    info.State.Msgs,
-			"bytes":       info.State.Bytes,
-			"consumers":   info.State.Consumers,
-			"first_seq":   info.State.FirstSeq,
-			"last_seq":    info.State.LastSeq,
+			"messages":  info.State.Msgs,
+			"bytes":     info.State.Bytes,
+			"consumers": info.State.Consumers,
+			"first_seq": info.State.FirstSeq,
+			"last_seq":  info.State.LastSeq,
 		}
 	}
 	stats["streams"] = streamStats
@@ -655,20 +655,20 @@ func (q *NATSQueue) Stats(ctx context.Context) (map[string]interface{}, error) {
 			continue
 		}
 		consumerStats[name] = map[string]interface{}{
-			"pending":         info.NumPending,
-			"waiting":         info.NumWaiting,
-			"ack_pending":     info.NumAckPending,
-			"redelivered":     info.NumRedelivered,
-			"delivered":       info.Delivered.Consumer,
+			"pending":     info.NumPending,
+			"waiting":     info.NumWaiting,
+			"ack_pending": info.NumAckPending,
+			"redelivered": info.NumRedelivered,
+			"delivered":   info.Delivered.Consumer,
 		}
 	}
 	stats["consumers"] = consumerStats
 
 	// Connection info
 	stats["connection"] = map[string]interface{}{
-		"connected":    q.conn.IsConnected(),
-		"server":       q.conn.ConnectedUrl(),
-		"cluster":      q.conn.ConnectedClusterName(),
+		"connected": q.conn.IsConnected(),
+		"server":    q.conn.ConnectedUrl(),
+		"cluster":   q.conn.ConnectedClusterName(),
 	}
 
 	return stats, nil
