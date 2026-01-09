@@ -12,17 +12,14 @@ RUN apk add --no-cache git ca-certificates tzdata
 # Set working directory
 WORKDIR /build
 
-# Copy go mod files
-COPY go.mod go.sum ./
-
 # Set GOPRIVATE to bypass checksum database for telemetryflow SDK
 ENV GOPRIVATE=github.com/telemetryflow/*
 
-# Download dependencies
-RUN go mod download
-
 # Copy source code
 COPY . .
+
+# Download dependencies
+RUN go mod download
 
 # Build arguments
 ARG VERSION=1.1.2
