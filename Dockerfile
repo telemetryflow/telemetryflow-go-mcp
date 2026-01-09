@@ -15,6 +15,9 @@ WORKDIR /build
 # Copy go mod files
 COPY go.mod go.sum ./
 
+# Set GOPRIVATE to bypass checksum database for telemetryflow SDK
+ENV GOPRIVATE=github.com/telemetryflow/*
+
 # Download dependencies
 RUN go mod download
 
