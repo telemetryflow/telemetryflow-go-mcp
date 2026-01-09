@@ -99,7 +99,7 @@ validate_tests() {
 validate_config_file() {
     log_info "Validating configuration file..."
 
-    local config_file="${1:-configs/config.yaml}"
+    local config_file="${1:-configs/tfo-mcp.yaml}"
 
     if [[ ! -f "${config_file}" ]]; then
         log_warning "Configuration file not found: ${config_file}"

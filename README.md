@@ -590,7 +590,7 @@ docker run --rm -it \
 
 ### Configuration File
 
-Create `config.yaml` or use `configs/config.yaml`:
+Create `tfo-mcp.yaml` or use `configs/tfo-mcp.yaml`:
 
 ```yaml
 # =============================================================================

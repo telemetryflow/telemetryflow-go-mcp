@@ -348,14 +348,14 @@ docker run -it --rm \
 
 # With custom config
 docker run -it --rm \
-  -v $(pwd)/config.yaml:/app/config.yaml \
+  -v $(pwd)/tfo-mcp.yaml:/app/tfo-mcp.yaml \
   -e TELEMETRYFLOW_MCP_CLAUDE_API_KEY="your-api-key" \
   devopscorner/tfo-mcp:latest \
-  run --config /app/config.yaml
+  run --config /app/tfo-mcp.yaml
 
 # With volume for resources
 docker run -it --rm \
-  -v $(pwd)/config.yaml:/app/config.yaml \
+  -v $(pwd)/tfo-mcp.yaml:/app/tfo-mcp.yaml \
   -v $(pwd)/resources:/app/resources \
   -e TELEMETRYFLOW_MCP_CLAUDE_API_KEY="your-api-key" \
   devopscorner/tfo-mcp:latest
@@ -577,7 +577,7 @@ docker run --rm devopscorner/tfo-mcp:latest version
 
 # Run validation
 docker run --rm \
-  -v $(pwd)/config.yaml:/app/config.yaml \
+  -v $(pwd)/tfo-mcp.yaml:/app/tfo-mcp.yaml \
   devopscorner/tfo-mcp:latest validate
 ```
 
@@ -606,7 +606,7 @@ flowchart TB
 
 ```bash
 # 1. Backup configuration
-cp /etc/tfo-mcp/config.yaml /etc/tfo-mcp/config.yaml.bak
+cp /etc/tfo-mcp/tfo-mcp.yaml /etc/tfo-mcp/tfo-mcp.yaml.bak
 
 # 2. Download new version
 curl -LO https://github.com/telemetryflow/telemetryflow-mcp/releases/latest/download/tfo-mcp_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m).tar.gz

@@ -313,7 +313,7 @@ jobs:
           echo "# Run TelemetryFlow MCP Server" >> $GITHUB_STEP_SUMMARY
           echo "docker run -d \\" >> $GITHUB_STEP_SUMMARY
           echo "  --name tfo-mcp \\" >> $GITHUB_STEP_SUMMARY
-          echo "  -v /path/to/config.yaml:/etc/tfo-mcp/config.yaml \\" >> $GITHUB_STEP_SUMMARY
+          echo "  -v /path/to/tfo-mcp.yaml:/etc/tfo-mcp/tfo-mcp.yaml \\" >> $GITHUB_STEP_SUMMARY
           echo "  -e ANTHROPIC_API_KEY=your-api-key \\" >> $GITHUB_STEP_SUMMARY
           echo "  ${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY

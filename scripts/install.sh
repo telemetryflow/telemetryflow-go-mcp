@@ -146,8 +146,8 @@ create_config() {
     mkdir -p "${CONFIG_DIR}"
 
     # Create default config if it doesn't exist
-    if [[ ! -f "${CONFIG_DIR}/config.yaml" ]]; then
-        cat > "${CONFIG_DIR}/config.yaml" << 'EOF'
+    if [[ ! -f "${CONFIG_DIR}/tfo-mcp.yaml" ]]; then
+        cat > "${CONFIG_DIR}/tfo-mcp.yaml" << 'EOF'
 # TFO-MCP Configuration File
 # See documentation for full configuration options
 
@@ -178,9 +178,9 @@ logging:
 telemetry:
   enabled: false
 EOF
-        log_success "Created default configuration: ${CONFIG_DIR}/config.yaml"
+        log_success "Created default configuration: ${CONFIG_DIR}/tfo-mcp.yaml"
     else
-        log_warning "Configuration already exists: ${CONFIG_DIR}/config.yaml"
+        log_warning "Configuration already exists: ${CONFIG_DIR}/tfo-mcp.yaml"
     fi
 }
 
@@ -289,7 +289,7 @@ print_post_install() {
     echo "     export TELEMETRYFLOW_MCP_CLAUDE_API_KEY=\"your-api-key\""
     echo ""
     echo "  2. Edit configuration (optional):"
-    echo "     ${CONFIG_DIR}/config.yaml"
+    echo "     ${CONFIG_DIR}/tfo-mcp.yaml"
     echo ""
     echo "  3. Run the server:"
     echo "     tfo-mcp run"

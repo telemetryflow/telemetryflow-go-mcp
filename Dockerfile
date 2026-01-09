@@ -69,7 +69,7 @@ WORKDIR /app
 COPY --from=builder /build/tfo-mcp /app/tfo-mcp
 
 # Copy default config
-COPY configs/config.yaml /app/configs/config.yaml
+COPY configs/tfo-mcp.yaml /app/configs/tfo-mcp.yaml
 
 # Set ownership
 RUN chown -R telemetryflow:telemetryflow /app
@@ -132,4 +132,4 @@ EXPOSE 8080
 ENTRYPOINT ["/app/tfo-mcp"]
 
 # Default command
-CMD ["--config", "/app/configs/config.yaml"]
+CMD ["--config", "/app/configs/tfo-mcp.yaml"]
