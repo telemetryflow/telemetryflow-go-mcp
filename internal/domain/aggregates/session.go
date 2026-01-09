@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/entities"
-	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/events"
-	vo "github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/valueobjects"
+	"github.com/telemetryflow/telemetryflow-mcp/internal/domain/entities"
+	"github.com/telemetryflow/telemetryflow-mcp/internal/domain/events"
+	vo "github.com/telemetryflow/telemetryflow-mcp/internal/domain/valueobjects"
 )
 
 // Session errors

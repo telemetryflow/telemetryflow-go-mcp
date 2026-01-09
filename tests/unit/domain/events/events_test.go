@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/events"
-	vo "github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/valueobjects"
+	"github.com/telemetryflow/telemetryflow-mcp/internal/domain/events"
+	vo "github.com/telemetryflow/telemetryflow-mcp/internal/domain/valueobjects"
 )
 
 func TestNewSessionCreatedEvent(t *testing.T) {

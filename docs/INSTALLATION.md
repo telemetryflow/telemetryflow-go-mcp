@@ -294,10 +294,10 @@ make build-all
 
 ```bash
 # Install latest version
-go install github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/cmd/mcp@latest
+go install github.com/telemetryflow/telemetryflow-mcp/cmd/mcp@latest
 
 # Install specific version
-go install github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/cmd/mcp@v1.1.2
+go install github.com/telemetryflow/telemetryflow-mcp/cmd/mcp@v1.1.2
 
 # Verify
 tfo-mcp version

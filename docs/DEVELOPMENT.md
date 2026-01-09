@@ -368,7 +368,7 @@ import (
     "github.com/google/uuid"
 
     // Internal packages
-    "github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain"
+    "github.com/telemetryflow/telemetryflow-mcp/internal/domain"
 )
 
 // Constants

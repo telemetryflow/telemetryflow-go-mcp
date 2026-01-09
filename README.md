@@ -569,7 +569,7 @@ make install
 ### Using Go Install
 
 ```bash
-go install github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/cmd/mcp@latest
+go install github.com/telemetryflow/telemetryflow-mcp/cmd/mcp@latest
 ```
 
 ### Docker

@@ -6,10 +6,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/application/dto"
-	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/repositories"
-	"github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/services"
-	vo "github.com/telemetryflow/telemetryflow-mcp/telemetryflow-mcp/internal/domain/valueobjects"
+	"github.com/telemetryflow/telemetryflow-mcp/internal/application/dto"
+	"github.com/telemetryflow/telemetryflow-mcp/internal/domain/repositories"
+	"github.com/telemetryflow/telemetryflow-mcp/internal/domain/services"
+	vo "github.com/telemetryflow/telemetryflow-mcp/internal/domain/valueobjects"
 )
 
 // Application service errors
