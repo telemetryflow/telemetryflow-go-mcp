@@ -1,0 +1,100 @@
+# ==============================================================================
+# TelemetryFlow MCP Server .gitignore
+# ==============================================================================
+
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+tfo-mcp
+
+# Build directories
+build/
+dist/
+bin/
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.html
+coverage.txt
+
+# Dependency directories
+vendor/
+
+# IDE and editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# Config files with secrets
+config.local.yaml
+config.*.local.yaml
+
+# Log files
+*.log
+logs/
+
+# Debug files
+debug
+*.debug
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Go workspace file
+go.work
+
+# Air live reload
+.air.toml
+tmp/
+
+# Profiling
+*.prof
+*.pprof
+
+# Generated files
+*.gen.go
+
+# Test cache
+.testcache/
+
+# Security - never commit these
+*.pem
+*.key
+*.crt
+*.p12
+credentials.json
+secrets.yaml
+secrets.json
+
+.kiro
+.claude
+.env

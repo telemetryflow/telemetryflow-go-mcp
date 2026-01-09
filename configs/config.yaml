@@ -1,0 +1,124 @@
+# TelemetryFlow MCP Server Configuration
+# Version: 1.1.2
+
+# Server configuration
+server:
+  name: "TelemetryFlow-MCP"
+  version: "1.1.2"
+  host: "localhost"
+  port: 8080
+  # Transport type: "stdio", "sse", "websocket"
+  transport: "stdio"
+  # Timeouts
+  read_timeout: "30s"
+  write_timeout: "30s"
+  shutdown_timeout: "10s"
+  # Debug mode
+  debug: false
+
+# Claude API configuration
+claude:
+  # API key - can also be set via ANTHROPIC_API_KEY environment variable
+  # api_key: "your-api-key-here"
+  base_url: "https://api.anthropic.com"
+  default_model: "claude-sonnet-4-20250514"
+  max_tokens: 4096
+  temperature: 1.0
+  top_p: 1.0
+  top_k: 0
+  timeout: "120s"
+  max_retries: 3
+  retry_delay: "1s"
+  enable_batching: false
+
+# MCP Protocol configuration
+mcp:
+  protocol_version: "2024-11-05"
+  # Capabilities
+  enable_tools: true
+  enable_resources: true
+  enable_prompts: true
+  enable_logging: true
+  enable_sampling: false
+  # Limits
+  max_tools_per_session: 100
+  max_resources_per_session: 100
+  max_prompts_per_session: 50
+  max_conversations: 10
+  max_messages_per_conv: 1000
+  # Tool execution
+  tool_timeout: "30s"
+
+# Logging configuration
+logging:
+  # Level: debug, info, warn, error
+  level: "info"
+  # Format: json, text
+  format: "json"
+  # Output: stdout, stderr, or file path
+  output: "stderr"
+  add_source: false
+  time_format: "2006-01-02T15:04:05Z07:00"
+
+# Telemetry (OpenTelemetry) configuration
+telemetry:
+  enabled: true
+  service_name: "telemetryflow-mcp"
+  environment: "development"
+  otlp_endpoint: "localhost:4317"
+  otlp_insecure: true
+  # Trace sampling rate (0.0 to 1.0)
+  trace_sample_rate: 1.0
+  # Metrics
+  metrics_enabled: true
+  metrics_interval: "30s"
+
+# Security configuration
+security:
+  # API key validation
+  require_api_key: false
+  allowed_api_keys: []
+  # Rate limiting
+  rate_limit_enabled: true
+  rate_limit_per_minute: 100
+  # CORS (for SSE transport)
+  cors_enabled: true
+  cors_allowed_origins:
+    - "*"
+
+# PostgreSQL database configuration
+database:
+  enabled: false
+  host: "localhost"
+  port: 5432
+  user: "telemetryflow"
+  password: ""
+  database: "telemetryflow_mcp"
+  ssl_mode: "disable"
+  # Connection pool
+  max_idle_conns: 10
+  max_open_conns: 100
+  conn_max_lifetime: "1h"
+  conn_max_idle_time: "10m"
+  # Logging level: silent, error, warn, info
+  log_level: "warn"
+
+# ClickHouse analytics configuration
+clickhouse:
+  enabled: false
+  host: "localhost"
+  port: 9000
+  database: "telemetryflow_analytics"
+  username: "default"
+  password: ""
+  secure: false
+  debug: false
+  # Connection settings
+  dial_timeout: "10s"
+  max_open_conns: 10
+  max_idle_conns: 5
+  conn_max_lifetime: "1h"
+  compression: "lz4"
+  # Analytics settings
+  batch_size: 1000
+  flush_interval: "5s"
