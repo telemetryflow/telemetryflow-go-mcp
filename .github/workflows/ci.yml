@@ -87,7 +87,7 @@ jobs:
           cache: true
 
       - name: Download and verify dependencies
-        run: make deps-refresh-refresh
+        run: make deps-refresh
 
       - name: Check formatting
         run: make fmt-check
