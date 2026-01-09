@@ -197,7 +197,7 @@ func (r *AnalyticsRepository) GetRequestsTimeSeries(ctx context.Context, since, 
 	if err != nil {
 		return nil, fmt.Errorf("failed to query requests time series: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var points []TimeSeriesPoint
 	for rows.Next() {
@@ -227,7 +227,7 @@ func (r *AnalyticsRepository) GetTokensTimeSeries(ctx context.Context, since, un
 	if err != nil {
 		return nil, fmt.Errorf("failed to query tokens time series: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var points []TimeSeriesPoint
 	for rows.Next() {
@@ -257,7 +257,7 @@ func (r *AnalyticsRepository) GetLatencyTimeSeries(ctx context.Context, since, u
 	if err != nil {
 		return nil, fmt.Errorf("failed to query latency time series: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var points []TimeSeriesPoint
 	for rows.Next() {
@@ -287,7 +287,7 @@ func (r *AnalyticsRepository) GetErrorRate(ctx context.Context, since, until tim
 	if err != nil {
 		return nil, fmt.Errorf("failed to query error rate: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var points []TimeSeriesPoint
 	for rows.Next() {
@@ -324,7 +324,7 @@ func (r *AnalyticsRepository) GetTopTools(ctx context.Context, since, until time
 	if err != nil {
 		return nil, fmt.Errorf("failed to query top tools: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var stats []ToolUsageStats
 	for rows.Next() {
@@ -384,11 +384,11 @@ func (r *AnalyticsRepository) GetDashboardSummary(ctx context.Context, since, un
 			&summary.AvgLatencyMs,
 			&summary.ErrorRate,
 		); err != nil {
-			rows.Close()
+			_ = rows.Close()
 			return nil, err
 		}
 	}
-	rows.Close()
+	_ = rows.Close()
 
 	// Get tool call count
 	toolQuery := `
@@ -404,11 +404,11 @@ func (r *AnalyticsRepository) GetDashboardSummary(ctx context.Context, since, un
 
 	if rows.Next() {
 		if err := rows.Scan(&summary.TotalToolCalls); err != nil {
-			rows.Close()
+			_ = rows.Close()
 			return nil, err
 		}
 	}
-	rows.Close()
+	_ = rows.Close()
 
 	// Get session count
 	sessionQuery := `
@@ -424,11 +424,11 @@ func (r *AnalyticsRepository) GetDashboardSummary(ctx context.Context, since, un
 
 	if rows.Next() {
 		if err := rows.Scan(&summary.TotalSessions); err != nil {
-			rows.Close()
+			_ = rows.Close()
 			return nil, err
 		}
 	}
-	rows.Close()
+	_ = rows.Close()
 
 	// Calculate requests per minute
 	duration := until.Sub(since)

@@ -70,6 +70,7 @@ make test
 ```
 
 This script will:
+
 - Install Go development tools (golangci-lint, goimports, etc.)
 - Download dependencies
 - Set up Git hooks
@@ -115,16 +116,16 @@ export TELEMETRYFLOW_MCP_TELEMETRY_ENABLED="false"
 
 We welcome many types of contributions:
 
-| Type | Description |
-|------|-------------|
-| Bug Reports | Report issues and bugs |
-| Feature Requests | Suggest new features |
-| Bug Fixes | Fix existing issues |
-| New Features | Implement new functionality |
-| Documentation | Improve docs, examples, comments |
-| Tests | Add or improve tests |
-| Performance | Optimize code performance |
-| Refactoring | Improve code quality |
+| Type             | Description                      |
+| ---------------- | -------------------------------- |
+| Bug Reports      | Report issues and bugs           |
+| Feature Requests | Suggest new features             |
+| Bug Fixes        | Fix existing issues              |
+| New Features     | Implement new functionality      |
+| Documentation    | Improve docs, examples, comments |
+| Tests            | Add or improve tests             |
+| Performance      | Optimize code performance        |
+| Refactoring      | Improve code quality             |
 
 ### Reporting Bugs
 
@@ -138,27 +139,34 @@ Before reporting a bug:
 
 ```markdown
 ## Description
+
 Brief description of the bug.
 
 ## Steps to Reproduce
+
 1. Step one
 2. Step two
 3. Step three
 
 ## Expected Behavior
+
 What should happen.
 
 ## Actual Behavior
+
 What actually happens.
 
 ## Environment
+
 - TFO-MCP Version:
 - OS:
 - Go Version:
 
 ## Logs
 ```
+
 Paste relevant logs here
+
 ```
 
 ## Additional Context
@@ -171,18 +179,23 @@ Any other relevant information.
 
 ```markdown
 ## Problem Statement
+
 Describe the problem this feature would solve.
 
 ## Proposed Solution
+
 Describe your proposed solution.
 
 ## Alternatives Considered
+
 What alternatives have you considered?
 
 ## Use Cases
+
 How would this feature be used?
 
 ## Additional Context
+
 Any other relevant information.
 ```
 
@@ -207,6 +220,7 @@ flowchart LR
 ### Step-by-Step
 
 1. **Fork the repository**
+
    ```bash
    # Fork on GitHub, then clone your fork
    git clone https://github.com/YOUR_USERNAME/telemetryflow.git
@@ -214,6 +228,7 @@ flowchart LR
    ```
 
 2. **Create a feature branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    # or
@@ -221,11 +236,13 @@ flowchart LR
    ```
 
 3. **Make your changes**
+
    - Follow coding standards
    - Add tests for new functionality
    - Update documentation as needed
 
 4. **Test your changes**
+
    ```bash
    make test          # Run tests
    make lint          # Run linter
@@ -233,6 +250,7 @@ flowchart LR
    ```
 
 5. **Commit with conventional commits**
+
    ```bash
    git commit -m "feat(tools): add new search tool"
    ```
@@ -256,6 +274,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation
@@ -267,6 +286,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/):
 - `ci`: CI/CD changes
 
 **Examples:**
+
 ```
 feat(tools): add file search tool with regex support
 
@@ -286,28 +306,34 @@ Session timeout was not being reset after successful requests.
 
 ```markdown
 ## Description
+
 Brief description of changes.
 
 ## Type of Change
+
 - [ ] Bug fix (non-breaking change fixing an issue)
 - [ ] New feature (non-breaking change adding functionality)
 - [ ] Breaking change (fix or feature causing existing functionality to change)
 - [ ] Documentation update
 
 ## Related Issues
+
 Fixes #(issue number)
 
 ## Changes Made
+
 - Change 1
 - Change 2
 - Change 3
 
 ## Testing
+
 - [ ] Unit tests added/updated
 - [ ] Integration tests added/updated
 - [ ] Manual testing performed
 
 ## Checklist
+
 - [ ] My code follows the project's style guidelines
 - [ ] I have performed a self-review
 - [ ] I have commented hard-to-understand code
@@ -327,16 +353,16 @@ Follow the official [Go Code Review Comments](https://github.com/golang/go/wiki/
 
 ### Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Package | lowercase | `valueobjects` |
-| Interface | PascalCase with I prefix | `ISessionRepository` |
-| Struct | PascalCase | `SessionHandler` |
-| Public Function | PascalCase | `HandleRequest` |
-| Private Function | camelCase | `parseInput` |
-| Variable | camelCase | `sessionID` |
-| Constant | PascalCase | `MaxRetries` |
-| Error | Err prefix | `ErrSessionNotFound` |
+| Type             | Convention               | Example              |
+| ---------------- | ------------------------ | -------------------- |
+| Package          | lowercase                | `valueobjects`       |
+| Interface        | PascalCase with I prefix | `ISessionRepository` |
+| Struct           | PascalCase               | `SessionHandler`     |
+| Public Function  | PascalCase               | `HandleRequest`      |
+| Private Function | camelCase                | `parseInput`         |
+| Variable         | camelCase                | `sessionID`          |
+| Constant         | PascalCase               | `MaxRetries`         |
+| Error            | Err prefix               | `ErrSessionNotFound` |
 
 ### File Organization
 
@@ -510,6 +536,7 @@ func NewSessionID(value string) (SessionID, error) {
 ### Updating Documentation
 
 When making changes:
+
 1. Update code comments
 2. Update relevant markdown files in `docs/`
 3. Update README if needed
@@ -528,6 +555,7 @@ When making changes:
 ### Recognition
 
 Contributors will be recognized in:
+
 - CONTRIBUTORS.md file
 - Release notes
 - Project documentation

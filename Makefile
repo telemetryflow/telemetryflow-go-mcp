@@ -193,6 +193,92 @@ test-short: ## Run short tests only
 	@echo "Running short tests..."
 	$(GOTEST) -v -short ./...
 
+.PHONY: test-all
+test-all: ## Run all tests (unit, integration, e2e)
+	@echo "Running all tests..."
+	$(GOTEST) -v -race -count=1 ./...
+	@echo "All tests complete"
+
+.PHONY: ci-test
+ci-test: fmt-check vet lint test ## Run CI pipeline (format, vet, lint, test)
+	@echo "CI pipeline complete"
+
+# ==============================================================================
+# CI-SPECIFIC TARGETS (GitHub Actions)
+# ==============================================================================
+
+.PHONY: test-unit-ci
+test-unit-ci: ## Run unit tests for CI with coverage output
+	@echo "Running unit tests for CI..."
+	$(GOTEST) -v -race -coverprofile=coverage-unit.out ./tests/unit/...
+	@echo "Unit tests complete"
+
+.PHONY: test-integration-ci
+test-integration-ci: ## Run integration tests for CI with coverage output
+	@echo "Running integration tests for CI..."
+	$(GOTEST) -v -race -coverprofile=coverage-integration.out ./tests/integration/...
+	@echo "Integration tests complete"
+
+.PHONY: test-e2e-ci
+test-e2e-ci: ## Run E2E tests for CI
+	@echo "Running E2E tests for CI..."
+	$(GOTEST) -v -race ./tests/e2e/...
+	@echo "E2E tests complete"
+
+.PHONY: ci-build
+ci-build: ## Build binary for CI (uses GOOS/GOARCH env vars)
+	@echo "Building for CI ($(GOOS)/$(GOARCH))..."
+	@mkdir -p $(BUILD_DIR)
+	@if [ "$(GOOS)" = "windows" ]; then \
+		CGO_ENABLED=0 $(GOBUILD) $(LDFLAGS_RELEASE) -o $(BUILD_DIR)/$(BINARY_NAME)-$(GOOS)-$(GOARCH).exe ./$(CMD_DIR); \
+	else \
+		CGO_ENABLED=0 $(GOBUILD) $(LDFLAGS_RELEASE) -o $(BUILD_DIR)/$(BINARY_NAME)-$(GOOS)-$(GOARCH) ./$(CMD_DIR); \
+	fi
+	@echo "CI build complete"
+
+.PHONY: deps-verify
+deps-verify: ## Verify dependencies
+	@echo "Verifying dependencies..."
+	$(GOMOD) download
+	$(GOMOD) verify
+	@echo "Dependencies verified"
+
+.PHONY: staticcheck
+staticcheck: ## Run staticcheck
+	@echo "Running staticcheck..."
+	@if command -v staticcheck >/dev/null 2>&1; then \
+		staticcheck ./...; \
+	else \
+		echo "staticcheck not installed. Run: go install honnef.co/go/tools/cmd/staticcheck@latest"; \
+	fi
+
+.PHONY: govulncheck
+govulncheck: ## Run govulncheck for vulnerability scanning
+	@echo "Running govulncheck..."
+	@if command -v govulncheck >/dev/null 2>&1; then \
+		govulncheck ./...; \
+	else \
+		echo "govulncheck not installed. Run: go install golang.org/x/vuln/cmd/govulncheck@latest"; \
+	fi
+
+.PHONY: coverage-report
+coverage-report: ## Generate merged coverage report
+	@echo "Generating coverage report..."
+	@if [ -f coverage-unit.out ] && [ -f coverage-integration.out ]; then \
+		echo "mode: atomic" > coverage-merged.out; \
+		tail -n +2 coverage-unit.out >> coverage-merged.out; \
+		tail -n +2 coverage-integration.out >> coverage-merged.out; \
+	elif [ -f coverage-unit.out ]; then \
+		cp coverage-unit.out coverage-merged.out; \
+	else \
+		echo "No coverage files found"; \
+		exit 1; \
+	fi
+	$(GOCMD) tool cover -func=coverage-merged.out > coverage-summary.txt
+	$(GOCMD) tool cover -html=coverage-merged.out -o coverage.html
+	@echo "Coverage report generated"
+	@cat coverage-summary.txt
+
 # ==============================================================================
 # CROSS-COMPILATION
 # ==============================================================================

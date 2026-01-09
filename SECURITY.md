@@ -17,7 +17,7 @@
 We provide security updates for the following versions:
 
 | Version | Supported          |
-|---------|--------------------|
+| ------- | ------------------ |
 | 1.1.x   | :white_check_mark: |
 | 1.0.x   | :x:                |
 | < 1.0   | :x:                |
@@ -50,12 +50,12 @@ Please include the following information in your report:
 
 ### Response Timeline
 
-| Stage | Timeline |
-|-------|----------|
-| Initial Response | Within 48 hours |
-| Vulnerability Confirmation | Within 7 days |
-| Fix Development | Within 30 days |
-| Public Disclosure | After fix is released |
+| Stage                      | Timeline              |
+| -------------------------- | --------------------- |
+| Initial Response           | Within 48 hours       |
+| Vulnerability Confirmation | Within 7 days         |
+| Fix Development            | Within 30 days        |
+| Public Disclosure          | After fix is released |
 
 ### What to Expect
 
@@ -141,7 +141,7 @@ TELEMETRYFLOW_MCP_CLAUDE_API_KEY=$(aws secretsmanager get-secret-value --secret-
 ```yaml
 # config.yaml - DO NOT include secrets here
 claude:
-  api_key: ""  # Use environment variable instead
+  api_key: "" # Use environment variable instead
 
 security:
   rate_limit:
@@ -211,12 +211,12 @@ apiKey := os.Getenv("TELEMETRYFLOW_MCP_CLAUDE_API_KEY")
 
 We use multiple tools to scan for vulnerabilities:
 
-| Tool | Purpose |
-|------|---------|
+| Tool          | Purpose                   |
+| ------------- | ------------------------- |
 | `govulncheck` | Go vulnerability database |
-| `nancy` | Sonatype OSS Index |
-| `trivy` | Container image scanning |
-| `grype` | Container/SBOM scanning |
+| `nancy`       | Sonatype OSS Index        |
+| `trivy`       | Container image scanning  |
+| `grype`       | Container/SBOM scanning   |
 
 ### Running Security Scans
 
@@ -247,11 +247,11 @@ trivy image telemetryflow-mcp:latest
 
 ### Storage Guidelines
 
-| Environment | Recommendation |
-|-------------|----------------|
-| Development | `.env` file (gitignored) |
-| CI/CD | Secret management (GitHub Secrets, etc.) |
-| Production | Secret manager (AWS, GCP, Azure, Vault) |
+| Environment | Recommendation                           |
+| ----------- | ---------------------------------------- |
+| Development | `.env` file (gitignored)                 |
+| CI/CD       | Secret management (GitHub Secrets, etc.) |
+| Production  | Secret manager (AWS, GCP, Azure, Vault)  |
 
 ### Rotation Policy
 
@@ -303,14 +303,14 @@ trivy image telemetryflow-mcp:latest
 
 ### Built-in Security
 
-| Feature | Description |
-|---------|-------------|
-| Rate Limiting | Prevent abuse with configurable limits |
-| Input Validation | JSON schema validation for all inputs |
-| Path Sanitization | Prevent directory traversal attacks |
-| Command Allowlist | Restrict executable commands |
-| Error Handling | Secure error messages without leaks |
-| Logging | Sensitive data redaction |
+| Feature           | Description                            |
+| ----------------- | -------------------------------------- |
+| Rate Limiting     | Prevent abuse with configurable limits |
+| Input Validation  | JSON schema validation for all inputs  |
+| Path Sanitization | Prevent directory traversal attacks    |
+| Command Allowlist | Restrict executable commands           |
+| Error Handling    | Secure error messages without leaks    |
+| Logging           | Sensitive data redaction               |
 
 ### Configuration
 

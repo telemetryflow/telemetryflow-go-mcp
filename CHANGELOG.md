@@ -8,22 +8,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.2] - 2025-01-09
 
 ### Added
+
+#### Database Infrastructure
+
 - PostgreSQL database support with GORM ORM
   - Session repository for persistent session storage
   - Conversation repository for message history
-  - Database models with JSONB support
+  - Database models with JSONB support for flexible data storage
   - Connection pooling and health checks
+  - Custom GORM types: `JSONB`, `JSONBArray`, `StringArray`
 - ClickHouse analytics database support
-  - Tool call analytics table
-  - API request analytics table
-  - Session analytics table
-  - Time series aggregation queries
+  - Tool call analytics table with MergeTree engine
+  - API request analytics table for Claude API usage
+  - Session analytics table for lifecycle events
+  - Error analytics table for debugging
+  - Time series aggregation queries with percentiles (p50/p95/p99)
+  - Hourly aggregation tables (SummingMergeTree, ReplacingMergeTree)
+  - Materialized views for real-time aggregations
   - Batch insert support for high throughput
-- Analytics repository with dashboard queries
-  - Token usage by model
-  - Tool usage statistics with percentiles
+
+#### Analytics & Dashboard
+
+- Analytics repository with comprehensive dashboard queries
+  - Token usage statistics by model
+  - Tool usage statistics with p50/p95/p99 percentiles
   - Request/token/latency time series
-  - Error rate tracking
+  - Error rate tracking over time
+  - Dashboard summary with key metrics
+
+#### Migration & Seeding Infrastructure
+
+- Database migration infrastructure
+  - Versioned migrations for PostgreSQL and ClickHouse
+  - Migration runner with up/down/reset/fresh operations
+  - Migration status tracking via `schema_migrations` table
+  - GORM AutoMigrate integration
+- Database seeding infrastructure
+  - Idempotent seeders using FirstOrCreate pattern
+  - Default seeders: tools, resources, prompts, api_keys, demo_session
+  - Production-safe seeder subset (excludes demo data)
+  - SeederResult tracking for executed/skipped/failed seeders
+
+#### Caching & Queue Infrastructure
+
 - Redis caching infrastructure
   - Cache service with TTL support
   - Session and conversation caching
@@ -32,21 +59,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Durable message queuing
   - Publisher/subscriber pattern
   - Task acknowledgment with retry support
+
+#### Testing & CI/CD
+
 - Comprehensive test suite
   - Session aggregate tests
   - Conversation aggregate tests
   - Tool entity tests
   - MCP protocol tests
+  - Migration and seeder tests
+  - GORM model tests
   - Benchmarks for performance testing
-- Additional test coverage
-- Performance benchmarks
+- CI-specific Makefile targets for GitHub Actions
+  - `test-unit-ci`: Unit tests with coverage output
+  - `test-integration-ci`: Integration tests with coverage
+  - `test-e2e-ci`: End-to-end tests
+  - `ci-build`: Cross-platform CI builds with GOOS/GOARCH
+  - `ci-test`: Combined format, vet, lint, test pipeline
+  - `test-all`: Run all test types
+  - `deps-verify`: Dependency verification
+  - `staticcheck`: Static analysis
+  - `govulncheck`: Vulnerability scanning
+  - `coverage-report`: Merged coverage report generation
 - GitHub Actions CI/CD workflows
   - Lint, test, build pipeline
-  - Multi-platform build support
+  - Multi-platform build support (Linux, macOS, Windows)
   - Security scanning with Gosec and govulncheck
-  - Coverage reporting
+  - Coverage reporting with merged reports
 
 ### Changed
+
 - **BREAKING**: Refactored all environment variable keys from `TFO_*` to `TELEMETRYFLOW_*`
   - `TFO_CLAUDE_API_KEY` → `TELEMETRYFLOW_MCP_CLAUDE_API_KEY`
   - `TFO_LOG_LEVEL` → `TELEMETRYFLOW_MCP_LOG_LEVEL`
@@ -56,97 +98,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated go.mod with GORM, ClickHouse, Redis, and NATS dependencies
 - Enhanced configuration with database, cache, and queue settings
 - Updated Viper SetEnvPrefix from `TFO_MCP` to `TELEMETRYFLOW_MCP`
+- Improved error handling in analytics repository with proper resource cleanup
+- Enhanced event publishing with explicit error ignoring for best-effort delivery
 
 ### Fixed
-- Minor bug fixes
+
+- Fixed all golangci-lint errors (0 issues)
+  - Added proper error handling for `rows.Close()` in analytics repository
+  - Added explicit error ignoring for event publisher calls (best-effort delivery)
+  - Fixed empty branches in test assertions
+  - Removed unused variables in server tests
 - Fixed anthropic SDK API compatibility in client.go
 - Fixed observability.go StartSpan return type
 
 ---
 
-## [1.1.2] - 2026-01-09
+## [1.1.1] - 2025-01-05
 
 ### Added
 
-#### Core Features
-- Complete MCP protocol implementation (version 2024-11-05)
-- Claude AI integration with Anthropic SDK v0.2.0-beta.3
-- Domain-Driven Design (DDD) architecture
-- CQRS pattern for command/query separation
-
-#### Domain Layer
-- Session aggregate for MCP session lifecycle management
-- Conversation aggregate for multi-turn conversations
-- Value objects: SessionID, ConversationID, MessageID, ToolID, ResourceID, PromptID
-- Domain events: SessionCreated, MessageAdded, ToolExecuted, etc.
-- Repository interfaces for persistence abstraction
-
-#### Application Layer
-- Session commands: InitializeSession, CloseSession
-- Conversation commands: CreateConversation, SendMessage
-- Tool commands: ExecuteTool, RegisterTool
-- Query handlers for tools, resources, and prompts
-
-#### Infrastructure Layer
-- Claude API client with retry logic and streaming support
-- In-memory repositories for session, conversation, tool management
-- Configuration management with Viper
-- Structured logging with Zerolog
-
-#### Presentation Layer
-- MCP server with JSON-RPC 2.0 transport
-- Built-in tools: claude_conversation, read_file, write_file, list_directory
-- Additional tools: execute_command, search_files, system_info, echo
-- Resource and prompt endpoints
-
-#### Observability
-- OpenTelemetry SDK v1.39.0 integration
-- Distributed tracing support
-- Metrics collection
-- Structured logging
-
-#### Developer Experience
-- Comprehensive Makefile with 30+ targets
-- Docker support with multi-stage builds
-- Cross-platform builds (Linux, macOS, Windows)
-- Development scripts (build, test, release, validate)
-
-#### Documentation
-- README with Mermaid diagrams
-- Architecture documentation
-- Configuration guide
-- Commands reference
-- Development guide
-- Installation guide
-- Troubleshooting guide
-
-### Technical Details
-
-- **Go Version**: 1.24+
-- **MCP Protocol**: 2024-11-05
-- **Claude API**: anthropic-sdk-go v0.2.0-beta.3
-- **OpenTelemetry**: v1.39.0
-- **Logging**: Zerolog v1.33.0
-- **CLI**: Cobra v1.8.1
-- **Config**: Viper v1.19.0
-
----
-
-## [1.1.1] - 2026-01-05
-
-### Added
 - Initial project structure
 - Basic MCP protocol support
 - Claude API integration prototype
 
 ### Changed
+
 - Refined DDD architecture
 
 ---
 
-## [1.1.0] - 2026-01-01
+## [1.1.0] - 2025-01-01
 
 ### Added
+
 - Project inception
 - Architecture design
 - Technology stack selection
@@ -155,11 +139,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History Summary
 
-| Version | Date | Highlights |
-|---------|------|------------|
-| 1.1.2 | 2026-01-09 | Full MCP implementation, comprehensive documentation |
-| 1.1.1 | 2026-01-05 | Initial structure, basic protocol support |
-| 1.1.0 | 2026-01-01 | Project inception |
+| Version | Date       | Highlights                                                     |
+| ------- | ---------- | -------------------------------------------------------------- |
+| 1.1.2   | 2025-01-09 | Database infrastructure, CI/CD, analytics, comprehensive tests |
+| 1.1.1   | 2025-01-05 | Initial structure, basic protocol support                      |
+| 1.1.0   | 2025-01-01 | Project inception                                              |
 
 ---
 

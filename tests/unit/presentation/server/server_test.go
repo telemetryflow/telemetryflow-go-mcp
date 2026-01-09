@@ -275,18 +275,19 @@ func TestMCPServer_CallTool(t *testing.T) {
 	})
 
 	t.Run("missing required arguments", func(t *testing.T) {
-		toolName := "read_file"
 		arguments := map[string]interface{}{}
 
 		requiredArgs := []string{"path"}
+		missingCount := 0
 		for _, arg := range requiredArgs {
 			if _, ok := arguments[arg]; !ok {
-				// This is expected - missing required argument
-				continue
+				missingCount++
 			}
 		}
 
-		_ = toolName
+		if missingCount != len(requiredArgs) {
+			t.Errorf("expected %d missing args, got %d", len(requiredArgs), missingCount)
+		}
 	})
 }
 
@@ -304,12 +305,11 @@ func TestMCPServer_ErrorCodes(t *testing.T) {
 			if code >= 0 {
 				t.Errorf("JSON-RPC error codes should be negative, got %d for %s", code, name)
 			}
-			if code > -32600 || code < -32700 {
-				if code > -32000 || code < -32099 {
-					// Server errors are -32000 to -32099
-					// Pre-defined errors are -32600 to -32700
-					// Both ranges are valid
-				}
+			// Valid ranges: Server errors (-32000 to -32099) or Pre-defined errors (-32600 to -32700)
+			isServerError := code <= -32000 && code >= -32099
+			isPredefinedError := code <= -32600 && code >= -32700
+			if !isServerError && !isPredefinedError {
+				t.Errorf("JSON-RPC error code %d for %s is outside valid ranges", code, name)
 			}
 		})
 	}

@@ -70,30 +70,32 @@ graph LR
     style CORE fill:#B3E5FC,stroke:#0288D1
 ```
 
-| Component | Version | OTEL Base | Role |
-|-----------|---------|-----------|------|
-| TFO-Core | v1.1.4 | - | Identity & Access Management |
-| TFO-Agent | v1.1.2 | SDK v1.39.0 | Telemetry Collection Agent |
-| TFO-Collector | v1.1.2 | Collector v0.142.0 | Central Telemetry Processing |
-| TFO-Go-SDK | v1.1.2 | SDK v1.39.0 | Go Instrumentation |
-| TFO-Python-SDK | v1.1.2 | SDK v1.28.0 | Python Instrumentation |
-| **TFO-MCP** | **v1.1.2** | **SDK v1.39.0** | **MCP Server + Claude AI** |
+| Component      | Version    | OTEL Base          | Role                         |
+| -------------- | ---------- | ------------------ | ---------------------------- |
+| TFO-Core       | v1.1.4     | -                  | Identity & Access Management |
+| TFO-Agent      | v1.1.2     | SDK v1.39.0        | Telemetry Collection Agent   |
+| TFO-Collector  | v1.1.2     | Collector v0.142.0 | Central Telemetry Processing |
+| TFO-Go-SDK     | v1.1.2     | SDK v1.39.0        | Go Instrumentation           |
+| TFO-Python-SDK | v1.1.2     | SDK v1.28.0        | Python Instrumentation       |
+| **TFO-MCP**    | **v1.1.2** | **SDK v1.39.0**    | **MCP Server + Claude AI**   |
 
 ---
 
 ## Quick Facts
 
-| Property | Value |
-|----------|-------|
-| **Version** | 1.1.2 |
-| **Language** | Go 1.24+ |
-| **MCP Protocol** | 2024-11-05 |
-| **Claude SDK** | anthropic-sdk-go v0.2.0-beta.3 |
-| **OTEL SDK** | v1.39.0 |
-| **Architecture** | DDD/CQRS |
-| **Transport** | stdio, SSE (planned), WebSocket (planned) |
-| **Built-in Tools** | 8 tools |
+| Property             | Value                                                   |
+| -------------------- | ------------------------------------------------------- |
+| **Version**          | 1.1.2                                                   |
+| **Language**         | Go 1.24+                                                |
+| **MCP Protocol**     | 2024-11-05                                              |
+| **Claude SDK**       | anthropic-sdk-go v0.2.0-beta.3                          |
+| **OTEL SDK**         | v1.39.0                                                 |
+| **Architecture**     | DDD/CQRS                                                |
+| **Transport**        | stdio, SSE (planned), WebSocket (planned)               |
+| **Built-in Tools**   | 8 tools                                                 |
 | **Supported Models** | Claude 4 Opus, Claude 4 Sonnet, Claude 3.5 Sonnet/Haiku |
+| **Databases**        | PostgreSQL (GORM), ClickHouse, Redis (Cache)            |
+| **Queue**            | NATS JetStream                                          |
 
 ---
 
@@ -398,16 +400,16 @@ graph TB
 
 ### Tool Reference
 
-| Tool | Category | Description | Key Parameters |
-|------|----------|-------------|----------------|
-| `claude_conversation` | AI | Send messages to Claude AI | `message`, `model`, `system_prompt` |
-| `read_file` | File | Read file contents | `path`, `encoding` |
-| `write_file` | File | Write content to file | `path`, `content`, `create_dirs` |
-| `list_directory` | File | List directory contents | `path`, `recursive` |
-| `search_files` | File | Search files by pattern | `path`, `pattern` |
-| `execute_command` | System | Execute shell commands | `command`, `working_dir`, `timeout` |
-| `system_info` | System | Get system information | - |
-| `echo` | Utility | Echo input (testing) | `message` |
+| Tool                  | Category | Description                | Key Parameters                      |
+| --------------------- | -------- | -------------------------- | ----------------------------------- |
+| `claude_conversation` | AI       | Send messages to Claude AI | `message`, `model`, `system_prompt` |
+| `read_file`           | File     | Read file contents         | `path`, `encoding`                  |
+| `write_file`          | File     | Write content to file      | `path`, `content`, `create_dirs`    |
+| `list_directory`      | File     | List directory contents    | `path`, `recursive`                 |
+| `search_files`        | File     | Search files by pattern    | `path`, `pattern`                   |
+| `execute_command`     | System   | Execute shell commands     | `command`, `working_dir`, `timeout` |
+| `system_info`         | System   | Get system information     | -                                   |
+| `echo`                | Utility  | Echo input (testing)       | `message`                           |
 
 ---
 
@@ -447,13 +449,13 @@ sequenceDiagram
 
 ### Supported Models
 
-| Model | ID | Use Case |
-|-------|-----|----------|
-| Claude 4 Opus | `claude-opus-4-20250514` | Complex reasoning, analysis |
-| Claude 4 Sonnet | `claude-sonnet-4-20250514` | Balanced performance (default) |
-| Claude 3.7 Sonnet | `claude-3-7-sonnet-20250219` | Extended thinking |
-| Claude 3.5 Sonnet | `claude-3-5-sonnet-20241022` | Fast, capable |
-| Claude 3.5 Haiku | `claude-3-5-haiku-20241022` | Quick responses |
+| Model             | ID                           | Use Case                       |
+| ----------------- | ---------------------------- | ------------------------------ |
+| Claude 4 Opus     | `claude-opus-4-20250514`     | Complex reasoning, analysis    |
+| Claude 4 Sonnet   | `claude-sonnet-4-20250514`   | Balanced performance (default) |
+| Claude 3.7 Sonnet | `claude-3-7-sonnet-20250219` | Extended thinking              |
+| Claude 3.5 Sonnet | `claude-3-5-sonnet-20241022` | Fast, capable                  |
+| Claude 3.5 Haiku  | `claude-3-5-haiku-20241022`  | Quick responses                |
 
 ---
 
@@ -527,16 +529,16 @@ graph TD
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `ANTHROPIC_API_KEY` | Claude API key (required) | - |
-| `TELEMETRYFLOW_MCP_SERVER_TRANSPORT` | Transport type | `stdio` |
-| `TELEMETRYFLOW_MCP_SERVER_PORT` | Server port (SSE/WS) | `8080` |
-| `TELEMETRYFLOW_MCP_LOG_LEVEL` | Log level | `info` |
-| `TELEMETRYFLOW_MCP_LOG_FORMAT` | Log format | `json` |
-| `TELEMETRYFLOW_MCP_DEBUG` | Debug mode | `false` |
-| `TELEMETRYFLOW_MCP_CLAUDE_DEFAULT_MODEL` | Default Claude model | `claude-sonnet-4-20250514` |
-| `TELEMETRYFLOW_MCP_OTLP_ENDPOINT` | OTEL collector endpoint | `localhost:4317` |
+| Variable                                 | Description               | Default                    |
+| ---------------------------------------- | ------------------------- | -------------------------- |
+| `ANTHROPIC_API_KEY`                      | Claude API key (required) | -                          |
+| `TELEMETRYFLOW_MCP_SERVER_TRANSPORT`     | Transport type            | `stdio`                    |
+| `TELEMETRYFLOW_MCP_SERVER_PORT`          | Server port (SSE/WS)      | `8080`                     |
+| `TELEMETRYFLOW_MCP_LOG_LEVEL`            | Log level                 | `info`                     |
+| `TELEMETRYFLOW_MCP_LOG_FORMAT`           | Log format                | `json`                     |
+| `TELEMETRYFLOW_MCP_DEBUG`                | Debug mode                | `false`                    |
+| `TELEMETRYFLOW_MCP_CLAUDE_DEFAULT_MODEL` | Default Claude model      | `claude-sonnet-4-20250514` |
+| `TELEMETRYFLOW_MCP_OTLP_ENDPOINT`        | OTEL collector endpoint   | `localhost:4317`           |
 
 ---
 
@@ -599,7 +601,7 @@ Create `config.yaml` or use `configs/config.yaml`:
 server:
   name: "TelemetryFlow-MCP"
   version: "1.1.2"
-  transport: "stdio"        # stdio, sse, websocket
+  transport: "stdio" # stdio, sse, websocket
   debug: false
 
 claude:
@@ -619,8 +621,8 @@ mcp:
   tool_timeout: "30s"
 
 logging:
-  level: "info"             # debug, info, warn, error
-  format: "json"            # json, text
+  level: "info" # debug, info, warn, error
+  format: "json" # json, text
   output: "stderr"
 
 telemetry:
@@ -774,13 +776,41 @@ telemetryflow-mcp/
 │   │   │   └── client.go
 │   │   ├── config/                     # Configuration management
 │   │   │   └── config.go
+│   │   ├── cache/                      # Redis cache implementation
+│   │   │   └── redis.go
+│   │   ├── queue/                      # NATS JetStream queue
+│   │   │   ├── nats.go
+│   │   │   └── tasks.go
 │   │   └── persistence/                # Repository implementations
-│   │       └── memory_repositories.go
+│   │       ├── memory_repositories.go
+│   │       ├── clickhouse.go           # ClickHouse analytics
+│   │       ├── analytics_repository.go # Analytics queries
+│   │       ├── migrator.go             # Database migrations
+│   │       ├── seeder.go               # Database seeding
+│   │       └── models/                 # GORM models
+│   │           └── models.go
 │   └── presentation/                   # Presentation Layer
 │       ├── server/                     # MCP server implementation
 │       │   └── server.go
 │       └── tools/                      # Built-in tools
 │           └── builtin_tools.go
+├── migrations/                         # Database migrations
+│   ├── postgres/                       # PostgreSQL migrations
+│   │   ├── 000001_init_schema.up.sql
+│   │   └── 000001_init_schema.down.sql
+│   └── clickhouse/                     # ClickHouse migrations
+│       ├── 000001_init_analytics.up.sql
+│       └── 000001_init_analytics.down.sql
+├── scripts/                            # Initialization scripts
+│   ├── init-db.sql                     # PostgreSQL Docker init
+│   └── init-clickhouse.sql             # ClickHouse Docker init
+├── tests/                              # Test suites
+│   ├── unit/                           # Unit tests
+│   │   ├── domain/
+│   │   ├── application/
+│   │   ├── infrastructure/
+│   │   └── presentation/
+│   └── integration/                    # Integration tests
 ├── configs/
 │   └── config.yaml                     # Default configuration
 ├── docs/                               # Documentation
@@ -788,6 +818,7 @@ telemetryflow-mcp/
 │   ├── ARCHITECTURE.md
 │   ├── CONFIGURATION.md
 │   ├── COMMANDS.md
+│   ├── ERD.md                          # Entity relationship diagrams
 │   └── DEVELOPMENT.md
 ├── .kiro/                              # Specifications and steering
 │   └── steering/
@@ -795,6 +826,7 @@ telemetryflow-mcp/
 │       └── development-patterns.md
 ├── Makefile                            # Build automation
 ├── Dockerfile                          # Container build
+├── docker-compose.yml                  # Local development stack
 ├── go.mod                              # Go module
 ├── .env.example                        # Environment template
 └── .gitignore
@@ -834,6 +866,8 @@ make lint-fix           # Auto-fix lint issues
 make test               # Run tests
 make test-cover         # Tests with coverage
 make test-bench         # Run benchmarks
+make test-short         # Run short tests only
+make test-all           # Run all tests (unit, integration, e2e)
 
 # Cross-compilation
 make build-all          # Build for all platforms
@@ -847,7 +881,18 @@ make docker-run         # Run Docker container
 
 # CI/CD
 make ci                 # Full CI pipeline
+make ci-test            # CI pipeline (format, vet, lint, test)
 make release            # Create release artifacts
+
+# CI-Specific (GitHub Actions)
+make test-unit-ci       # Unit tests with coverage output
+make test-integration-ci # Integration tests with coverage
+make test-e2e-ci        # End-to-end tests
+make ci-build           # Cross-platform CI build
+make deps-verify        # Verify dependencies
+make staticcheck        # Run staticcheck
+make govulncheck        # Vulnerability scanning
+make coverage-report    # Generate merged coverage report
 ```
 
 ### Testing
@@ -855,6 +900,9 @@ make release            # Create release artifacts
 ```bash
 # Run all tests
 make test
+
+# Run all test types (unit, integration, e2e)
+make test-all
 
 # Run tests with coverage
 make test-cover
@@ -864,6 +912,9 @@ open build/coverage.html
 
 # Run benchmarks
 make test-bench
+
+# Run CI test pipeline (format + vet + lint + test)
+make ci-test
 ```
 
 ---
@@ -916,17 +967,17 @@ telemetry:
 
 ## MCP Capabilities Matrix
 
-| Capability | Status | Description |
-|------------|--------|-------------|
-| `tools` | ✅ | Tool listing and execution |
-| `tools.listChanged` | ✅ | Dynamic tool registration |
-| `resources` | ✅ | Resource listing and reading |
-| `resources.subscribe` | ✅ | Resource change subscriptions |
-| `resources.listChanged` | ✅ | Dynamic resource registration |
-| `prompts` | ✅ | Prompt templates |
-| `prompts.listChanged` | ✅ | Dynamic prompt registration |
-| `logging` | ✅ | Log level management |
-| `sampling` | 🔜 | LLM sampling (planned) |
+| Capability              | Status | Description                   |
+| ----------------------- | ------ | ----------------------------- |
+| `tools`                 | ✅     | Tool listing and execution    |
+| `tools.listChanged`     | ✅     | Dynamic tool registration     |
+| `resources`             | ✅     | Resource listing and reading  |
+| `resources.subscribe`   | ✅     | Resource change subscriptions |
+| `resources.listChanged` | ✅     | Dynamic resource registration |
+| `prompts`               | ✅     | Prompt templates              |
+| `prompts.listChanged`   | ✅     | Dynamic prompt registration   |
+| `logging`               | ✅     | Log level management          |
+| `sampling`              | 🔜     | LLM sampling (planned)        |
 
 ---
 
@@ -970,28 +1021,28 @@ graph TD
 
 ## Security Considerations
 
-| Aspect | Implementation |
-|--------|----------------|
-| **API Key Storage** | Environment variables only |
+| Aspect                | Implementation                           |
+| --------------------- | ---------------------------------------- |
+| **API Key Storage**   | Environment variables only               |
 | **Command Execution** | Configurable timeout, sandboxing planned |
-| **File Access** | Path validation, no traversal |
-| **Rate Limiting** | Configurable per-minute limits |
-| **CORS** | Configurable for SSE transport |
-| **Input Validation** | JSON Schema validation for tools |
+| **File Access**       | Path validation, no traversal            |
+| **Rate Limiting**     | Configurable per-minute limits           |
+| **CORS**              | Configurable for SSE transport           |
+| **Input Validation**  | JSON Schema validation for tools         |
 
 ---
 
 ## Documentation Index
 
-| Document | Description |
-|----------|-------------|
-| [README.md](README.md) | Project overview and quick start |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Detailed architecture documentation |
-| [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | Configuration reference |
-| [docs/COMMANDS.md](docs/COMMANDS.md) | CLI commands reference |
-| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Development guide |
-| [docs/INSTALLATION.md](docs/INSTALLATION.md) | Installation guide |
-| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Troubleshooting guide |
+| Document                                           | Description                         |
+| -------------------------------------------------- | ----------------------------------- |
+| [README.md](README.md)                             | Project overview and quick start    |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)       | Detailed architecture documentation |
+| [docs/CONFIGURATION.md](docs/CONFIGURATION.md)     | Configuration reference             |
+| [docs/COMMANDS.md](docs/COMMANDS.md)               | CLI commands reference              |
+| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)         | Development guide                   |
+| [docs/INSTALLATION.md](docs/INSTALLATION.md)       | Installation guide                  |
+| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Troubleshooting guide               |
 
 ---
 

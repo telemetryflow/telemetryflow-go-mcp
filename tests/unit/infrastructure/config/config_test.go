@@ -63,8 +63,10 @@ func TestLoadConfig_EnvironmentVariables(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Set environment variable
-			os.Setenv(tt.envKey, tt.envValue)
-			defer os.Unsetenv(tt.envKey)
+			if err := os.Setenv(tt.envKey, tt.envValue); err != nil {
+				t.Fatalf("failed to set env var %s: %v", tt.envKey, err)
+			}
+			defer func() { _ = os.Unsetenv(tt.envKey) }()
 
 			// Verify environment variable is set
 			value := os.Getenv(tt.envKey)

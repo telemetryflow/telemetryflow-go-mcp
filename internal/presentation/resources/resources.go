@@ -67,7 +67,7 @@ func (h *ResourceHandler) ReadResource(ctx context.Context, uri string) (*Resour
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	data, err := io.ReadAll(file)
 	if err != nil {

@@ -109,9 +109,9 @@ func (h *ToolHandler) HandleRegisterTool(ctx context.Context, cmd *commands.Regi
 		return nil, err
 	}
 
-	// Publish event
+	// Publish event (best-effort, don't fail on publish errors)
 	event := events.NewToolRegisteredEvent(cmd.SessionID, cmd.Name)
-	h.eventPublisher.Publish(ctx, event)
+	_ = h.eventPublisher.Publish(ctx, event)
 
 	return tool, nil
 }
@@ -192,10 +192,10 @@ func (h *ToolHandler) HandleExecuteTool(ctx context.Context, cmd *commands.Execu
 	result, err := h.executeToolWithContext(execCtx, tool, cmd.Arguments)
 	duration := time.Since(startTime)
 
-	// Publish execution event
+	// Publish execution event (best-effort, don't fail on publish errors)
 	success := err == nil && (result == nil || !result.IsError)
 	event := events.NewToolExecutedEvent(cmd.SessionID, cmd.Name, success, duration)
-	h.eventPublisher.Publish(ctx, event)
+	_ = h.eventPublisher.Publish(ctx, event)
 
 	if err != nil {
 		return entities.NewErrorToolResult(err), nil

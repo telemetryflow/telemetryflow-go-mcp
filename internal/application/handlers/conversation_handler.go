@@ -241,9 +241,9 @@ func (h *ConversationHandler) HandleCloseConversation(ctx context.Context, cmd *
 		return err
 	}
 
-	// Publish events
+	// Publish events (best-effort, don't fail on publish errors)
 	for _, event := range conversation.Events() {
-		h.eventPublisher.Publish(ctx, event)
+		_ = h.eventPublisher.Publish(ctx, event)
 	}
 
 	return nil

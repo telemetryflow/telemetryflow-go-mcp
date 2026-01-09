@@ -106,9 +106,10 @@ func (m *Migrator) LoadMigrationsFromFS(fsys embed.FS, dir string) error {
 			}
 		}
 
-		if direction == "up" {
+		switch direction {
+		case "up":
 			migrationMap[version].UpSQL = string(content)
-		} else if direction == "down" {
+		case "down":
 			migrationMap[version].DownSQL = string(content)
 		}
 	}
