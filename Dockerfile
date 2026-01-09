@@ -15,15 +15,14 @@ WORKDIR /build
 # Set GOPRIVATE to bypass checksum database for telemetryflow SDK
 ENV GOPRIVATE=github.com/telemetryflow/*
 
+# Copy go module files first for better caching
+COPY go.mod go.sum ./
+
+# Download dependencies (leverages Docker layer caching)
+RUN go mod download && go mod verify
+
 # Copy source code
 COPY . .
-
-# Cleanup Cache
-RUN go clean -modcache -cache
-RUN rm -f go.sum
-
-# Download dependencies
-RUN go mod download
 
 # Build arguments
 ARG VERSION=1.1.2
