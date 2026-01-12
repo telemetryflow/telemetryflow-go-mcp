@@ -17,7 +17,7 @@
 #
 # =============================================================================
 
-name: Docker Build - TFO MCP
+name: Docker Build - TFO GO MCP
 
 on:
   push:
