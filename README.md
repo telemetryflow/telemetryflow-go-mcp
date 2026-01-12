@@ -67,7 +67,7 @@ graph LR
     MCP_GO -.-> |AI Capabilities| COLLECTOR
     MCP_PY -.-> |AI Capabilities| COLLECTOR
 
-    style MCP_GO fill:#3776AB,stroke:#FFD43B,stroke-width:3px
+    style MCP_GO fill:#FFA1E1,stroke:#C989B4,stroke-width:5px
     style MCP_PY fill:#E1BEE7,stroke:#7B1FA2
     style SDK_GO fill:#C8E6C9,stroke:#388E3C
     style SDK_PY fill:#C8E6C9,stroke:#388E3C
@@ -77,15 +77,15 @@ graph LR
     style CORE fill:#B3E5FC,stroke:#0288D1
 ```
 
-| Component      | Version    | OTEL Base          | Role                         |
-| -------------- | ---------- | ------------------ | ---------------------------- |
-| TFO-Core       | v1.1.4     | -                  | Identity & Access Management |
-| TFO-Agent      | v1.1.2     | SDK v1.39.0        | Telemetry Collection Agent   |
-| TFO-Collector  | v1.1.2     | Collector v0.142.0 | Central Telemetry Processing |
-| TFO-Go-SDK     | v1.1.2     | SDK v1.39.0        | Go Instrumentation           |
-| TFO-Python-SDK | v1.1.2     | SDK v1.28.0        | Python Instrumentation       |
-| **TFO-Go-MCP**    | **v1.1.2** | **SDK v1.39.0**    | **GO MCP Server + Claude AI**   |
-| TFO-Python-MCP | v1.1.2 | SDK v1.28.0 | Python MCP Server + Claude AI |
+| Component      | Version    | OTEL Base          | Role                          |
+| -------------- | ---------- | ------------------ | ----------------------------- |
+| TFO-Core       | v1.1.4     | -                  | Identity & Access Management  |
+| TFO-Agent      | v1.1.2     | SDK v1.39.0        | Telemetry Collection Agent    |
+| TFO-Collector  | v1.1.2     | Collector v0.142.0 | Central Telemetry Processing  |
+| TFO-Go-SDK     | v1.1.2     | SDK v1.39.0        | Go Instrumentation            |
+| TFO-Python-SDK | v1.1.2     | SDK v1.28.0        | Python Instrumentation        |
+| **TFO-Go-MCP** | **v1.1.2** | **SDK v1.39.0**    | **GO MCP Server + Claude AI** |
+| TFO-Python-MCP | v1.1.2     | SDK v1.28.0        | Python MCP Server + Claude AI |
 
 ---
 
