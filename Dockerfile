@@ -3,11 +3,18 @@
 # Multi-stage build for minimal production image
 # ==============================================================================
 
-# Build stage
-FROM golang:1.24-alpine AS builder
+# -----------------------------------------------------------------------------
+# Stage 1: Builder
+# -----------------------------------------------------------------------------
+FROM golang:1.26-alpine AS builder
+
+# Build arguments
+ARG VERSION=1.2.0
+ARG COMMIT=unknown
+ARG BUILD_DATE=unknown
 
 # Install build dependencies
-RUN apk add --no-cache git ca-certificates tzdata
+RUN apk add --no-cache git make ca-certificates tzdata
 
 # Set working directory
 WORKDIR /build
@@ -24,61 +31,65 @@ RUN go mod download && go mod verify
 # Copy source code
 COPY . .
 
-# Build arguments
-ARG VERSION=1.1.2
-ARG COMMIT=unknown
-ARG BUILD_DATE=unknown
-
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-    -ldflags "-s -w -X main.version=${VERSION} -X main.commit=${COMMIT} -X main.buildDate=${BUILD_DATE}" \
-    -o tfo-mcp \
-    ./cmd/mcp
+    -ldflags "-s -w \
+    -X 'main.version=${VERSION}' \
+    -X 'main.commit=${COMMIT}' \
+    -X 'main.buildDate=${BUILD_DATE}'" \
+    -o /tfo-mcp ./cmd/mcp
 
-# ==============================================================================
-# Production stage
-# ==============================================================================
-FROM alpine:3.21
+# Verify binary
+RUN /tfo-mcp version
+
+# -----------------------------------------------------------------------------
+# Stage 2: Runtime
+# -----------------------------------------------------------------------------
+FROM alpine:3.23
 
 # =============================================================================
 # TelemetryFlow Metadata Labels (OCI Image Spec)
 # =============================================================================
 LABEL org.opencontainers.image.title="TelemetryFlow GO MCP Server" \
     org.opencontainers.image.description="Enterprise MCP (Model Context Protocol) server for AI-powered observability - Community Enterprise Observability Platform (CEOP)" \
-    org.opencontainers.image.version="1.1.2" \
+    org.opencontainers.image.version="1.2.0" \
     org.opencontainers.image.vendor="TelemetryFlow" \
-    org.opencontainers.image.authors="DevOpsCorner Indonesia <support@devopscorner.id>" \
+    org.opencontainers.image.authors="Telemetri Data Indonesia <support@devopscorner.id>" \
     org.opencontainers.image.url="https://telemetryflow.id" \
     org.opencontainers.image.documentation="https://docs.telemetryflow.id" \
     org.opencontainers.image.source="https://github.com/telemetryflow/telemetryflow-go-mcp" \
     org.opencontainers.image.licenses="Apache-2.0" \
-    org.opencontainers.image.base.name="alpine:3.21" \
-    # TelemetryFlow specific labels
+    org.opencontainers.image.base.name="alpine:3.23" \
     io.telemetryflow.product="TelemetryFlow GO MCP Server" \
     io.telemetryflow.component="tfo-mcp" \
     io.telemetryflow.platform="CEOP" \
-    io.telemetryflow.maintainer="DevOpsCorner Indonesia"
+    io.telemetryflow.maintainer="Telemetri Data Indonesia"
 
 # Install runtime dependencies
-RUN apk add --no-cache ca-certificates tzdata
+RUN apk add --no-cache \
+    ca-certificates \
+    tzdata \
+    && rm -rf /var/cache/apk/*
 
-# Create non-root user
-RUN addgroup -S telemetryflow && adduser -S telemetryflow -G telemetryflow
+# Create non-root user and group
+RUN addgroup -g 10001 -S telemetryflow && \
+    adduser -u 10001 -S telemetryflow -G telemetryflow -h /home/telemetryflow
 
-# Set working directory
-WORKDIR /app
+# Create app directory
+RUN mkdir -p /app/configs && chown -R telemetryflow:telemetryflow /app
 
 # Copy binary from builder
-COPY --from=builder /build/tfo-mcp /app/tfo-mcp
+COPY --from=builder /tfo-mcp /usr/local/bin/tfo-mcp
+RUN chmod +x /usr/local/bin/tfo-mcp
 
 # Copy default config
-COPY configs/tfo-mcp.yaml /app/configs/tfo-mcp.yaml
-
-# Set ownership
-RUN chown -R telemetryflow:telemetryflow /app
+COPY --chown=telemetryflow:telemetryflow configs/tfo-mcp.yaml /app/configs/tfo-mcp.yaml
 
 # Switch to non-root user
 USER telemetryflow
+
+# Set working directory
+WORKDIR /app
 
 # =============================================================================
 # Environment Variables (synchronized with .env.example)
@@ -91,7 +102,7 @@ ENV ANTHROPIC_API_KEY=""
 ENV TELEMETRYFLOW_API_KEY=""
 ENV TELEMETRYFLOW_ENDPOINT="https://api.telemetryflow.io"
 ENV TELEMETRYFLOW_SERVICE_NAME="telemetryflow-go-mcp"
-ENV TELEMETRYFLOW_SERVICE_VERSION="1.1.2"
+ENV TELEMETRYFLOW_SERVICE_VERSION="1.2.0"
 ENV TELEMETRYFLOW_ENVIRONMENT="production"
 
 # Server Configuration
@@ -132,7 +143,7 @@ ENV TELEMETRYFLOW_MCP_SERVICE_NAME="telemetryflow-go-mcp"
 EXPOSE 8080
 
 # Entry point
-ENTRYPOINT ["/app/tfo-mcp"]
+ENTRYPOINT ["/usr/local/bin/tfo-mcp"]
 
 # Default command
 CMD ["--config", "/app/configs/tfo-mcp.yaml"]

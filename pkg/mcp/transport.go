@@ -40,11 +40,13 @@ func NewStdioTransport(reader io.Reader, writer io.Writer) *StdioTransport {
 
 // Read reads the next JSON-RPC request from stdin
 func (t *StdioTransport) Read(ctx context.Context) (*Request, error) {
+	t.mu.Lock()
 	if t.closed {
+		t.mu.Unlock()
 		return nil, fmt.Errorf("transport closed")
 	}
+	t.mu.Unlock()
 
-	// Read line from stdin
 	line, err := t.reader.ReadBytes('\n')
 	if err != nil {
 		if err == io.EOF {

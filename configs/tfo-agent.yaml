@@ -1,0 +1,100 @@
+# =============================================================================
+# TelemetryFlow Agent Configuration — MCP Docker Compose
+# =============================================================================
+# Lightweight agent config for MCP server development environment.
+# Collects system metrics and forwards to TFO-Collector.
+#
+# Environment Variables:
+#   TELEMETRYFLOW_API_KEY_ID      - API Key ID (tfk_xxx)
+#   TELEMETRYFLOW_API_KEY_SECRET  - API Key Secret (tfs_xxx)
+#   TELEMETRYFLOW_AGENT_ID        - Unique agent ID (auto-generated if unset)
+#   TELEMETRYFLOW_AGENT_NAME      - Human-readable agent name
+#   TELEMETRYFLOW_ENVIRONMENT     - Deployment environment
+# =============================================================================
+
+telemetryflow:
+  api_key_id: "${TELEMETRYFLOW_API_KEY_ID}"
+  api_key_secret: "${TELEMETRYFLOW_API_KEY_SECRET}"
+  endpoint: "http://host.docker.internal:3000/api/v2"
+  protocol: http
+  tls:
+    enabled: false
+    insecure_skip_verify: true
+  retry:
+    enabled: true
+    max_attempts: 3
+    initial_interval: 1s
+    max_interval: 30s
+
+agent:
+  id: ""
+  hostname: ""
+  name: "${TELEMETRYFLOW_AGENT_NAME:-tfo-agent-mcp}"
+  description: "TelemetryFlow Agent - MCP Server Development Environment"
+  version: ""
+  tags:
+    environment: "${TELEMETRYFLOW_ENVIRONMENT:-development}"
+    provider: docker
+    source: tfo-go-mcp
+
+heartbeat:
+  interval: 60s
+  timeout: 10s
+  include_system_info: true
+
+collectors:
+  system:
+    enabled: true
+    interval: 15s
+    cpu: true
+    memory: true
+    disk: true
+    network: true
+    disk_paths: []
+
+  logs:
+    enabled: false
+    paths:
+      - /var/log/pods/*/*/*.log
+      - /var/log/containers/*.log
+
+  kubernetes:
+    enabled: false
+
+exporter:
+  otlp:
+    enabled: true
+    batch_size: 100
+    flush_interval: 10s
+    compression: gzip
+    endpoint_version: v2
+
+    metrics:
+      enabled: true
+      endpoint: "http://tfo-collector:4318/v2/metrics"
+
+    traces:
+      enabled: true
+      endpoint: "http://tfo-collector:4318/v2/traces"
+
+    logs:
+      enabled: true
+      endpoint: "http://tfo-collector:4318/v2/logs"
+
+buffer:
+  enabled: true
+  max_size_mb: 50
+  path: "/data/buffer"
+  max_age: 24h
+  flush_interval: 5s
+
+logging:
+  level: info
+  format: json
+  file: ""
+  max_size_mb: 50
+  max_backups: 2
+  max_age_days: 3
+  include_stack_trace: false
+  sampling_initial: 100
+  sampling_thereafter: 100

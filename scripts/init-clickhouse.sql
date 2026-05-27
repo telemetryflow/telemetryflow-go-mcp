@@ -4,14 +4,14 @@
 -- ============================================================================
 
 -- Create database
-CREATE DATABASE IF NOT EXISTS telemetryflow_mcp;
+CREATE DATABASE IF NOT EXISTS telemetryflow_analytics;
 
 -- ============================================================================
 -- Analytics Tables
 -- ============================================================================
 
 -- Tool Call Analytics
-CREATE TABLE IF NOT EXISTS telemetryflow_mcp.tool_call_analytics (
+CREATE TABLE IF NOT EXISTS telemetryflow_analytics.tool_call_analytics (
     timestamp DateTime64(3) CODEC(Delta, ZSTD(1)),
     session_id UUID,
     conversation_id UUID,
@@ -29,7 +29,7 @@ TTL timestamp + INTERVAL 90 DAY
 SETTINGS index_granularity = 8192;
 
 -- API Request Analytics
-CREATE TABLE IF NOT EXISTS telemetryflow_mcp.api_request_analytics (
+CREATE TABLE IF NOT EXISTS telemetryflow_analytics.api_request_analytics (
     timestamp DateTime64(3) CODEC(Delta, ZSTD(1)),
     request_id UUID,
     session_id UUID,
@@ -51,7 +51,7 @@ TTL timestamp + INTERVAL 90 DAY
 SETTINGS index_granularity = 8192;
 
 -- Session Analytics
-CREATE TABLE IF NOT EXISTS telemetryflow_mcp.session_analytics (
+CREATE TABLE IF NOT EXISTS telemetryflow_analytics.session_analytics (
     timestamp DateTime64(3) CODEC(Delta, ZSTD(1)),
     session_id UUID,
     event_type LowCardinality(String),
@@ -75,7 +75,7 @@ SETTINGS index_granularity = 8192;
 -- ============================================================================
 
 -- Token Usage Hourly
-CREATE TABLE IF NOT EXISTS telemetryflow_mcp.token_usage_hourly (
+CREATE TABLE IF NOT EXISTS telemetryflow_analytics.token_usage_hourly (
     hour DateTime CODEC(Delta, ZSTD(1)),
     model LowCardinality(String),
     input_tokens UInt64,
@@ -88,7 +88,7 @@ ORDER BY (hour, model)
 SETTINGS index_granularity = 8192;
 
 -- Tool Usage Hourly
-CREATE TABLE IF NOT EXISTS telemetryflow_mcp.tool_usage_hourly (
+CREATE TABLE IF NOT EXISTS telemetryflow_analytics.tool_usage_hourly (
     hour DateTime CODEC(Delta, ZSTD(1)),
     tool_name LowCardinality(String),
     call_count UInt64,
@@ -102,7 +102,7 @@ ORDER BY (hour, tool_name)
 SETTINGS index_granularity = 8192;
 
 -- Error Analytics
-CREATE TABLE IF NOT EXISTS telemetryflow_mcp.error_analytics (
+CREATE TABLE IF NOT EXISTS telemetryflow_analytics.error_analytics (
     timestamp DateTime64(3) CODEC(Delta, ZSTD(1)),
     session_id UUID,
     conversation_id UUID,
@@ -119,7 +119,7 @@ TTL timestamp + INTERVAL 30 DAY
 SETTINGS index_granularity = 8192;
 
 -- Latency Percentiles
-CREATE TABLE IF NOT EXISTS telemetryflow_mcp.latency_percentiles_hourly (
+CREATE TABLE IF NOT EXISTS telemetryflow_analytics.latency_percentiles_hourly (
     hour DateTime CODEC(Delta, ZSTD(1)),
     model LowCardinality(String),
     p50_ms Float64,
@@ -138,8 +138,8 @@ SETTINGS index_granularity = 8192;
 -- ============================================================================
 
 -- Token Usage Materialized View
-CREATE MATERIALIZED VIEW IF NOT EXISTS telemetryflow_mcp.mv_token_usage_hourly
-TO telemetryflow_mcp.token_usage_hourly
+CREATE MATERIALIZED VIEW IF NOT EXISTS telemetryflow_analytics.mv_token_usage_hourly
+TO telemetryflow_analytics.token_usage_hourly
 AS SELECT
     toStartOfHour(timestamp) AS hour,
     model,
@@ -147,12 +147,12 @@ AS SELECT
     sum(output_tokens) AS output_tokens,
     sum(total_tokens) AS total_tokens,
     count() AS request_count
-FROM telemetryflow_mcp.api_request_analytics
+FROM telemetryflow_analytics.api_request_analytics
 GROUP BY hour, model;
 
 -- Tool Usage Materialized View
-CREATE MATERIALIZED VIEW IF NOT EXISTS telemetryflow_mcp.mv_tool_usage_hourly
-TO telemetryflow_mcp.tool_usage_hourly
+CREATE MATERIALIZED VIEW IF NOT EXISTS telemetryflow_analytics.mv_tool_usage_hourly
+TO telemetryflow_analytics.tool_usage_hourly
 AS SELECT
     toStartOfHour(timestamp) AS hour,
     tool_name,
@@ -161,27 +161,27 @@ AS SELECT
     sum(duration_ms) AS total_duration_ms,
     min(duration_ms) AS min_duration_ms,
     max(duration_ms) AS max_duration_ms
-FROM telemetryflow_mcp.tool_call_analytics
+FROM telemetryflow_analytics.tool_call_analytics
 GROUP BY hour, tool_name;
 
 -- ============================================================================
 -- Schema Migrations Tracking
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS telemetryflow_mcp.schema_migrations (
+CREATE TABLE IF NOT EXISTS telemetryflow_analytics.schema_migrations (
     version String,
     applied_at DateTime DEFAULT now()
 ) ENGINE = MergeTree()
 ORDER BY version;
 
-INSERT INTO telemetryflow_mcp.schema_migrations (version) VALUES ('init');
+INSERT INTO telemetryflow_analytics.schema_migrations (version) VALUES ('init');
 
 -- ============================================================================
 -- Seed Sample Analytics Data (for development/testing)
 -- ============================================================================
 
 -- Insert sample tool call analytics
-INSERT INTO telemetryflow_mcp.tool_call_analytics (timestamp, session_id, conversation_id, tool_name, duration_ms, is_error, input_size, output_size)
+INSERT INTO telemetryflow_analytics.tool_call_analytics (timestamp, session_id, conversation_id, tool_name, duration_ms, is_error, input_size, output_size)
 SELECT
     now() - INTERVAL number MINUTE AS timestamp,
     generateUUIDv4() AS session_id,
@@ -194,13 +194,13 @@ SELECT
 FROM numbers(100);
 
 -- Insert sample API request analytics
-INSERT INTO telemetryflow_mcp.api_request_analytics (timestamp, request_id, session_id, conversation_id, model, input_tokens, output_tokens, total_tokens, duration_ms, status_code, is_error)
+INSERT INTO telemetryflow_analytics.api_request_analytics (timestamp, request_id, session_id, conversation_id, model, input_tokens, output_tokens, total_tokens, duration_ms, status_code, is_error)
 SELECT
     now() - INTERVAL number MINUTE AS timestamp,
     generateUUIDv4() AS request_id,
     generateUUIDv4() AS session_id,
     generateUUIDv4() AS conversation_id,
-    arrayElement(['claude-3-opus', 'claude-3-sonnet', 'claude-3-haiku', 'claude-3-5-sonnet'], (number % 4) + 1) AS model,
+    arrayElement(['claude-opus-4-7', 'claude-sonnet-4-7', 'gpt-4o', 'gemini-2.5-pro'], (number % 4) + 1) AS model,
     100 + rand() % 2000 AS input_tokens,
     200 + rand() % 4000 AS output_tokens,
     300 + rand() % 6000 AS total_tokens,
@@ -210,7 +210,7 @@ SELECT
 FROM numbers(100);
 
 -- Insert sample session analytics
-INSERT INTO telemetryflow_mcp.session_analytics (timestamp, session_id, event_type, client_name, client_version, duration_ms, message_count, tool_call_count, total_tokens)
+INSERT INTO telemetryflow_analytics.session_analytics (timestamp, session_id, event_type, client_name, client_version, duration_ms, message_count, tool_call_count, total_tokens)
 SELECT
     now() - INTERVAL number HOUR AS timestamp,
     generateUUIDv4() AS session_id,

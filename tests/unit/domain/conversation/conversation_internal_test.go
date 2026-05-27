@@ -1,19 +1,19 @@
-// Package aggregates contains tests for domain aggregates
-package aggregates
+package conversation_test
 
 import (
 	"sync"
 	"testing"
 
+	"github.com/telemetryflow/telemetryflow-go-mcp/internal/domain/aggregates"
 	"github.com/telemetryflow/telemetryflow-go-mcp/internal/domain/entities"
 	vo "github.com/telemetryflow/telemetryflow-go-mcp/internal/domain/valueobjects"
 )
 
-func TestNewConversation(t *testing.T) {
+func TestNewConversation_Internal(t *testing.T) {
 	sessionID := vo.GenerateSessionID()
-	model := vo.ModelClaude4Sonnet
+	model := vo.ModelClaudeSonnet4
 
-	conv := NewConversation(sessionID, model)
+	conv := aggregates.NewConversation(sessionID, model)
 
 	if conv == nil {
 		t.Fatal("NewConversation() returned nil")
@@ -31,8 +31,8 @@ func TestNewConversation(t *testing.T) {
 		t.Errorf("Expected model %s, got %s", model, conv.Model())
 	}
 
-	if conv.Status() != ConversationStatusActive {
-		t.Errorf("Expected status %s, got %s", ConversationStatusActive, conv.Status())
+	if conv.Status() != aggregates.ConversationStatusActive {
+		t.Errorf("Expected status %s, got %s", aggregates.ConversationStatusActive, conv.Status())
 	}
 
 	if !conv.IsActive() {
@@ -48,27 +48,26 @@ func TestNewConversation(t *testing.T) {
 	}
 }
 
-func TestConversation_SetModel(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_SetModel_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
-	err := conv.SetModel(vo.ModelClaude3Opus)
+	err := conv.SetModel(vo.ModelClaudeOpus47)
 	if err != nil {
 		t.Fatalf("SetModel() failed: %v", err)
 	}
 
-	if conv.Model() != vo.ModelClaude3Opus {
-		t.Errorf("Expected model %s, got %s", vo.ModelClaude3Opus, conv.Model())
+	if conv.Model() != vo.ModelClaudeOpus47 {
+		t.Errorf("Expected model %s, got %s", vo.ModelClaudeOpus47, conv.Model())
 	}
 
-	// Invalid model should fail
 	err = conv.SetModel(vo.Model("invalid-model"))
 	if err == nil {
 		t.Error("Expected error for invalid model")
 	}
 }
 
-func TestConversation_SystemPrompt(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_SystemPrompt_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
 	prompt, _ := vo.NewSystemPrompt("You are a helpful assistant.")
 	err := conv.SetSystemPrompt(prompt)
@@ -81,8 +80,8 @@ func TestConversation_SystemPrompt(t *testing.T) {
 	}
 }
 
-func TestConversation_AddUserMessage(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_AddUserMessage_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
 	msg, err := conv.AddUserMessage("Hello, Claude!")
 	if err != nil {
@@ -107,95 +106,89 @@ func TestConversation_AddUserMessage(t *testing.T) {
 	}
 }
 
-func TestConversation_SystemPromptImmutableAfterUserMessage(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_SystemPromptImmutableAfterUserMessage_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
-	// Add user message first
 	_, _ = conv.AddUserMessage("Hello!")
 
-	// Now try to set system prompt - should fail
 	prompt, _ := vo.NewSystemPrompt("You are a helpful assistant.")
 	err := conv.SetSystemPrompt(prompt)
-	if err != ErrSystemPromptImmutable {
+	if err != aggregates.ErrSystemPromptImmutable {
 		t.Errorf("Expected ErrSystemPromptImmutable, got %v", err)
 	}
 }
 
-func TestConversation_AddMessageToClosedConversation(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_AddMessageToClosedConversation_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 	conv.Close()
 
 	_, err := conv.AddUserMessage("Hello!")
-	if err != ErrConversationClosed {
+	if err != aggregates.ErrConversationClosed {
 		t.Errorf("Expected ErrConversationClosed, got %v", err)
 	}
 }
 
-func TestConversation_PauseAndResume(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_PauseAndResume_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
 	if !conv.IsActive() {
 		t.Error("Conversation should be active initially")
 	}
 
 	conv.Pause()
-	if conv.Status() != ConversationStatusPaused {
-		t.Errorf("Expected status %s, got %s", ConversationStatusPaused, conv.Status())
+	if conv.Status() != aggregates.ConversationStatusPaused {
+		t.Errorf("Expected status %s, got %s", aggregates.ConversationStatusPaused, conv.Status())
 	}
 	if conv.IsActive() {
 		t.Error("IsActive() should return false when paused")
 	}
 
 	conv.Resume()
-	if conv.Status() != ConversationStatusActive {
-		t.Errorf("Expected status %s, got %s", ConversationStatusActive, conv.Status())
+	if conv.Status() != aggregates.ConversationStatusActive {
+		t.Errorf("Expected status %s, got %s", aggregates.ConversationStatusActive, conv.Status())
 	}
 	if !conv.IsActive() {
 		t.Error("IsActive() should return true after resume")
 	}
 }
 
-func TestConversation_Close(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_Close_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
 	conv.Close()
 
-	if conv.Status() != ConversationStatusClosed {
-		t.Errorf("Expected status %s, got %s", ConversationStatusClosed, conv.Status())
+	if conv.Status() != aggregates.ConversationStatusClosed {
+		t.Errorf("Expected status %s, got %s", aggregates.ConversationStatusClosed, conv.Status())
 	}
 
 	if conv.ClosedAt() == nil {
 		t.Error("ClosedAt should not be nil after closing")
 	}
 
-	// Closing again should be idempotent
 	conv.Close()
-	if conv.Status() != ConversationStatusClosed {
+	if conv.Status() != aggregates.ConversationStatusClosed {
 		t.Error("Conversation should remain closed")
 	}
 }
 
-func TestConversation_Archive(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_Archive_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
-	// Can't archive an active conversation
 	conv.Archive()
-	if conv.Status() == ConversationStatusArchived {
+	if conv.Status() == aggregates.ConversationStatusArchived {
 		t.Error("Should not be able to archive active conversation")
 	}
 
-	// Close first, then archive
 	conv.Close()
 	conv.Archive()
-	if conv.Status() != ConversationStatusArchived {
-		t.Errorf("Expected status %s, got %s", ConversationStatusArchived, conv.Status())
+	if conv.Status() != aggregates.ConversationStatusArchived {
+		t.Errorf("Expected status %s, got %s", aggregates.ConversationStatusArchived, conv.Status())
 	}
 }
 
-func TestConversation_MaxTokens(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_MaxTokens_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
-	// Default max tokens
 	if conv.MaxTokens() != 4096 {
 		t.Errorf("Expected default max tokens 4096, got %d", conv.MaxTokens())
 	}
@@ -206,10 +199,9 @@ func TestConversation_MaxTokens(t *testing.T) {
 	}
 }
 
-func TestConversation_Temperature(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_Temperature_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
-	// Default temperature
 	if conv.Temperature() != 1.0 {
 		t.Errorf("Expected default temperature 1.0, got %f", conv.Temperature())
 	}
@@ -219,7 +211,6 @@ func TestConversation_Temperature(t *testing.T) {
 		t.Errorf("Expected temperature 0.5, got %f", conv.Temperature())
 	}
 
-	// Should clamp values
 	conv.SetTemperature(-1.0)
 	if conv.Temperature() != 0 {
 		t.Errorf("Expected temperature 0 (clamped), got %f", conv.Temperature())
@@ -231,10 +222,9 @@ func TestConversation_Temperature(t *testing.T) {
 	}
 }
 
-func TestConversation_TopP(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_TopP_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
-	// Default top_p
 	if conv.TopP() != 1.0 {
 		t.Errorf("Expected default top_p 1.0, got %f", conv.TopP())
 	}
@@ -244,7 +234,6 @@ func TestConversation_TopP(t *testing.T) {
 		t.Errorf("Expected top_p 0.9, got %f", conv.TopP())
 	}
 
-	// Should clamp values
 	conv.SetTopP(-0.5)
 	if conv.TopP() != 0 {
 		t.Errorf("Expected top_p 0 (clamped), got %f", conv.TopP())
@@ -256,10 +245,9 @@ func TestConversation_TopP(t *testing.T) {
 	}
 }
 
-func TestConversation_TopK(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_TopK_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
-	// Default top_k
 	if conv.TopK() != 0 {
 		t.Errorf("Expected default top_k 0, got %d", conv.TopK())
 	}
@@ -269,15 +257,14 @@ func TestConversation_TopK(t *testing.T) {
 		t.Errorf("Expected top_k 50, got %d", conv.TopK())
 	}
 
-	// Should clamp negative values
 	conv.SetTopK(-10)
 	if conv.TopK() != 0 {
 		t.Errorf("Expected top_k 0 (clamped), got %d", conv.TopK())
 	}
 }
 
-func TestConversation_StopSequences(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_StopSequences_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
 	if conv.StopSequences() != nil && len(conv.StopSequences()) != 0 {
 		t.Error("Expected empty stop sequences initially")
@@ -292,14 +279,13 @@ func TestConversation_StopSequences(t *testing.T) {
 	}
 }
 
-func TestConversation_Tools(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_Tools_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
 	toolName, _ := vo.NewToolName("test_tool")
 	toolDesc, _ := vo.NewToolDescription("A test tool")
 	tool, _ := entities.NewTool(toolName, toolDesc, nil)
 
-	// Add tool
 	conv.AddTool(tool)
 
 	tools := conv.Tools()
@@ -307,13 +293,11 @@ func TestConversation_Tools(t *testing.T) {
 		t.Errorf("Expected 1 tool, got %d", len(tools))
 	}
 
-	// Get tool
 	retrieved := conv.GetTool(toolName)
 	if retrieved == nil {
 		t.Error("Should find added tool")
 	}
 
-	// Remove tool
 	conv.RemoveTool(toolName)
 	tools = conv.Tools()
 	if len(tools) != 0 {
@@ -321,14 +305,12 @@ func TestConversation_Tools(t *testing.T) {
 	}
 }
 
-func TestConversation_Metadata(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_Metadata_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
-	// Set metadata
 	conv.SetMetadata("key1", "value1")
 	conv.SetMetadata("key2", 42)
 
-	// Get metadata
 	val, ok := conv.GetMetadata("key1")
 	if !ok {
 		t.Error("Should find metadata key1")
@@ -345,29 +327,25 @@ func TestConversation_Metadata(t *testing.T) {
 		t.Errorf("Expected 42, got %v", val)
 	}
 
-	// Get all metadata
 	metadata := conv.Metadata()
 	if len(metadata) != 2 {
 		t.Errorf("Expected 2 metadata entries, got %d", len(metadata))
 	}
 }
 
-func TestConversation_Events(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_Events_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
-	// Should have created event
 	events := conv.Events()
 	if len(events) == 0 {
 		t.Error("Should have at least one event after creation")
 	}
 
-	// Events should be cleared after retrieval
 	events = conv.Events()
 	if len(events) != 0 {
 		t.Error("Events should be cleared after retrieval")
 	}
 
-	// Clear events explicitly
 	_, _ = conv.AddUserMessage("Test")
 	conv.ClearEvents()
 	events = conv.Events()
@@ -376,8 +354,8 @@ func TestConversation_Events(t *testing.T) {
 	}
 }
 
-func TestConversation_GetMessagesForAPI(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_GetMessagesForAPI_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
 	_, _ = conv.AddUserMessage("Hello, Claude!")
 
@@ -392,13 +370,12 @@ func TestConversation_GetMessagesForAPI(t *testing.T) {
 	}
 }
 
-func TestConversation_ConcurrentAccess(t *testing.T) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func TestConversation_ConcurrentAccess_Internal(t *testing.T) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
 	var wg sync.WaitGroup
 	numGoroutines := 50
 
-	// Concurrent metadata writes
 	for i := 0; i < numGoroutines; i++ {
 		wg.Add(1)
 		go func(idx int) {
@@ -407,7 +384,6 @@ func TestConversation_ConcurrentAccess(t *testing.T) {
 		}(i)
 	}
 
-	// Concurrent reads
 	for i := 0; i < numGoroutines; i++ {
 		wg.Add(1)
 		go func() {
@@ -422,23 +398,21 @@ func TestConversation_ConcurrentAccess(t *testing.T) {
 	wg.Wait()
 }
 
-func BenchmarkConversation_AddUserMessage(b *testing.B) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func BenchmarkConversation_AddUserMessage_Internal(b *testing.B) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		// Reset conversation for each iteration to avoid MaxMessages limit
 		if conv.MessageCount() >= 1000 {
-			conv = NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+			conv = aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 		}
 		_, _ = conv.AddUserMessage("Test message")
 	}
 }
 
-func BenchmarkConversation_GetMessagesForAPI(b *testing.B) {
-	conv := NewConversation(vo.GenerateSessionID(), vo.ModelClaude4Sonnet)
+func BenchmarkConversation_GetMessagesForAPI_Internal(b *testing.B) {
+	conv := aggregates.NewConversation(vo.GenerateSessionID(), vo.ModelClaudeSonnet4)
 
-	// Add some messages
 	for i := 0; i < 100; i++ {
 		_, _ = conv.AddUserMessage("Test message")
 	}

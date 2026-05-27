@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # TFO-GO-MCP Installation Script
-# Version: 1.1.2
+# Version: 1.2.0
 # Description: Install TelemetryFlow GO MCP Server
 # ==============================================================================
 
@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 BINARY_NAME="tfo-mcp"
-VERSION="${VERSION:-1.1.2}"
+VERSION="${VERSION:-1.2.0}"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 CONFIG_DIR="${CONFIG_DIR:-$HOME/.tfo-mcp}"
 GITHUB_REPO="telemetryflow/telemetryflow-go-mcp"
@@ -153,7 +153,7 @@ create_config() {
 
 server:
   name: "tfo-mcp"
-  version: "1.1.2"
+  version: "1.2.0"
   timeout: 30s
 
 claude:

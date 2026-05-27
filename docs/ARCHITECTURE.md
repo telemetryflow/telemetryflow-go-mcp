@@ -1,8 +1,8 @@
 # TelemetryFlow GO MCP Server Architecture
 
-- **Version:** 1.1.2
+- **Version:** 1.2.0
 - **MCP Protocol:** 2024-11-05
-- **Last Updated:** January 2026
+- **Last Updated:** May 2026
 - **Status:** Production Ready
 
 ---
@@ -159,12 +159,12 @@ graph LR
 
 ### Layer Responsibilities
 
-| Layer | Responsibility | Components |
-|-------|----------------|------------|
-| **Presentation** | Protocol handling, request/response | MCP Server, Tools, Resources, Prompts |
-| **Application** | Use case orchestration, CQRS | Commands, Queries, Handlers |
-| **Domain** | Business logic, invariants | Aggregates, Entities, Value Objects, Events |
-| **Infrastructure** | External integrations, persistence | Claude Client, Repositories, Config, Logging |
+| Layer              | Responsibility                      | Components                                   |
+| ------------------ | ----------------------------------- | -------------------------------------------- |
+| **Presentation**   | Protocol handling, request/response | MCP Server, Tools, Resources, Prompts        |
+| **Application**    | Use case orchestration, CQRS        | Commands, Queries, Handlers                  |
+| **Domain**         | Business logic, invariants          | Aggregates, Entities, Value Objects, Events  |
+| **Infrastructure** | External integrations, persistence  | Claude Client, Repositories, Config, Logging |
 
 ---
 
@@ -453,24 +453,24 @@ sequenceDiagram
 
 ### Commands and Queries
 
-| Type | Name | Description |
-|------|------|-------------|
-| **Command** | InitializeSessionCommand | Initialize MCP session |
-| **Command** | CloseSessionCommand | Close MCP session |
-| **Command** | SetLogLevelCommand | Set session log level |
-| **Command** | CreateConversationCommand | Create new conversation |
-| **Command** | SendMessageCommand | Send message to Claude |
-| **Command** | RegisterToolCommand | Register new tool |
-| **Command** | ExecuteToolCommand | Execute a tool |
-| **Command** | RegisterResourceCommand | Register new resource |
-| **Command** | RegisterPromptCommand | Register new prompt |
-| **Query** | GetSessionQuery | Get session by ID |
-| **Query** | ListToolsQuery | List available tools |
-| **Query** | GetToolQuery | Get tool by name |
-| **Query** | ListResourcesQuery | List available resources |
-| **Query** | ReadResourceQuery | Read resource content |
-| **Query** | ListPromptsQuery | List available prompts |
-| **Query** | GetPromptQuery | Get prompt messages |
+| Type        | Name                      | Description              |
+| ----------- | ------------------------- | ------------------------ |
+| **Command** | InitializeSessionCommand  | Initialize MCP session   |
+| **Command** | CloseSessionCommand       | Close MCP session        |
+| **Command** | SetLogLevelCommand        | Set session log level    |
+| **Command** | CreateConversationCommand | Create new conversation  |
+| **Command** | SendMessageCommand        | Send message to Claude   |
+| **Command** | RegisterToolCommand       | Register new tool        |
+| **Command** | ExecuteToolCommand        | Execute a tool           |
+| **Command** | RegisterResourceCommand   | Register new resource    |
+| **Command** | RegisterPromptCommand     | Register new prompt      |
+| **Query**   | GetSessionQuery           | Get session by ID        |
+| **Query**   | ListToolsQuery            | List available tools     |
+| **Query**   | GetToolQuery              | Get tool by name         |
+| **Query**   | ListResourcesQuery        | List available resources |
+| **Query**   | ReadResourceQuery         | Read resource content    |
+| **Query**   | ListPromptsQuery          | List available prompts   |
+| **Query**   | GetPromptQuery            | Get prompt messages      |
 
 ---
 
@@ -1104,31 +1104,31 @@ graph TB
 
 Primary transactional database for MCP session state and metadata:
 
-| Table | Purpose | Key Columns |
-|-------|---------|-------------|
-| `sessions` | MCP session state | id, state, client_name, capabilities |
-| `conversations` | Claude conversations | id, session_id, model, status |
-| `messages` | Conversation messages | id, conversation_id, role, content |
-| `tools` | Registered tools | id, name, input_schema, is_enabled |
-| `resources` | Available resources | id, uri, name, mime_type |
-| `prompts` | Prompt templates | id, name, arguments, template |
-| `resource_subscriptions` | Resource watchers | id, session_id, resource_uri |
-| `tool_executions` | Tool execution log | id, session_id, tool_name, duration_ms |
-| `api_keys` | API authentication | id, key_hash, scopes, rate_limits |
-| `schema_migrations` | Migration tracking | version, applied_at |
+| Table                    | Purpose               | Key Columns                            |
+| ------------------------ | --------------------- | -------------------------------------- |
+| `sessions`               | MCP session state     | id, state, client_name, capabilities   |
+| `conversations`          | Claude conversations  | id, session_id, model, status          |
+| `messages`               | Conversation messages | id, conversation_id, role, content     |
+| `tools`                  | Registered tools      | id, name, input_schema, is_enabled     |
+| `resources`              | Available resources   | id, uri, name, mime_type               |
+| `prompts`                | Prompt templates      | id, name, arguments, template          |
+| `resource_subscriptions` | Resource watchers     | id, session_id, resource_uri           |
+| `tool_executions`        | Tool execution log    | id, session_id, tool_name, duration_ms |
+| `api_keys`               | API authentication    | id, key_hash, scopes, rate_limits      |
+| `schema_migrations`      | Migration tracking    | version, applied_at                    |
 
 ### ClickHouse Analytics Schema
 
 High-performance analytics for operational intelligence:
 
-| Table | Purpose | Engine |
-|-------|---------|--------|
-| `tool_call_analytics` | Tool execution metrics | MergeTree |
-| `api_request_analytics` | Claude API usage | MergeTree |
-| `session_analytics` | Session lifecycle events | MergeTree |
-| `error_analytics` | Error tracking | MergeTree |
-| `token_usage_hourly` | Aggregated token usage | SummingMergeTree |
-| `tool_usage_hourly` | Aggregated tool usage | SummingMergeTree |
+| Table                        | Purpose                   | Engine             |
+| ---------------------------- | ------------------------- | ------------------ |
+| `tool_call_analytics`        | Tool execution metrics    | MergeTree          |
+| `api_request_analytics`      | Claude API usage          | MergeTree          |
+| `session_analytics`          | Session lifecycle events  | MergeTree          |
+| `error_analytics`            | Error tracking            | MergeTree          |
+| `token_usage_hourly`         | Aggregated token usage    | SummingMergeTree   |
+| `tool_usage_hourly`          | Aggregated tool usage     | SummingMergeTree   |
 | `latency_percentiles_hourly` | Response time percentiles | ReplacingMergeTree |
 
 ### GORM Models
@@ -1271,14 +1271,14 @@ migrations/
 
 ### Migration Commands
 
-| Command | Description |
-|---------|-------------|
-| `migrate up` | Apply all pending migrations |
-| `migrate down` | Rollback the last migration |
-| `migrate down-to VERSION` | Rollback to a specific version |
-| `migrate reset` | Rollback all migrations |
-| `migrate fresh` | Reset and re-run all migrations |
-| `migrate status` | Show migration status |
+| Command                   | Description                     |
+| ------------------------- | ------------------------------- |
+| `migrate up`              | Apply all pending migrations    |
+| `migrate down`            | Rollback the last migration     |
+| `migrate down-to VERSION` | Rollback to a specific version  |
+| `migrate reset`           | Rollback all migrations         |
+| `migrate fresh`           | Reset and re-run all migrations |
+| `migrate status`          | Show migration status           |
 
 ### Seeding Architecture
 
@@ -1322,7 +1322,7 @@ flowchart TD
 
 ### Default Seed Data
 
-**Tools (8 default):**
+**Tools (11 default):**
 | Name | Category | Description |
 |------|----------|-------------|
 | `echo` | utility | Echo input back |
@@ -1333,6 +1333,9 @@ flowchart TD
 | `search_files` | filesystem | Search files by pattern |
 | `system_info` | system | Get system information |
 | `claude_conversation` | ai | Have conversation with Claude |
+| `collect_telemetry_context` | telemetry | Collect live telemetry data from ClickHouse/PostgreSQL |
+| `list_context_types` | telemetry | List all 70+ available context types |
+| `build_system_prompt` | telemetry | Build context-aware system prompt |
 
 **Resources (3 default):**
 | URI | Name | Type |
@@ -1622,15 +1625,16 @@ telemetryflow-go-mcp/
 
 ## Version Compatibility
 
-| Component | Version | Compatibility |
-|-----------|---------|---------------|
-| TFO-GO-MCP | v1.1.2 | MCP 2024-11-05 |
-| Go | 1.24+ | Required |
-| anthropic-sdk-go | v0.2.0-beta.3 | Claude API |
-| OTEL SDK | v1.39.0 | TFO ecosystem aligned |
-| Zerolog | v1.33.0 | Logging |
-| Viper | v1.19.0 | Configuration |
-| Cobra | v1.8.1 | CLI |
+| Component        | Version       | Compatibility         |
+| ---------------- | ------------- | --------------------- |
+| TFO-GO-MCP       | v1.2.0        | MCP 2024-11-05        |
+| Go               | 1.26+         | Required              |
+| anthropic-sdk-go | v0.2.0-beta.3 | Claude API            |
+| OTEL SDK         | v1.43.0       | TFO ecosystem aligned |
+| mcp-go           | v0.54.1       | MCP protocol SDK      |
+| Zerolog          | v1.33.0       | Logging               |
+| Viper            | v1.19.0       | Configuration         |
+| Cobra            | v1.8.1        | CLI                   |
 
 ---
 

@@ -444,7 +444,7 @@ func SeedDemoSession(ctx context.Context, db *gorm.DB) error {
 		ClientName:      "Demo Client",
 		ClientVersion:   "1.0.0",
 		ServerName:      "TelemetryFlow-MCP",
-		ServerVersion:   "1.1.2",
+		ServerVersion:   "1.2.0",
 		Capabilities: models.JSONB{
 			"tools":     map[string]interface{}{"listChanged": true},
 			"resources": map[string]interface{}{"subscribe": true, "listChanged": true},

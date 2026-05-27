@@ -1,0 +1,1 @@
+CREATE TABLE test_table_002 (id INTEGER PRIMARY KEY, name TEXT);

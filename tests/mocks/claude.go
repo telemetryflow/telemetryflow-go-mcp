@@ -166,7 +166,7 @@ func MockClaudeStreamEvents(text string) <-chan *services.ClaudeStreamEvent {
 // MockClaudeRequest creates a mock Claude request
 func MockClaudeRequest(message string) *services.ClaudeRequest {
 	return &services.ClaudeRequest{
-		Model:     vo.ModelClaude4Sonnet,
+		Model:     vo.ModelClaudeOpus47,
 		MaxTokens: 4096,
 		Messages: []services.ClaudeMessage{
 			{
@@ -183,7 +183,7 @@ func MockClaudeRequest(message string) *services.ClaudeRequest {
 func MockClaudeRequestWithSystem(systemPrompt, message string) *services.ClaudeRequest {
 	sp, _ := vo.NewSystemPrompt(systemPrompt)
 	return &services.ClaudeRequest{
-		Model:        vo.ModelClaude4Sonnet,
+		Model:        vo.ModelClaudeOpus47,
 		MaxTokens:    4096,
 		SystemPrompt: sp,
 		Messages: []services.ClaudeMessage{
@@ -200,7 +200,7 @@ func MockClaudeRequestWithSystem(systemPrompt, message string) *services.ClaudeR
 // MockClaudeRequestWithTools creates a mock Claude request with tools
 func MockClaudeRequestWithTools(message string, tools []services.ClaudeTool) *services.ClaudeRequest {
 	return &services.ClaudeRequest{
-		Model:     vo.ModelClaude4Sonnet,
+		Model:     vo.ModelClaudeOpus47,
 		MaxTokens: 4096,
 		Messages: []services.ClaudeMessage{
 			{

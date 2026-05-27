@@ -3,7 +3,7 @@
 # =============================================================================
 #
 # TelemetryFlow GO MCP Server - Model Context Protocol Server
-# Copyright (c) 2024-2026 DevOpsCorner Indonesia. All rights reserved.
+# Copyright (c) 2024-2026 Telemetri Data Indonesia. All rights reserved.
 #
 # This workflow builds and releases TelemetryFlow GO MCP Server for multiple platforms:
 # - Linux: RPM (RHEL/CentOS/Fedora), DEB (Debian/Ubuntu)
@@ -40,10 +40,10 @@ on:
         default: true
 
 env:
-  GO_VERSION: '1.24'
+  GO_VERSION: '1.26'
   BINARY_NAME: tfo-mcp
   PRODUCT_NAME: TelemetryFlow GO MCP Server
-  VENDOR: DevOpsCorner Indonesia
+  VENDOR: Telemetri Data Indonesia
   MAINTAINER: support@telemetryflow.id
   DESCRIPTION: Model Context Protocol (MCP) server for Claude AI integration with enterprise telemetry capabilities
   LICENSE: Apache-2.0
@@ -585,7 +585,7 @@ jobs:
           Documentation: https://docs.telemetryflow.id
           Support: support@telemetryflow.id
 
-          Copyright (c) 2024-2026 DevOpsCorner Indonesia
+          Copyright (c) 2024-2026 Telemetri Data Indonesia
           EOF
 
           zip -r ${{ env.BINARY_NAME }}-${VERSION}-windows-amd64.zip ${PKG_DIR}
@@ -682,7 +682,7 @@ jobs:
           Documentation: https://docs.telemetryflow.id
           Support: support@telemetryflow.id
 
-          Copyright (c) 2024-2026 DevOpsCorner Indonesia
+          Copyright (c) 2024-2026 Telemetri Data Indonesia
           EOF
 
       - name: Create DMG

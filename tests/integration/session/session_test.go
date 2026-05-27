@@ -53,7 +53,7 @@ func TestSessionLifecycle(t *testing.T) {
 		assert.Len(t, session.ListResources(), 1)
 
 		// Create conversation
-		conv, err := session.CreateConversation(vo.ModelClaude4Sonnet)
+		conv, err := session.CreateConversation(vo.ModelClaudeSonnet4)
 		require.NoError(t, err)
 		assert.Len(t, session.ListConversations(), 1)
 
@@ -71,9 +71,9 @@ func TestSessionLifecycle(t *testing.T) {
 
 		// Create multiple conversations
 		models := []vo.Model{
-			vo.ModelClaude4Opus,
-			vo.ModelClaude4Sonnet,
-			vo.ModelClaude35Sonnet,
+			vo.ModelClaudeOpus47,
+			vo.ModelClaudeSonnet4,
+			vo.ModelClaudeSonnet46,
 		}
 
 		for _, model := range models {
@@ -123,7 +123,7 @@ func TestConversationLifecycle(t *testing.T) {
 
 	t.Run("complete conversation lifecycle", func(t *testing.T) {
 		session := createReadySession(t)
-		conv, err := session.CreateConversation(vo.ModelClaude4Sonnet)
+		conv, err := session.CreateConversation(vo.ModelClaudeSonnet4)
 		require.NoError(t, err)
 
 		// Set system prompt
@@ -156,7 +156,7 @@ func TestConversationLifecycle(t *testing.T) {
 
 	t.Run("conversation with tool use", func(t *testing.T) {
 		session := createReadySession(t)
-		conv, err := session.CreateConversation(vo.ModelClaude4Sonnet)
+		conv, err := session.CreateConversation(vo.ModelClaudeSonnet4)
 		require.NoError(t, err)
 
 		// Register tool in conversation
@@ -178,7 +178,7 @@ func TestConversationLifecycle(t *testing.T) {
 
 	t.Run("conversation settings persistence", func(t *testing.T) {
 		session := createReadySession(t)
-		conv, err := session.CreateConversation(vo.ModelClaude4Sonnet)
+		conv, err := session.CreateConversation(vo.ModelClaudeSonnet4)
 		require.NoError(t, err)
 
 		// Set various settings
@@ -225,7 +225,7 @@ func TestConcurrentSessionOperations(t *testing.T) {
 
 	t.Run("concurrent message addition", func(t *testing.T) {
 		session := createReadySession(t)
-		conv, err := session.CreateConversation(vo.ModelClaude4Sonnet)
+		conv, err := session.CreateConversation(vo.ModelClaudeSonnet4)
 		require.NoError(t, err)
 
 		// Add messages concurrently

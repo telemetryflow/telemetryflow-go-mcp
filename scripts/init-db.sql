@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     client_name VARCHAR(255),
     client_version VARCHAR(50),
     server_name VARCHAR(255) NOT NULL DEFAULT 'TelemetryFlow-MCP',
-    server_version VARCHAR(50) NOT NULL DEFAULT '1.1.2',
+    server_version VARCHAR(50) NOT NULL DEFAULT '1.2.0',
     capabilities JSONB NOT NULL DEFAULT '{}',
     log_level VARCHAR(20) NOT NULL DEFAULT 'info',
     metadata JSONB NOT NULL DEFAULT '{}',
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 CREATE TABLE IF NOT EXISTS conversations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     session_id UUID NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
-    model VARCHAR(100) NOT NULL DEFAULT 'claude-sonnet-4-20250514',
+    model VARCHAR(100) NOT NULL DEFAULT 'claude-opus-4-7',
     system_prompt TEXT,
     status VARCHAR(20) NOT NULL DEFAULT 'active',
     max_tokens INTEGER NOT NULL DEFAULT 4096,

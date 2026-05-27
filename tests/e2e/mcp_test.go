@@ -241,7 +241,7 @@ func TestMCPConversationFlow(t *testing.T) {
 
 	t.Run("should handle multi-turn conversation", func(t *testing.T) {
 		session := createE2ESession(t)
-		conv := aggregates.NewConversation(session.ID(), vo.ModelClaude4Sonnet)
+		conv := aggregates.NewConversation(session.ID(), vo.ModelClaudeSonnet4)
 
 		// Set system prompt
 		systemPrompt, err := vo.NewSystemPrompt("You are a helpful coding assistant.")
@@ -273,7 +273,7 @@ func TestMCPConversationFlow(t *testing.T) {
 
 	t.Run("should handle conversation with tool use", func(t *testing.T) {
 		session := createE2ESession(t)
-		conv := aggregates.NewConversation(session.ID(), vo.ModelClaude4Sonnet)
+		conv := aggregates.NewConversation(session.ID(), vo.ModelClaudeSonnet4)
 
 		// Add tool
 		tool := createE2ETool(t, "get_file_content", "Get contents of a file")
@@ -420,7 +420,7 @@ func TestMCPErrorHandling(t *testing.T) {
 
 	t.Run("should handle closed conversation operations", func(t *testing.T) {
 		session := createE2ESession(t)
-		conv := aggregates.NewConversation(session.ID(), vo.ModelClaude4Sonnet)
+		conv := aggregates.NewConversation(session.ID(), vo.ModelClaudeSonnet4)
 
 		conv.Close()
 

@@ -118,7 +118,7 @@ func TestSessionModelFields(t *testing.T) {
 			ClientName:      "Test Client",
 			ClientVersion:   "1.0.0",
 			ServerName:      "TelemetryFlow-MCP",
-			ServerVersion:   "1.1.2",
+			ServerVersion:   "1.2.0",
 			Capabilities:    models.JSONB{"tools": map[string]interface{}{}},
 			LogLevel:        "info",
 			Metadata:        models.JSONB{},

@@ -19,39 +19,39 @@ import (
 func TestNewConversation(t *testing.T) {
 	t.Run("should create conversation with unique ID", func(t *testing.T) {
 		sessionID := vo.GenerateSessionID()
-		conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
+		conv := aggregates.NewConversation(sessionID, vo.ModelClaudeSonnet4)
 		require.NotNil(t, conv)
 		assert.NotEmpty(t, conv.ID().String())
 	})
 
 	t.Run("should create conversation with specified session ID", func(t *testing.T) {
 		sessionID := vo.GenerateSessionID()
-		conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
+		conv := aggregates.NewConversation(sessionID, vo.ModelClaudeSonnet4)
 		assert.Equal(t, sessionID, conv.SessionID())
 	})
 
 	t.Run("should create conversation with specified model", func(t *testing.T) {
 		sessionID := vo.GenerateSessionID()
-		conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Opus)
-		assert.Equal(t, vo.ModelClaude4Opus, conv.Model())
+		conv := aggregates.NewConversation(sessionID, vo.ModelClaudeOpus47)
+		assert.Equal(t, vo.ModelClaudeOpus47, conv.Model())
 	})
 
 	t.Run("should create conversation in active status", func(t *testing.T) {
 		sessionID := vo.GenerateSessionID()
-		conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
+		conv := aggregates.NewConversation(sessionID, vo.ModelClaudeSonnet4)
 		assert.Equal(t, aggregates.ConversationStatusActive, conv.Status())
 	})
 
 	t.Run("should have empty message list initially", func(t *testing.T) {
 		sessionID := vo.GenerateSessionID()
-		conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
+		conv := aggregates.NewConversation(sessionID, vo.ModelClaudeSonnet4)
 		assert.Empty(t, conv.Messages())
 	})
 
 	t.Run("should generate unique IDs for different conversations", func(t *testing.T) {
 		sessionID := vo.GenerateSessionID()
-		conv1 := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
-		conv2 := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
+		conv1 := aggregates.NewConversation(sessionID, vo.ModelClaudeSonnet4)
+		conv2 := aggregates.NewConversation(sessionID, vo.ModelClaudeSonnet4)
 		assert.NotEqual(t, conv1.ID().String(), conv2.ID().String())
 	})
 }
@@ -334,11 +334,11 @@ func TestConversationCreatedAt(t *testing.T) {
 
 func TestConversationModels(t *testing.T) {
 	models := []vo.Model{
-		vo.ModelClaude4Opus,
-		vo.ModelClaude4Sonnet,
-		vo.ModelClaude37Sonnet,
-		vo.ModelClaude35Sonnet,
-		vo.ModelClaude35Haiku,
+		vo.ModelClaudeOpus47,
+		vo.ModelClaudeSonnet4,
+		vo.ModelClaudeSonnet46,
+		vo.ModelClaudeSonnet45,
+		vo.ModelClaudeHaiku45,
 	}
 
 	for _, model := range models {
@@ -371,7 +371,7 @@ func TestConversationMessageContent(t *testing.T) {
 func createTestConversation(t *testing.T) *aggregates.Conversation {
 	t.Helper()
 	sessionID := vo.GenerateSessionID()
-	return aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
+	return aggregates.NewConversation(sessionID, vo.ModelClaudeSonnet4)
 }
 
 func createTextMessage(t *testing.T, role vo.Role, text string) *entities.Message {
@@ -398,13 +398,13 @@ func BenchmarkNewConversation(b *testing.B) {
 	sessionID := vo.GenerateSessionID()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
+		_ = aggregates.NewConversation(sessionID, vo.ModelClaudeSonnet4)
 	}
 }
 
 func BenchmarkConversationAddMessage(b *testing.B) {
 	sessionID := vo.GenerateSessionID()
-	conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
+	conv := aggregates.NewConversation(sessionID, vo.ModelClaudeSonnet4)
 	msg, _ := entities.NewTextMessage(vo.RoleUser, "Benchmark message")
 
 	b.ResetTimer()
@@ -415,7 +415,7 @@ func BenchmarkConversationAddMessage(b *testing.B) {
 
 func BenchmarkConversationGetMessages(b *testing.B) {
 	sessionID := vo.GenerateSessionID()
-	conv := aggregates.NewConversation(sessionID, vo.ModelClaude4Sonnet)
+	conv := aggregates.NewConversation(sessionID, vo.ModelClaudeSonnet4)
 
 	// Add 100 messages alternating roles
 	for i := 0; i < 100; i++ {

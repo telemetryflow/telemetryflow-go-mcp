@@ -145,13 +145,13 @@ flowchart TB
 
 ### Quick Fixes
 
-| Issue | Quick Fix |
-|-------|-----------|
-| Command not found | Add to PATH: `export PATH=$PATH:/usr/local/bin` |
-| Permission denied | Set executable: `chmod +x tfo-mcp` |
-| API key error | Set env var: `export TELEMETRYFLOW_MCP_CLAUDE_API_KEY="..."` |
-| Config not found | Create config: `tfo-mcp validate --verbose` |
-| Connection timeout | Check network and retry |
+| Issue              | Quick Fix                                                    |
+| ------------------ | ------------------------------------------------------------ |
+| Command not found  | Add to PATH: `export PATH=$PATH:/usr/local/bin`              |
+| Permission denied  | Set executable: `chmod +x tfo-mcp`                           |
+| API key error      | Set env var: `export TELEMETRYFLOW_MCP_CLAUDE_API_KEY="..."` |
+| Config not found   | Create config: `tfo-mcp validate --verbose`                  |
+| Connection timeout | Check network and retry                                      |
 
 ---
 
@@ -184,6 +184,7 @@ sequenceDiagram
 ### Server Won't Start
 
 **Symptoms:**
+
 - Server exits immediately
 - No output or error message
 - "Address already in use" error
@@ -207,6 +208,7 @@ tfo-mcp run --log-level debug 2>&1 | head -50
 ### Client Can't Connect
 
 **Symptoms:**
+
 - MCP client reports "connection refused"
 - Timeout waiting for server response
 
@@ -226,6 +228,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | tfo-mcp run
 ### Network Timeout
 
 **Symptoms:**
+
 - "context deadline exceeded"
 - "connection timeout"
 
@@ -278,6 +281,7 @@ flowchart TB
 ### Invalid Configuration File
 
 **Symptoms:**
+
 - "yaml: unmarshal errors"
 - "invalid configuration"
 
@@ -327,6 +331,7 @@ server:
 ### Missing Required Fields
 
 **Symptoms:**
+
 - "required field missing"
 - "api_key is required"
 
@@ -347,6 +352,7 @@ claude:
 ### Environment Variable Not Loaded
 
 **Symptoms:**
+
 - Configuration shows empty values
 - "API key is required" despite setting env var
 
@@ -406,6 +412,7 @@ flowchart TB
 ### Authentication Errors (401)
 
 **Symptoms:**
+
 - "authentication_error"
 - "invalid x-api-key"
 - "401 Unauthorized"
@@ -431,6 +438,7 @@ curl -X POST https://api.anthropic.com/v1/messages \
 ### Rate Limiting (429)
 
 **Symptoms:**
+
 - "rate_limit_error"
 - "429 Too Many Requests"
 - Requests failing intermittently
@@ -450,12 +458,13 @@ claude:
 security:
   rate_limit:
     enabled: true
-    requests_per_minute: 30  # Below API limit
+    requests_per_minute: 30 # Below API limit
 ```
 
 ### Model Not Found
 
 **Symptoms:**
+
 - "model_not_found"
 - "invalid_request_error"
 
@@ -464,7 +473,8 @@ security:
 ```yaml
 # Use valid model name
 claude:
-  model: "claude-sonnet-4-20250514"  # Correct
+  model: "claude-sonnet-4-20250514" # Correct
+
 
 # Available models:
 # - claude-opus-4-20250514
@@ -476,6 +486,7 @@ claude:
 ### Token Limit Exceeded
 
 **Symptoms:**
+
 - "max_tokens exceeded"
 - Response truncated
 
@@ -484,7 +495,8 @@ claude:
 ```yaml
 # Adjust token settings
 claude:
-  max_tokens: 8192  # Increase limit
+  max_tokens: 8192 # Increase limit
+
 
 # Or reduce input size
 # Chunk large inputs into smaller requests
@@ -532,6 +544,7 @@ flowchart TB
 ### Slow Response Times
 
 **Symptoms:**
+
 - Requests taking > 30 seconds
 - Client timeouts
 
@@ -554,6 +567,7 @@ server:
 ### High Memory Usage
 
 **Symptoms:**
+
 - Memory usage grows over time
 - Out of memory errors
 
@@ -573,6 +587,7 @@ go tool pprof http://localhost:6060/debug/pprof/heap
 ### Connection Pooling Issues
 
 **Symptoms:**
+
 - "too many open files"
 - Connection refused after many requests
 
@@ -621,6 +636,7 @@ flowchart TB
 ### Tool Not Found
 
 **Symptoms:**
+
 - "unknown tool"
 - "tool not registered"
 
@@ -637,6 +653,7 @@ tfo-mcp run --log-level debug
 ### Invalid Tool Arguments
 
 **Symptoms:**
+
 - "invalid arguments"
 - "missing required parameter"
 - "type mismatch"
@@ -665,6 +682,7 @@ tfo-mcp run --log-level debug
 ### Tool Execution Failed
 
 **Symptoms:**
+
 - Tool returns error result
 - "isError": true in response
 
@@ -759,16 +777,16 @@ grep '"level":"error"' tfo-mcp.log | jq -r '.time + " " + .message'
 
 ### Error Code Reference
 
-| Code | Name | Description | Solution |
-|------|------|-------------|----------|
-| -32700 | Parse Error | Invalid JSON | Fix JSON syntax |
-| -32600 | Invalid Request | Invalid JSON-RPC | Check request format |
-| -32601 | Method Not Found | Unknown method | Use valid method |
-| -32602 | Invalid Params | Invalid parameters | Check parameter types |
-| -32603 | Internal Error | Server error | Check logs |
-| -32001 | Session Not Found | Invalid session | Re-initialize |
-| -32002 | Tool Not Found | Unknown tool | List available tools |
-| -32003 | Resource Not Found | Unknown resource | List resources |
+| Code   | Name               | Description        | Solution              |
+| ------ | ------------------ | ------------------ | --------------------- |
+| -32700 | Parse Error        | Invalid JSON       | Fix JSON syntax       |
+| -32600 | Invalid Request    | Invalid JSON-RPC   | Check request format  |
+| -32601 | Method Not Found   | Unknown method     | Use valid method      |
+| -32602 | Invalid Params     | Invalid parameters | Check parameter types |
+| -32603 | Internal Error     | Server error       | Check logs            |
+| -32001 | Session Not Found  | Invalid session    | Re-initialize         |
+| -32002 | Tool Not Found     | Unknown tool       | List available tools  |
+| -32003 | Resource Not Found | Unknown resource   | List resources        |
 
 ### MCP Error Mapping
 
@@ -804,6 +822,7 @@ flowchart TB
 ### Frequently Asked Questions
 
 **Q: How do I reset the server state?**
+
 ```bash
 # Restart the server
 pkill tfo-mcp
@@ -811,6 +830,7 @@ tfo-mcp run
 ```
 
 **Q: How do I update to the latest version?**
+
 ```bash
 # Binary
 curl -LO https://github.com/telemetryflow/telemetryflow-go-mcp/releases/latest/download/tfo-mcp_$(uname -s)_$(uname -m).tar.gz
@@ -822,6 +842,7 @@ docker pull devopscorner/tfo-mcp:latest
 ```
 
 **Q: How do I check the API key is valid?**
+
 ```bash
 curl -X POST https://api.anthropic.com/v1/messages \
   -H "x-api-key: $TELEMETRYFLOW_MCP_CLAUDE_API_KEY" \
@@ -831,6 +852,7 @@ curl -X POST https://api.anthropic.com/v1/messages \
 ```
 
 **Q: How do I enable telemetry/tracing?**
+
 ```yaml
 telemetry:
   enabled: true
@@ -839,6 +861,7 @@ telemetry:
 ```
 
 **Q: Where are the log files?**
+
 ```bash
 # Logs go to stderr by default
 # Redirect to file:
@@ -886,34 +909,42 @@ When creating a GitHub issue, include:
 
 ```markdown
 ## Environment
+
 - TelemetryFlow GO MCP Version: `tfo-mcp version`
 - OS: macOS 14.0 / Ubuntu 22.04 / Windows 11
-- Go Version: go1.24
+- Go Version: go1.26
 
 ## Description
+
 Brief description of the issue.
 
 ## Steps to Reproduce
+
 1. Step one
 2. Step two
 3. Step three
 
 ## Expected Behavior
+
 What should happen.
 
 ## Actual Behavior
+
 What actually happens.
 
 ## Logs
 ```
+
 <paste relevant logs here>
 ```
 
 ## Configuration
+
 ```yaml
 <paste sanitized config here>
 ```
-```
+
+````
 
 ### Useful Information to Collect
 
@@ -930,7 +961,7 @@ cat config.yaml | grep -v api_key
 
 # Recent logs
 tfo-mcp run --log-level debug 2>&1 | tail -100
-```
+````
 
 ---
 

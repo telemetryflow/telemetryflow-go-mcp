@@ -18,7 +18,7 @@ type SessionModel struct {
 	ClientName      string         `gorm:"type:varchar(255)"`
 	ClientVersion   string         `gorm:"type:varchar(50)"`
 	ServerName      string         `gorm:"type:varchar(255);not null;default:'TelemetryFlow-MCP'"`
-	ServerVersion   string         `gorm:"type:varchar(50);not null;default:'1.1.2'"`
+	ServerVersion   string         `gorm:"type:varchar(50);not null;default:'1.2.0'"`
 	Capabilities    JSONB          `gorm:"type:jsonb"`
 	LogLevel        string         `gorm:"type:varchar(50);default:'info'"`
 	Metadata        JSONB          `gorm:"type:jsonb"`

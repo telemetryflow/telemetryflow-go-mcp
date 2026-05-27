@@ -70,7 +70,7 @@ func TestNewSessionClosedEvent(t *testing.T) {
 func TestNewConversationCreatedEvent(t *testing.T) {
 	conversationID := vo.GenerateConversationID()
 	sessionID := vo.GenerateSessionID()
-	model := vo.ModelClaude4Sonnet
+	model := vo.ModelClaudeSonnet4
 
 	event := events.NewConversationCreatedEvent(conversationID, sessionID, model)
 

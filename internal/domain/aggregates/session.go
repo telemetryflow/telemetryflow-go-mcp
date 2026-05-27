@@ -101,7 +101,7 @@ func NewSession() *Session {
 		state:           SessionStateCreated,
 		serverInfo: &ServerInfo{
 			Name:    "TelemetryFlow-MCP",
-			Version: "1.1.2",
+			Version: "1.2.0",
 		},
 		capabilities: &SessionCapabilities{
 			Tools:     &ToolsCapability{ListChanged: true},
@@ -524,4 +524,38 @@ func (s *Session) ToInitializeResult() map[string]interface{} {
 		"capabilities":    s.capabilities,
 	}
 	return result
+}
+
+// RestoreSession reconstructs a Session aggregate from persisted data
+func RestoreSession(
+	id vo.SessionID,
+	protocolVersion vo.MCPProtocolVersion,
+	state SessionState,
+	serverName, serverVersion, clientName, clientVersion, logLevel string,
+	createdAt, updatedAt time.Time,
+	closedAt *time.Time,
+) *Session {
+	s := &Session{
+		id:              id,
+		protocolVersion: protocolVersion,
+		state:           state,
+		clientInfo:      nil,
+		serverInfo:      &ServerInfo{Name: serverName, Version: serverVersion},
+		capabilities:    &SessionCapabilities{},
+		tools:           make(map[string]*entities.Tool),
+		resources:       make(map[string]*entities.Resource),
+		prompts:         make(map[string]*entities.Prompt),
+		subscriptions:   make(map[string]bool),
+		conversations:   make(map[string]*Conversation),
+		logLevel:        vo.MCPLogLevel(logLevel),
+		createdAt:       createdAt,
+		updatedAt:       updatedAt,
+		closedAt:        closedAt,
+		metadata:        make(map[string]interface{}),
+		events:          make([]events.DomainEvent, 0),
+	}
+	if clientName != "" || clientVersion != "" {
+		s.clientInfo = &ClientInfo{Name: clientName, Version: clientVersion}
+	}
+	return s
 }

@@ -124,6 +124,7 @@ flowchart TB
 ```
 
 **Rules:**
+
 - Always deployable
 - Protected - no direct commits
 - Requires PR with approval
@@ -144,6 +145,7 @@ flowchart TB
 ```
 
 **Rules:**
+
 - Integration branch for features
 - CI runs on every push
 - Nightly builds for testing
@@ -164,6 +166,7 @@ flowchart TB
 ```
 
 **Naming Convention:**
+
 ```
 feature/<ticket-id>-<short-description>
 feature/add-search-tool
@@ -172,6 +175,7 @@ feature/improve-error-handling
 ```
 
 **Rules:**
+
 - Branch from `develop`
 - Merge back to `develop`
 - Delete after merge
@@ -193,6 +197,7 @@ flowchart TB
 ```
 
 **Naming Convention:**
+
 ```
 release/<version>
 release/1.1.0
@@ -200,6 +205,7 @@ release/1.2.0-rc1
 ```
 
 **Rules:**
+
 - Branch from `develop`
 - Only bug fixes allowed
 - Merge to `main` and back to `develop`
@@ -221,6 +227,7 @@ flowchart TB
 ```
 
 **Naming Convention:**
+
 ```
 hotfix/<version>-<description>
 hotfix/1.1.1-session-timeout
@@ -228,6 +235,7 @@ hotfix/1.1.2-api-auth-fix
 ```
 
 **Rules:**
+
 - Branch from `main`
 - Critical fixes only
 - Merge to `main` and `develop`
@@ -356,6 +364,7 @@ flowchart LR
 ```
 
 **Format:**
+
 ```
 <type>(<scope>): <description>
 
@@ -366,19 +375,19 @@ flowchart LR
 
 ### Commit Types
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `feat` | New feature | `feat(tools): add file search tool` |
-| `fix` | Bug fix | `fix(session): handle timeout correctly` |
-| `docs` | Documentation | `docs: update API reference` |
-| `style` | Formatting | `style: fix indentation` |
+| Type       | Description        | Example                                       |
+| ---------- | ------------------ | --------------------------------------------- |
+| `feat`     | New feature        | `feat(tools): add file search tool`           |
+| `fix`      | Bug fix            | `fix(session): handle timeout correctly`      |
+| `docs`     | Documentation      | `docs: update API reference`                  |
+| `style`    | Formatting         | `style: fix indentation`                      |
 | `refactor` | Code restructuring | `refactor(handlers): simplify error handling` |
-| `test` | Tests | `test: add session handler tests` |
-| `chore` | Maintenance | `chore: update dependencies` |
-| `perf` | Performance | `perf(claude): optimize token counting` |
-| `ci` | CI/CD | `ci: add release workflow` |
-| `build` | Build system | `build: update Dockerfile` |
-| `revert` | Revert commit | `revert: feat(tools): add file search tool` |
+| `test`     | Tests              | `test: add session handler tests`             |
+| `chore`    | Maintenance        | `chore: update dependencies`                  |
+| `perf`     | Performance        | `perf(claude): optimize token counting`       |
+| `ci`       | CI/CD              | `ci: add release workflow`                    |
+| `build`    | Build system       | `build: update Dockerfile`                    |
+| `revert`   | Revert commit      | `revert: feat(tools): add file search tool`   |
 
 ### Commit Message Examples
 
@@ -448,23 +457,28 @@ flowchart TB
 
 ```markdown
 ## Description
+
 Brief description of changes.
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Related Issues
+
 Fixes #(issue number)
 
 ## Testing
+
 - [ ] Unit tests added
 - [ ] Integration tests added
 - [ ] Manual testing performed
 
 ## Checklist
+
 - [ ] My code follows the style guidelines
 - [ ] I have performed a self-review
 - [ ] I have commented hard-to-understand code

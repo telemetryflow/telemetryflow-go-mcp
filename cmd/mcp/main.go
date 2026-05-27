@@ -8,10 +8,14 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
+	"gorm.io/gorm"
 
 	"github.com/telemetryflow/telemetryflow-go-mcp/internal/application/handlers"
+	appsvc "github.com/telemetryflow/telemetryflow-go-mcp/internal/application/services"
+	"github.com/telemetryflow/telemetryflow-go-mcp/internal/domain/repositories"
 	"github.com/telemetryflow/telemetryflow-go-mcp/internal/infrastructure/claude"
 	"github.com/telemetryflow/telemetryflow-go-mcp/internal/infrastructure/config"
 	"github.com/telemetryflow/telemetryflow-go-mcp/internal/infrastructure/persistence"
@@ -21,7 +25,7 @@ import (
 
 var (
 	// Version information (set at build time)
-	version   = "1.1.2"
+	version   = "1.2.0"
 	commit    = "unknown"
 	buildDate = "unknown"
 
@@ -80,9 +84,19 @@ func runServer(cmd *cobra.Command, args []string) error {
 	}
 
 	// Create repositories
-	sessionRepo := persistence.NewInMemorySessionRepository()
-	conversationRepo := persistence.NewInMemoryConversationRepository()
-	toolRepo := persistence.NewInMemoryToolRepository()
+	sessionRepo, conversationRepo, toolRepo, cleanup, err := initRepositories(cfg, logger)
+	if err != nil {
+		return fmt.Errorf("failed to init repositories: %w", err)
+	}
+	if cleanup != nil {
+		defer cleanup()
+	}
+
+	// Create context collector for telemetry data access
+	var contextCollector *appsvc.ContextCollector
+	if cfg.Database.Enabled || cfg.Clickhouse.Enabled {
+		contextCollector = initContextCollector(cfg, logger)
+	}
 
 	// Create event publisher (simple implementation)
 	eventPublisher := &simpleEventPublisher{logger: logger}
@@ -93,7 +107,12 @@ func runServer(cmd *cobra.Command, args []string) error {
 	conversationHandler := handlers.NewConversationHandler(sessionRepo, conversationRepo, claudeClient, eventPublisher)
 
 	// Create and register built-in tools
-	toolRegistry := tools.NewToolRegistry(claudeClient)
+	var toolRegistry *tools.ToolRegistry
+	if contextCollector != nil {
+		toolRegistry = tools.NewToolRegistryWithCollector(claudeClient, contextCollector)
+	} else {
+		toolRegistry = tools.NewToolRegistry(claudeClient)
+	}
 	for _, tool := range toolRegistry.GetTools() {
 		ctx := context.Background()
 		if err := toolRepo.Register(ctx, tool); err != nil {
@@ -130,6 +149,72 @@ func runServer(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func initRepositories(cfg *config.Config, logger zerolog.Logger) (
+	repositories.ISessionRepository,
+	repositories.IConversationRepository,
+	repositories.IToolRepository,
+	func(),
+	error,
+) {
+	if cfg.Database.Enabled {
+		logger.Info().Msg("PostgreSQL enabled, initializing GORM repositories")
+
+		dbCfg := &persistence.DatabaseConfig{
+			Host:         cfg.Database.Host,
+			Port:         cfg.Database.Port,
+			User:         cfg.Database.User,
+			Password:     cfg.Database.Password,
+			Database:     cfg.Database.Database,
+			SSLMode:      cfg.Database.SSLMode,
+			MaxIdleConns: cfg.Database.MaxIdleConns,
+			MaxOpenConns: cfg.Database.MaxOpenConns,
+		}
+		if cfg.Database.URL != "" {
+			dbCfg = nil
+		}
+
+		db, err := persistence.NewDatabase(dbCfg)
+		if err != nil {
+			return nil, nil, nil, nil, fmt.Errorf("failed to connect PostgreSQL: %w", err)
+		}
+
+		ctx := context.Background()
+		if err := db.Ping(ctx); err != nil {
+			_ = db.Close()
+			return nil, nil, nil, nil, fmt.Errorf("failed to ping PostgreSQL: %w", err)
+		}
+		logger.Info().Msg("PostgreSQL connection established")
+
+		gormDB := db.DB()
+		if cfg.Database.AutoMigrate {
+			if err := gormDB.AutoMigrate(persistence.AllModels()...); err != nil {
+				_ = db.Close()
+				return nil, nil, nil, nil, fmt.Errorf("failed to auto-migrate: %w", err)
+			}
+			logger.Info().Msg("PostgreSQL schema migration complete")
+		}
+
+		sessionRepo := persistence.NewGormSessionRepository(gormDB)
+		conversationRepo := persistence.NewGormConversationRepository(gormDB)
+		toolRepo := persistence.NewGormToolRepository(gormDB)
+
+		cleanup := func() {
+			logger.Info().Msg("Closing PostgreSQL connection")
+			_ = db.Close()
+		}
+
+		return sessionRepo, conversationRepo, toolRepo, cleanup, nil
+	}
+
+	logger.Info().Msg("Using in-memory repositories (PostgreSQL disabled)")
+
+	return persistence.NewInMemorySessionRepository(),
+		persistence.NewInMemoryConversationRepository(),
+		persistence.NewInMemoryToolRepository(),
+		nil,
+		nil
 }
 
 func setupLogger(cfg *config.Config) zerolog.Logger {
@@ -203,4 +288,61 @@ type simpleEventPublisher struct {
 func (p *simpleEventPublisher) Publish(ctx context.Context, event interface{}) error {
 	p.logger.Debug().Interface("event", event).Msg("Event published")
 	return nil
+}
+
+func initContextCollector(cfg *config.Config, logger zerolog.Logger) *appsvc.ContextCollector {
+	var gormDB interface{ DB() *gorm.DB }
+	var chConn driver.Conn
+	var chDB string
+
+	if cfg.Database.Enabled {
+		dbCfg := &persistence.DatabaseConfig{
+			Host:     cfg.Database.Host,
+			Port:     cfg.Database.Port,
+			User:     cfg.Database.User,
+			Password: cfg.Database.Password,
+			Database: cfg.Database.Database,
+			SSLMode:  cfg.Database.SSLMode,
+		}
+		if cfg.Database.URL != "" {
+			dbCfg = nil
+		}
+		db, err := persistence.NewDatabase(dbCfg)
+		if err != nil {
+			logger.Warn().Err(err).Msg("Failed to connect PostgreSQL for context collector")
+		} else {
+			gormDB = db
+			logger.Info().Msg("Context collector: PostgreSQL connected")
+		}
+	}
+
+	if cfg.Clickhouse.Enabled {
+		chCfg := &persistence.ClickHouseConfig{
+			Host:     cfg.Clickhouse.Host,
+			Port:     cfg.Clickhouse.Port,
+			Database: cfg.Clickhouse.Database,
+			Username: cfg.Clickhouse.Username,
+			Password: cfg.Clickhouse.Password,
+			Secure:   cfg.Clickhouse.Secure,
+		}
+		ch, err := persistence.NewClickHouse(chCfg)
+		if err != nil {
+			logger.Warn().Err(err).Msg("Failed to connect ClickHouse for context collector")
+		} else {
+			chConn = ch.Conn()
+			chDB = cfg.Clickhouse.Database
+			if chDB == "" {
+				chDB = "telemetryflow_analytics"
+			}
+			logger.Info().Msg("Context collector: ClickHouse connected")
+		}
+	}
+
+	var db *gorm.DB
+	if gormDB != nil {
+		db = gormDB.DB()
+	}
+
+	provider := appsvc.NewDefaultDBProvider(db, chConn, chDB)
+	return appsvc.NewContextCollector(provider, logger)
 }

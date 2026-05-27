@@ -119,7 +119,7 @@ type Session struct {
 	ClientName      string     `gorm:"type:varchar(255)" json:"clientName,omitempty"`
 	ClientVersion   string     `gorm:"type:varchar(50)" json:"clientVersion,omitempty"`
 	ServerName      string     `gorm:"type:varchar(255);not null;default:'TelemetryFlow-MCP'" json:"serverName"`
-	ServerVersion   string     `gorm:"type:varchar(50);not null;default:'1.1.2'" json:"serverVersion"`
+	ServerVersion   string     `gorm:"type:varchar(50);not null;default:'1.2.0'" json:"serverVersion"`
 	Capabilities    JSONB      `gorm:"type:jsonb;not null;default:'{}'" json:"capabilities"`
 	LogLevel        string     `gorm:"type:varchar(20);not null;default:'info'" json:"logLevel"`
 	Metadata        JSONB      `gorm:"type:jsonb;not null;default:'{}'" json:"metadata"`
@@ -152,7 +152,7 @@ func (s *Session) BeforeCreate(tx *gorm.DB) error {
 type Conversation struct {
 	ID            uuid.UUID   `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
 	SessionID     uuid.UUID   `gorm:"type:uuid;not null;index" json:"sessionId"`
-	Model         string      `gorm:"type:varchar(100);not null;default:'claude-sonnet-4-20250514'" json:"model"`
+	Model         string      `gorm:"type:varchar(100);not null;default:'claude-opus-4-7'" json:"model"`
 	SystemPrompt  string      `gorm:"type:text" json:"systemPrompt,omitempty"`
 	Status        string      `gorm:"type:varchar(20);not null;default:'active'" json:"status"`
 	MaxTokens     int         `gorm:"not null;default:4096" json:"maxTokens"`

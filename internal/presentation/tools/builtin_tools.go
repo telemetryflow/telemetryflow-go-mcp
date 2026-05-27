@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	appsvc "github.com/telemetryflow/telemetryflow-go-mcp/internal/application/services"
 	"github.com/telemetryflow/telemetryflow-go-mcp/internal/domain/entities"
 	"github.com/telemetryflow/telemetryflow-go-mcp/internal/domain/services"
 	vo "github.com/telemetryflow/telemetryflow-go-mcp/internal/domain/valueobjects"
@@ -18,18 +19,35 @@ import (
 
 // ToolRegistry manages built-in tools
 type ToolRegistry struct {
-	claudeService services.IClaudeService
-	tools         map[string]*entities.Tool
+	claudeService    services.IClaudeService
+	contextCollector *appsvc.ContextCollector
+	promptBuilder    *appsvc.PromptBuilder
+	tools            map[string]*entities.Tool
 }
 
 // NewToolRegistry creates a new tool registry
 func NewToolRegistry(claudeService services.IClaudeService) *ToolRegistry {
 	registry := &ToolRegistry{
 		claudeService: claudeService,
+		promptBuilder: appsvc.NewPromptBuilder(),
 		tools:         make(map[string]*entities.Tool),
 	}
 
 	// Register built-in tools
+	registry.registerBuiltinTools()
+
+	return registry
+}
+
+// NewToolRegistryWithCollector creates a new tool registry with context collection support
+func NewToolRegistryWithCollector(claudeService services.IClaudeService, collector *appsvc.ContextCollector) *ToolRegistry {
+	registry := &ToolRegistry{
+		claudeService:    claudeService,
+		contextCollector: collector,
+		promptBuilder:    appsvc.NewPromptBuilder(),
+		tools:            make(map[string]*entities.Tool),
+	}
+
 	registry.registerBuiltinTools()
 
 	return registry
@@ -71,6 +89,11 @@ func (r *ToolRegistry) registerBuiltinTools() {
 
 	// Echo tool (for testing)
 	r.registerEcho()
+
+	// Telemetry context tools
+	r.registerCollectTelemetryContext()
+	r.registerListContextTypes()
+	r.registerBuildSystemPrompt()
 }
 
 // registerClaudeConversation registers the Claude conversation tool
@@ -91,8 +114,22 @@ func (r *ToolRegistry) registerClaudeConversation() {
 			},
 			"model": {
 				Type:        "string",
-				Description: "The Claude model to use (default: claude-sonnet-4-20250514)",
-				Enum:        []interface{}{"claude-opus-4-20250514", "claude-sonnet-4-20250514", "claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022"},
+				Description: "The LLM model to use (default: claude-opus-4-7). Supported: Anthropic Claude, Google Gemini, OpenAI GPT/o, DeepSeek, Qwen, Mistral, Grok, Kimi, Zhipu GLM, Xiaomi MiMo",
+				Enum: []interface{}{
+					"claude-opus-4-7", "claude-opus-4-7-fast", "claude-opus-4-6", "claude-opus-4-6-fast",
+					"claude-sonnet-4-6", "claude-opus-4-5", "claude-sonnet-4-5-20250929",
+					"claude-haiku-4-5", "claude-haiku-4-5-20251001", "claude-sonnet-4-20250514",
+					"claude-mythos-preview",
+					"gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash",
+					"gpt-5.5-pro", "gpt-5.5", "gpt-5.4-pro", "gpt-5.4", "o3",
+					"deepseek-v4-pro", "deepseek-v4-flash", "deepseek-chat", "deepseek-reasoner",
+					"qwen3.6-max-preview", "qwen3.6-plus", "qwen3.6-flash",
+					"mistral-medium-3-5", "mistral-small-2603", "mistral-large-2512",
+					"grok-4.3", "grok-4.20-multi-agent", "grok-4.20-0309-reasoning",
+					"kimi-k2.6", "kimi-k2.5", "kimi-k2-thinking",
+					"glm-5.1", "glm-5-turbo", "glm-4.7-flash",
+					"mimo-v2.5-pro", "mimo-v2.5", "mimo-v2-pro",
+				},
 			},
 			"max_tokens": {
 				Type:        "integer",
@@ -119,7 +156,7 @@ func (r *ToolRegistry) handleClaudeConversation(input map[string]interface{}) (*
 	}
 
 	// Build request
-	model := vo.ModelClaude4Sonnet
+	model := vo.ModelClaudeOpus47
 	if m, ok := input["model"].(string); ok {
 		model = vo.Model(m)
 	}
@@ -542,4 +579,237 @@ func handleEcho(input map[string]interface{}) (*entities.ToolResult, error) {
 		return entities.NewErrorToolResult(fmt.Errorf("message is required")), nil
 	}
 	return entities.NewTextToolResult(message), nil
+}
+
+func (r *ToolRegistry) registerCollectTelemetryContext() {
+	name, _ := vo.NewToolName("collect_telemetry_context")
+	desc, _ := vo.NewToolDescription("Collect live telemetry context from TelemetryFlow platform for AI analysis. Queries ClickHouse and PostgreSQL for real observability data.")
+
+	var contextTypes []interface{}
+	for _, ct := range vo.AllContextTypes() {
+		contextTypes = append(contextTypes, string(ct))
+	}
+
+	schema := &entities.JSONSchema{
+		Type: "object",
+		Properties: map[string]*entities.JSONSchema{
+			"organization_id": {
+				Type:        "string",
+				Description: "The organization ID to collect context for",
+			},
+			"context_type": {
+				Type:        "string",
+				Description: "The type of telemetry context to collect",
+				Enum:        contextTypes,
+			},
+			"user_id": {
+				Type:        "string",
+				Description: "Optional user ID (required for account-* context types)",
+			},
+			"time_range_from": {
+				Type:        "string",
+				Description: "Start time in ISO 8601 format (default: 1 hour ago)",
+			},
+			"time_range_to": {
+				Type:        "string",
+				Description: "End time in ISO 8601 format (default: now)",
+			},
+			"max_items": {
+				Type:        "integer",
+				Description: "Maximum number of items to return (default: 30)",
+			},
+		},
+		Required: []string{"organization_id", "context_type"},
+	}
+
+	tool, _ := entities.NewTool(name, desc, schema)
+	tool.SetCategory("telemetry")
+	tool.SetTags([]string{"telemetry", "context", "observability", "telemetryflow"})
+	tool.SetHandler(r.handleCollectTelemetryContext)
+	tool.SetTimeout(10 * time.Second)
+
+	r.tools["collect_telemetry_context"] = tool
+}
+
+func (r *ToolRegistry) handleCollectTelemetryContext(input map[string]interface{}) (*entities.ToolResult, error) {
+	if r.contextCollector == nil {
+		return entities.NewErrorToolResult(fmt.Errorf("telemetry context collection is not available — ClickHouse and/or PostgreSQL not configured")), nil
+	}
+
+	orgID, ok := input["organization_id"].(string)
+	if !ok || orgID == "" {
+		return entities.NewErrorToolResult(fmt.Errorf("organization_id is required")), nil
+	}
+
+	contextTypeStr, ok := input["context_type"].(string)
+	if !ok || contextTypeStr == "" {
+		return entities.NewErrorToolResult(fmt.Errorf("context_type is required")), nil
+	}
+
+	contextType := vo.ContextType(contextTypeStr)
+	if !contextType.IsValid() {
+		return entities.NewErrorToolResult(fmt.Errorf("invalid context_type: %s", contextTypeStr)), nil
+	}
+
+	var timeRange *vo.TimeRange
+	if fromStr, ok := input["time_range_from"].(string); ok {
+		if toStr, ok2 := input["time_range_to"].(string); ok2 {
+			from, err := time.Parse(time.RFC3339, fromStr)
+			if err != nil {
+				return entities.NewErrorToolResult(fmt.Errorf("invalid time_range_from format: %w", err)), nil
+			}
+			to, err := time.Parse(time.RFC3339, toStr)
+			if err != nil {
+				return entities.NewErrorToolResult(fmt.Errorf("invalid time_range_to format: %w", err)), nil
+			}
+			timeRange = &vo.TimeRange{From: from, To: to}
+		}
+	}
+
+	maxItems := 30
+	if mi, ok := input["max_items"].(float64); ok {
+		maxItems = int(mi)
+	}
+
+	userID, _ := input["user_id"].(string)
+
+	opts := vo.CollectContextOptions{
+		OrganizationID: orgID,
+		UserID:         userID,
+		ContextType:    contextType,
+		TimeRange:      timeRange,
+		MaxItems:       maxItems,
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	tc, err := r.contextCollector.CollectContext(ctx, opts)
+	if err != nil {
+		return entities.NewErrorToolResult(fmt.Errorf("failed to collect context: %w", err)), nil
+	}
+
+	systemPrompt := r.promptBuilder.BuildSystemPrompt(contextType, "")
+	contextPrompt := r.promptBuilder.BuildContextPrompt(tc)
+
+	result := map[string]interface{}{
+		"context_type": string(tc.Type),
+		"time_range": map[string]string{
+			"from": tc.TimeRange.From.Format(time.RFC3339),
+			"to":   tc.TimeRange.To.Format(time.RFC3339),
+		},
+		"summary":        tc.Summary,
+		"data":           tc.Data,
+		"system_prompt":  systemPrompt,
+		"context_prompt": contextPrompt,
+	}
+
+	data, _ := json.MarshalIndent(result, "", "  ")
+	return entities.NewTextToolResult(string(data)), nil
+}
+
+func (r *ToolRegistry) registerListContextTypes() {
+	name, _ := vo.NewToolName("list_context_types")
+	desc, _ := vo.NewToolDescription("List all available telemetry context types supported by TelemetryFlow platform")
+
+	schema := &entities.JSONSchema{
+		Type:       "object",
+		Properties: map[string]*entities.JSONSchema{},
+	}
+
+	tool, _ := entities.NewTool(name, desc, schema)
+	tool.SetCategory("telemetry")
+	tool.SetTags([]string{"telemetry", "context", "discovery"})
+	tool.SetHandler(r.handleListContextTypes)
+
+	r.tools["list_context_types"] = tool
+}
+
+func (r *ToolRegistry) handleListContextTypes(input map[string]interface{}) (*entities.ToolResult, error) {
+	types := vo.AllContextTypes()
+
+	categories := map[string][]string{
+		"Core Telemetry":      {},
+		"Infrastructure":      {},
+		"Kubernetes":          {},
+		"AI Intelligence":     {},
+		"Database Monitoring": {},
+		"Platform Management": {},
+		"Account":             {},
+	}
+
+	for _, ct := range types {
+		s := string(ct)
+		switch {
+		case strings.HasPrefix(s, "db-monitoring-"):
+			categories["Database Monitoring"] = append(categories["Database Monitoring"], s)
+		case strings.HasPrefix(s, "kubernetes-"):
+			categories["Kubernetes"] = append(categories["Kubernetes"], s)
+		case strings.HasPrefix(s, "infra-"):
+			categories["Infrastructure"] = append(categories["Infrastructure"], s)
+		case strings.HasPrefix(s, "account-"):
+			categories["Account"] = append(categories["Account"], s)
+		case s == "anomaly-detection" || s == "corrective-maintenance" || s == "predictive-maintenance" || s == "cost-optimization":
+			categories["AI Intelligence"] = append(categories["AI Intelligence"], s)
+		case strings.HasPrefix(s, "iam-") || strings.HasPrefix(s, "tenancy-") ||
+			s == "audit" || s == "retention" || s == "subscription" || s == "api-keys" ||
+			s == "data-masking" || s == "system-setup" || s == "system-channels" ||
+			s == "ai-assistant" || s == "notifications" || s == "reports":
+			categories["Platform Management"] = append(categories["Platform Management"], s)
+		default:
+			categories["Core Telemetry"] = append(categories["Core Telemetry"], s)
+		}
+	}
+
+	result := map[string]interface{}{
+		"total":      len(types),
+		"categories": categories,
+	}
+
+	data, _ := json.MarshalIndent(result, "", "  ")
+	return entities.NewTextToolResult(string(data)), nil
+}
+
+func (r *ToolRegistry) registerBuildSystemPrompt() {
+	name, _ := vo.NewToolName("build_system_prompt")
+	desc, _ := vo.NewToolDescription("Build a context-aware system prompt for a given telemetry context type")
+
+	schema := &entities.JSONSchema{
+		Type: "object",
+		Properties: map[string]*entities.JSONSchema{
+			"context_type": {
+				Type:        "string",
+				Description: "The telemetry context type to build a prompt for",
+			},
+			"custom_prompt": {
+				Type:        "string",
+				Description: "Optional additional instructions to append",
+			},
+		},
+		Required: []string{"context_type"},
+	}
+
+	tool, _ := entities.NewTool(name, desc, schema)
+	tool.SetCategory("telemetry")
+	tool.SetTags([]string{"telemetry", "prompt", "ai"})
+	tool.SetHandler(r.handleBuildSystemPrompt)
+
+	r.tools["build_system_prompt"] = tool
+}
+
+func (r *ToolRegistry) handleBuildSystemPrompt(input map[string]interface{}) (*entities.ToolResult, error) {
+	contextTypeStr, ok := input["context_type"].(string)
+	if !ok || contextTypeStr == "" {
+		return entities.NewErrorToolResult(fmt.Errorf("context_type is required")), nil
+	}
+
+	contextType := vo.ContextType(contextTypeStr)
+	if !contextType.IsValid() {
+		return entities.NewErrorToolResult(fmt.Errorf("invalid context_type: %s", contextTypeStr)), nil
+	}
+
+	customPrompt, _ := input["custom_prompt"].(string)
+	prompt := r.promptBuilder.BuildSystemPrompt(contextType, customPrompt)
+
+	return entities.NewTextToolResult(prompt), nil
 }

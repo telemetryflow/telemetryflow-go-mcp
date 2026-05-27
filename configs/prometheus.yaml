@@ -1,0 +1,26 @@
+# =============================================================================
+# Prometheus Configuration — TelemetryFlow GO MCP Server
+# =============================================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'tfo-collector'
+    static_configs:
+      - targets: ['tfo-collector:8888']
+
+  - job_name: 'tfo-collector-exported'
+    static_configs:
+      - targets: ['tfo-collector:8889']
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'tfo-mcp'
+    static_configs:
+      - targets: ['tfo-mcp:8080']
+    metrics_path: '/metrics'
+    scheme: http

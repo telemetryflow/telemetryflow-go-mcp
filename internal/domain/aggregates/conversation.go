@@ -482,3 +482,27 @@ func (c *Conversation) GetMessagesForAPI() []map[string]interface{} {
 
 	return result
 }
+
+// RestoreConversation reconstructs a Conversation aggregate from persisted data
+func RestoreConversation(
+	id vo.ConversationID,
+	sessionID vo.SessionID,
+	model string,
+	status string,
+	createdAt, updatedAt time.Time,
+	closedAt *time.Time,
+) *Conversation {
+	return &Conversation{
+		id:        id,
+		sessionID: sessionID,
+		model:     vo.Model(model),
+		messages:  make([]*entities.Message, 0),
+		status:    ConversationStatus(status),
+		tools:     make([]*entities.Tool, 0),
+		createdAt: createdAt,
+		updatedAt: updatedAt,
+		closedAt:  closedAt,
+		metadata:  make(map[string]interface{}),
+		events:    make([]events.DomainEvent, 0),
+	}
+}

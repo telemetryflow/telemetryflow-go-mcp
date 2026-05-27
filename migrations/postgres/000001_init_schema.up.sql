@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     client_name VARCHAR(255),
     client_version VARCHAR(50),
     server_name VARCHAR(255) NOT NULL DEFAULT 'TelemetryFlow-MCP',
-    server_version VARCHAR(50) NOT NULL DEFAULT '1.1.2',
+    server_version VARCHAR(50) NOT NULL DEFAULT '1.2.0',
     capabilities JSONB NOT NULL DEFAULT '{}',
     log_level VARCHAR(20) NOT NULL DEFAULT 'info',
     metadata JSONB NOT NULL DEFAULT '{}',

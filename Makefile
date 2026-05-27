@@ -1,11 +1,11 @@
 # ==============================================================================
 # TelemetryFlow GO MCP Server Makefile
-# Version: 1.1.2
+# Version: 1.2.0
 # ==============================================================================
 
 # Build variables
 BINARY_NAME := tfo-mcp
-VERSION := 1.1.2
+VERSION := 1.2.0
 COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 GO_VERSION := $(shell go version | cut -d ' ' -f 3)

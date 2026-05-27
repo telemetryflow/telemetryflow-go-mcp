@@ -530,15 +530,15 @@ erDiagram
 
 ### ClickHouse Table Engines
 
-| Table | Engine | Partitioning | TTL |
-|-------|--------|--------------|-----|
-| `tool_call_analytics` | MergeTree | Monthly | 90 days |
-| `api_request_analytics` | MergeTree | Monthly | 90 days |
-| `session_analytics` | MergeTree | Monthly | 180 days |
-| `error_analytics` | MergeTree | Monthly | 30 days |
-| `token_usage_hourly` | SummingMergeTree | Monthly | - |
-| `tool_usage_hourly` | SummingMergeTree | Monthly | - |
-| `latency_percentiles_hourly` | ReplacingMergeTree | Monthly | - |
+| Table                        | Engine             | Partitioning | TTL      |
+| ---------------------------- | ------------------ | ------------ | -------- |
+| `tool_call_analytics`        | MergeTree          | Monthly      | 90 days  |
+| `api_request_analytics`      | MergeTree          | Monthly      | 90 days  |
+| `session_analytics`          | MergeTree          | Monthly      | 180 days |
+| `error_analytics`            | MergeTree          | Monthly      | 30 days  |
+| `token_usage_hourly`         | SummingMergeTree   | Monthly      | -        |
+| `tool_usage_hourly`          | SummingMergeTree   | Monthly      | -        |
+| `latency_percentiles_hourly` | ReplacingMergeTree | Monthly      | -        |
 
 ### Materialized Views
 

@@ -27,7 +27,7 @@ This guide provides comprehensive information for developers working on TFO-GO-M
 ```mermaid
 flowchart TB
     subgraph DevEnv["Development Environment"]
-        GO["Go 1.24+"]
+        GO["Go 1.26+"]
         EDITOR["IDE/Editor"]
         GIT["Git"]
         MAKE["Make"]
@@ -63,7 +63,7 @@ flowchart TB
 ```mermaid
 flowchart LR
     subgraph Required["Required"]
-        GO["Go 1.24+"]
+        GO["Go 1.26+"]
         GIT["Git"]
         MAKE["Make"]
     end
@@ -81,13 +81,13 @@ flowchart LR
 ### Installation
 
 ```bash
-# Install Go 1.24+
+# Install Go 1.26+
 # macOS
 brew install go
 
 # Linux
-wget https://go.dev/dl/go1.24.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.24.linux-amd64.tar.gz
+wget https://go.dev/dl/go1.26.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.26.linux-amd64.tar.gz
 export PATH=$PATH:/usr/local/go/bin
 
 # Windows
@@ -242,12 +242,12 @@ gitGraph
 
 ### Branch Naming
 
-| Type | Pattern | Example |
-|------|---------|---------|
+| Type    | Pattern               | Example                   |
+| ------- | --------------------- | ------------------------- |
 | Feature | `feature/description` | `feature/add-search-tool` |
-| Bug Fix | `fix/description` | `fix/session-timeout` |
-| Hotfix | `hotfix/description` | `hotfix/api-error` |
-| Release | `release/version` | `release/1.1.3` |
+| Bug Fix | `fix/description`     | `fix/session-timeout`     |
+| Hotfix  | `hotfix/description`  | `hotfix/api-error`        |
+| Release | `release/version`     | `release/1.1.3`           |
 
 ### Development Cycle
 
@@ -342,15 +342,15 @@ flowchart TB
 
 ### Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Package | lowercase | `valueobjects` |
-| Interface | PascalCase with I prefix | `ISessionRepository` |
-| Struct | PascalCase | `SessionHandler` |
-| Function | PascalCase (exported), camelCase (internal) | `HandleRequest`, `parseInput` |
-| Variable | camelCase | `sessionID` |
-| Constant | PascalCase | `MaxRetries` |
-| Error | Err prefix | `ErrSessionNotFound` |
+| Type      | Convention                                  | Example                       |
+| --------- | ------------------------------------------- | ----------------------------- |
+| Package   | lowercase                                   | `valueobjects`                |
+| Interface | PascalCase with I prefix                    | `ISessionRepository`          |
+| Struct    | PascalCase                                  | `SessionHandler`              |
+| Function  | PascalCase (exported), camelCase (internal) | `HandleRequest`, `parseInput` |
+| Variable  | camelCase                                   | `sessionID`                   |
+| Constant  | PascalCase                                  | `MaxRetries`                  |
+| Error     | Err prefix                                  | `ErrSessionNotFound`          |
 
 ### File Organization
 
@@ -799,6 +799,7 @@ flowchart TB
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation
@@ -833,20 +834,24 @@ docs(readme): update installation instructions
 
 ```markdown
 ## Description
+
 Brief description of changes.
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Unit tests added/updated
 - [ ] Integration tests added/updated
 - [ ] Manual testing performed
 
 ## Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Self-review completed
 - [ ] Documentation updated
@@ -897,7 +902,7 @@ flowchart LR
         PATCH["PATCH<br/>Bug fixes"]
     end
 
-    subgraph Example["Example: 1.1.2"]
+    subgraph Example["Example: 1.2.0"]
         M["1"]
         N["1"]
         P["2"]
@@ -923,7 +928,7 @@ make build-all
 make docker-push VERSION=1.1.3
 
 # Generate changelog
-git log --oneline v1.1.2..HEAD > CHANGELOG_NEW.md
+git log --oneline v1.2.0..HEAD > CHANGELOG_NEW.md
 ```
 
 ### GoReleaser Configuration
@@ -958,14 +963,14 @@ archives:
       - goos: windows
         format: zip
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
-      - '^chore:'
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
 ```
 
 ---

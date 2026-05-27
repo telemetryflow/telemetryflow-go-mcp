@@ -1,10 +1,10 @@
 # TelemetryFlow GO MCP Server Configuration
-# Version: 1.1.2
+# Version: 1.2.0
 
 # Server configuration
 server:
   name: "TelemetryFlow-MCP"
-  version: "1.1.2"
+  version: "1.2.0"
   host: "localhost"
   port: 8080
   # Transport type: "stdio", "sse", "websocket"
@@ -21,7 +21,7 @@ claude:
   # API key - can also be set via ANTHROPIC_API_KEY environment variable
   # api_key: "your-api-key-here"
   base_url: "https://api.anthropic.com"
-  default_model: "claude-sonnet-4-20250514"
+  default_model: "claude-opus-4-7"
   max_tokens: 4096
   temperature: 1.0
   top_p: 1.0

@@ -82,12 +82,12 @@ flowchart LR
 
 ### Software Requirements
 
-| Component | Minimum Version | Notes |
-|-----------|----------------|-------|
-| Operating System | Linux, macOS, Windows | 64-bit recommended |
-| Go (source build) | 1.24+ | Only for source installation |
-| Docker | 20.10+ | Only for Docker installation |
-| Git | 2.0+ | Only for source installation |
+| Component         | Minimum Version       | Notes                        |
+| ----------------- | --------------------- | ---------------------------- |
+| Operating System  | Linux, macOS, Windows | 64-bit recommended           |
+| Go (source build) | 1.26+                 | Only for source installation |
+| Docker            | 20.10+                | Only for Docker installation |
+| Git               | 2.0+                  | Only for source installation |
 
 ### Supported Platforms
 
@@ -121,12 +121,12 @@ flowchart TB
 
 ### Method Comparison
 
-| Method | Difficulty | Use Case | Auto-Update |
-|--------|------------|----------|-------------|
-| Binary | Easy | Quick setup, production | Manual |
-| Source | Medium | Development, customization | Manual |
-| Docker | Easy | Containerized environments | Image pull |
-| Go Install | Easy | Go developers | `go install` |
+| Method     | Difficulty | Use Case                   | Auto-Update  |
+| ---------- | ---------- | -------------------------- | ------------ |
+| Binary     | Easy       | Quick setup, production    | Manual       |
+| Source     | Medium     | Development, customization | Manual       |
+| Docker     | Easy       | Containerized environments | Image pull   |
+| Go Install | Easy       | Go developers              | `go install` |
 
 ---
 
@@ -276,7 +276,7 @@ tfo-mcp version
 
 ```bash
 # Build with specific version
-make build VERSION=1.1.2
+make build VERSION=1.2.0
 
 # Build with debug symbols
 go build -gcflags="all=-N -l" -o tfo-mcp ./cmd/mcp
@@ -297,7 +297,7 @@ make build-all
 go install github.com/telemetryflow/telemetryflow-go-mcp/cmd/mcp@latest
 
 # Install specific version
-go install github.com/telemetryflow/telemetryflow-go-mcp/cmd/mcp@v1.1.2
+go install github.com/telemetryflow/telemetryflow-go-mcp/cmd/mcp@v1.2.0
 
 # Verify
 tfo-mcp version
@@ -332,7 +332,7 @@ flowchart TB
 docker pull devopscorner/tfo-mcp:latest
 
 # Pull specific version
-docker pull devopscorner/tfo-mcp:1.1.2
+docker pull devopscorner/tfo-mcp:1.2.0
 
 # Verify image
 docker images devopscorner/tfo-mcp
@@ -384,17 +384,17 @@ docker-compose down -v
 
 **Services included in docker-compose.yaml:**
 
-| Service        | Port        | Description                           |
-| -------------- | ----------- | ------------------------------------- |
-| tfo-mcp        | 8080        | MCP Server                            |
-| nats           | 4222, 8222  | Message Queue (JetStream)             |
-| redis          | 6379        | Cache                                 |
-| postgres       | 5432        | Primary Database                      |
-| clickhouse     | 8123, 9000  | Analytics Database                    |
-| otel-collector | 4317, 4318  | OpenTelemetry (observability profile) |
-| jaeger         | 16686       | Tracing UI (observability profile)    |
-| prometheus     | 9090        | Metrics (observability profile)       |
-| grafana        | 3000        | Dashboards (observability profile)    |
+| Service        | Port       | Description                           |
+| -------------- | ---------- | ------------------------------------- |
+| tfo-mcp        | 8080       | MCP Server                            |
+| nats           | 4222, 8222 | Message Queue (JetStream)             |
+| redis          | 6379       | Cache                                 |
+| postgres       | 5432       | Primary Database                      |
+| clickhouse     | 8123, 9000 | Analytics Database                    |
+| otel-collector | 4317, 4318 | OpenTelemetry (observability profile) |
+| jaeger         | 16686      | Tracing UI (observability profile)    |
+| prometheus     | 9090       | Metrics (observability profile)       |
+| grafana        | 3000       | Dashboards (observability profile)    |
 
 See the full [docker-compose.yaml](../docker-compose.yaml) for complete configuration.
 
@@ -405,7 +405,7 @@ See the full [docker-compose.yaml](../docker-compose.yaml) for complete configur
 docker build -t my-tfo-mcp:latest .
 
 # Build with specific tag
-docker build -t my-tfo-mcp:1.1.2 .
+docker build -t my-tfo-mcp:1.2.0 .
 
 # Build multi-platform
 docker buildx build \
@@ -539,8 +539,8 @@ tfo-mcp version
 
 # Expected output:
 # TFO-GO-MCP - TelemetryFlow GO MCP Server
-# Version:    1.1.2
-# Go Version: go1.24
+# Version:    1.2.0
+# Go Version: go1.26
 # ...
 
 # 2. Validate configuration
@@ -721,12 +721,12 @@ go clean -modcache
 
 ### Common Issues
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Permission denied | Missing execute permission | `chmod +x tfo-mcp` |
-| Command not found | Not in PATH | Add to PATH or use full path |
-| API key error | Missing/invalid key | Set `TELEMETRYFLOW_MCP_CLAUDE_API_KEY` |
-| Config not found | Wrong path | Check config location |
+| Issue             | Cause                      | Solution                               |
+| ----------------- | -------------------------- | -------------------------------------- |
+| Permission denied | Missing execute permission | `chmod +x tfo-mcp`                     |
+| Command not found | Not in PATH                | Add to PATH or use full path           |
+| API key error     | Missing/invalid key        | Set `TELEMETRYFLOW_MCP_CLAUDE_API_KEY` |
+| Config not found  | Wrong path                 | Check config location                  |
 
 ### Getting Help
 

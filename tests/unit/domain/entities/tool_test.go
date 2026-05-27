@@ -1,11 +1,11 @@
-// Package entities contains tests for domain entities
-package entities
+package entities_test
 
 import (
 	"errors"
 	"testing"
 	"time"
 
+	"github.com/telemetryflow/telemetryflow-go-mcp/internal/domain/entities"
 	vo "github.com/telemetryflow/telemetryflow-go-mcp/internal/domain/valueobjects"
 )
 
@@ -13,7 +13,7 @@ func TestNewTool(t *testing.T) {
 	name, _ := vo.NewToolName("test_tool")
 	desc, _ := vo.NewToolDescription("A test tool for testing")
 
-	tool, err := NewTool(name, desc, nil)
+	tool, err := entities.NewTool(name, desc, nil)
 	if err != nil {
 		t.Fatalf("NewTool() failed: %v", err)
 	}
@@ -43,9 +43,9 @@ func TestTool_WithInputSchema(t *testing.T) {
 	name, _ := vo.NewToolName("search_tool")
 	desc, _ := vo.NewToolDescription("Search for items")
 
-	schema := &JSONSchema{
+	schema := &entities.JSONSchema{
 		Type: "object",
-		Properties: map[string]*JSONSchema{
+		Properties: map[string]*entities.JSONSchema{
 			"query": {
 				Type:        "string",
 				Description: "Search query",
@@ -58,7 +58,7 @@ func TestTool_WithInputSchema(t *testing.T) {
 		Required: []string{"query"},
 	}
 
-	tool, err := NewTool(name, desc, schema)
+	tool, err := entities.NewTool(name, desc, schema)
 	if err != nil {
 		t.Fatalf("NewTool() failed: %v", err)
 	}
@@ -80,16 +80,14 @@ func TestTool_SetHandler(t *testing.T) {
 	name, _ := vo.NewToolName("echo_tool")
 	desc, _ := vo.NewToolDescription("Echo tool")
 
-	tool, _ := NewTool(name, desc, nil)
+	tool, _ := entities.NewTool(name, desc, nil)
 
-	// Initially no handler
 	if tool.Handler() != nil {
 		t.Error("Handler should be nil initially")
 	}
 
-	// Set handler
-	handler := func(input map[string]interface{}) (*ToolResult, error) {
-		return NewTextToolResult("echoed: " + input["text"].(string)), nil
+	handler := func(input map[string]interface{}) (*entities.ToolResult, error) {
+		return entities.NewTextToolResult("echoed: " + input["text"].(string)), nil
 	}
 
 	tool.SetHandler(handler)
@@ -103,13 +101,13 @@ func TestTool_Execute_WithHandler(t *testing.T) {
 	name, _ := vo.NewToolName("add_tool")
 	desc, _ := vo.NewToolDescription("Add numbers")
 
-	tool, _ := NewTool(name, desc, nil)
+	tool, _ := entities.NewTool(name, desc, nil)
 
-	handler := func(input map[string]interface{}) (*ToolResult, error) {
+	handler := func(input map[string]interface{}) (*entities.ToolResult, error) {
 		a := input["a"].(float64)
 		b := input["b"].(float64)
 		result := a + b
-		return NewTextToolResult("Result: " + string(rune(int(result)))), nil
+		return entities.NewTextToolResult("Result: " + string(rune(int(result)))), nil
 	}
 
 	tool.SetHandler(handler)
@@ -132,7 +130,7 @@ func TestTool_Execute_WithoutHandler(t *testing.T) {
 	name, _ := vo.NewToolName("no_handler_tool")
 	desc, _ := vo.NewToolDescription("No handler tool")
 
-	tool, _ := NewTool(name, desc, nil)
+	tool, _ := entities.NewTool(name, desc, nil)
 
 	result, err := tool.Execute(map[string]interface{}{})
 	if err != nil {
@@ -152,7 +150,7 @@ func TestTool_EnableDisable(t *testing.T) {
 	name, _ := vo.NewToolName("toggle_tool")
 	desc, _ := vo.NewToolDescription("Toggle tool")
 
-	tool, _ := NewTool(name, desc, nil)
+	tool, _ := entities.NewTool(name, desc, nil)
 
 	if !tool.IsEnabled() {
 		t.Error("Tool should be enabled by default")
@@ -173,7 +171,7 @@ func TestTool_Category(t *testing.T) {
 	name, _ := vo.NewToolName("categorized_tool")
 	desc, _ := vo.NewToolDescription("Categorized tool")
 
-	tool, _ := NewTool(name, desc, nil)
+	tool, _ := entities.NewTool(name, desc, nil)
 
 	if tool.Category() != "" {
 		t.Error("Category should be empty initially")
@@ -189,7 +187,7 @@ func TestTool_Tags(t *testing.T) {
 	name, _ := vo.NewToolName("tagged_tool")
 	desc, _ := vo.NewToolDescription("Tagged tool")
 
-	tool, _ := NewTool(name, desc, nil)
+	tool, _ := entities.NewTool(name, desc, nil)
 
 	if tool.Tags() != nil && len(tool.Tags()) != 0 {
 		t.Error("Tags should be empty initially")
@@ -210,13 +208,13 @@ func TestTool_RateLimit(t *testing.T) {
 	name, _ := vo.NewToolName("limited_tool")
 	desc, _ := vo.NewToolDescription("Limited tool")
 
-	tool, _ := NewTool(name, desc, nil)
+	tool, _ := entities.NewTool(name, desc, nil)
 
 	if tool.RateLimitConfig() != nil {
 		t.Error("RateLimit should be nil initially")
 	}
 
-	limit := &RateLimit{
+	limit := &entities.RateLimit{
 		RequestsPerMinute: 10,
 		RequestsPerHour:   100,
 		RequestsPerDay:    1000,
@@ -236,9 +234,8 @@ func TestTool_Timeout(t *testing.T) {
 	name, _ := vo.NewToolName("timeout_tool")
 	desc, _ := vo.NewToolDescription("Timeout tool")
 
-	tool, _ := NewTool(name, desc, nil)
+	tool, _ := entities.NewTool(name, desc, nil)
 
-	// Default timeout
 	if tool.Timeout() != 30*time.Second {
 		t.Errorf("Expected default timeout 30s, got %v", tool.Timeout())
 	}
@@ -253,7 +250,7 @@ func TestTool_Metadata(t *testing.T) {
 	name, _ := vo.NewToolName("meta_tool")
 	desc, _ := vo.NewToolDescription("Meta tool")
 
-	tool, _ := NewTool(name, desc, nil)
+	tool, _ := entities.NewTool(name, desc, nil)
 
 	tool.SetMetadata("key1", "value1")
 	tool.SetMetadata("key2", 42)
@@ -273,7 +270,7 @@ func TestTool_Timestamps(t *testing.T) {
 	desc, _ := vo.NewToolDescription("Timestamp tool")
 
 	beforeCreate := time.Now().UTC()
-	tool, _ := NewTool(name, desc, nil)
+	tool, _ := entities.NewTool(name, desc, nil)
 	afterCreate := time.Now().UTC()
 
 	if tool.CreatedAt().Before(beforeCreate) || tool.CreatedAt().After(afterCreate) {
@@ -284,7 +281,6 @@ func TestTool_Timestamps(t *testing.T) {
 		t.Error("UpdatedAt should be within test bounds")
 	}
 
-	// Update should change UpdatedAt
 	time.Sleep(time.Millisecond)
 	tool.SetCategory("test")
 
@@ -297,14 +293,14 @@ func TestTool_ToMCPTool(t *testing.T) {
 	name, _ := vo.NewToolName("mcp_tool")
 	desc, _ := vo.NewToolDescription("MCP tool")
 
-	schema := &JSONSchema{
+	schema := &entities.JSONSchema{
 		Type: "object",
-		Properties: map[string]*JSONSchema{
+		Properties: map[string]*entities.JSONSchema{
 			"input": {Type: "string"},
 		},
 	}
 
-	tool, _ := NewTool(name, desc, schema)
+	tool, _ := entities.NewTool(name, desc, schema)
 
 	mcpTool := tool.ToMCPTool()
 
@@ -325,7 +321,7 @@ func TestTool_ToJSON(t *testing.T) {
 	name, _ := vo.NewToolName("json_tool")
 	desc, _ := vo.NewToolDescription("JSON tool")
 
-	tool, _ := NewTool(name, desc, nil)
+	tool, _ := entities.NewTool(name, desc, nil)
 
 	jsonBytes, err := tool.ToJSON()
 	if err != nil {
@@ -338,7 +334,7 @@ func TestTool_ToJSON(t *testing.T) {
 }
 
 func TestNewTextToolResult(t *testing.T) {
-	result := NewTextToolResult("Hello, World!")
+	result := entities.NewTextToolResult("Hello, World!")
 
 	if result.IsError {
 		t.Error("Text result should not be an error")
@@ -359,7 +355,7 @@ func TestNewTextToolResult(t *testing.T) {
 
 func TestNewErrorToolResult(t *testing.T) {
 	testErr := errors.New("something went wrong")
-	result := NewErrorToolResult(testErr)
+	result := entities.NewErrorToolResult(testErr)
 
 	if !result.IsError {
 		t.Error("Error result should have IsError=true")
@@ -371,7 +367,7 @@ func TestNewErrorToolResult(t *testing.T) {
 }
 
 func TestNewImageToolResult(t *testing.T) {
-	result := NewImageToolResult("base64data", "image/png")
+	result := entities.NewImageToolResult("base64data", "image/png")
 
 	if result.IsError {
 		t.Error("Image result should not be an error")
@@ -391,7 +387,7 @@ func TestNewImageToolResult(t *testing.T) {
 }
 
 func TestNewResourceToolResult(t *testing.T) {
-	result := NewResourceToolResult("file:///test", "content", "text/plain")
+	result := entities.NewResourceToolResult("file:///test", "content", "text/plain")
 
 	if result.IsError {
 		t.Error("Resource result should not be an error")
@@ -412,7 +408,7 @@ func BenchmarkNewTool(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = NewTool(name, desc, nil)
+		_, _ = entities.NewTool(name, desc, nil)
 	}
 }
 
@@ -420,9 +416,9 @@ func BenchmarkTool_Execute(b *testing.B) {
 	name, _ := vo.NewToolName("exec_tool")
 	desc, _ := vo.NewToolDescription("Execute tool")
 
-	tool, _ := NewTool(name, desc, nil)
-	tool.SetHandler(func(input map[string]interface{}) (*ToolResult, error) {
-		return NewTextToolResult("result"), nil
+	tool, _ := entities.NewTool(name, desc, nil)
+	tool.SetHandler(func(input map[string]interface{}) (*entities.ToolResult, error) {
+		return entities.NewTextToolResult("result"), nil
 	})
 
 	input := map[string]interface{}{"test": "value"}
@@ -437,7 +433,7 @@ func BenchmarkTool_ToMCPTool(b *testing.B) {
 	name, _ := vo.NewToolName("mcp_bench_tool")
 	desc, _ := vo.NewToolDescription("MCP benchmark tool")
 
-	tool, _ := NewTool(name, desc, &JSONSchema{Type: "object"})
+	tool, _ := entities.NewTool(name, desc, &entities.JSONSchema{Type: "object"})
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

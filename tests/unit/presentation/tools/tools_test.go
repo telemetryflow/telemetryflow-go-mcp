@@ -278,7 +278,7 @@ func TestSystemInfoTool(t *testing.T) {
 			OS:       "darwin",
 			Arch:     "amd64",
 			Hostname: "localhost",
-			GoVer:    "go1.24",
+			GoVer:    "go1.26",
 		}
 
 		if info.OS == "" {

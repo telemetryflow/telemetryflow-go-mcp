@@ -33,7 +33,7 @@ func DefaultConfig() *Config {
 	return &Config{
 		Enabled:        false,
 		ServiceName:    "tfo-mcp",
-		ServiceVersion: "1.1.2",
+		ServiceVersion: "1.2.0",
 		Environment:    "development",
 		Endpoint:       "localhost:4317",
 		SampleRate:     1.0,

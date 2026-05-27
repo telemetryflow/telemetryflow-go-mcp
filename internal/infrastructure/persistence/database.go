@@ -113,6 +113,11 @@ func NewDatabase(config *DatabaseConfig) (*Database, error) {
 	}, nil
 }
 
+// NewDatabaseFromDB creates a Database wrapping an existing gorm.DB (for testing)
+func NewDatabaseFromDB(db *gorm.DB) *Database {
+	return &Database{db: db, config: DefaultDatabaseConfig()}
+}
+
 // DB returns the underlying GORM database
 func (d *Database) DB() *gorm.DB {
 	return d.db

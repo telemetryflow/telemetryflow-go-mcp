@@ -270,3 +270,12 @@ func TestMessage_AddContent(t *testing.T) {
 		t.Errorf("AddContent() content length = %v, want %v", len(msg.Content()), initialLen+1)
 	}
 }
+
+func TestMessage_MetadataGetter(t *testing.T) {
+	msg, _ := entities.NewTextMessage(vo.RoleUser, "Hello")
+	msg.SetMetadata("key", "val")
+	md := msg.Metadata()
+	if md["key"] != "val" {
+		t.Errorf("Metadata() = %v, want val", md["key"])
+	}
+}

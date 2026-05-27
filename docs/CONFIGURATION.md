@@ -229,13 +229,13 @@ flowchart LR
 # Server Configuration
 server:
   name: "tfo-mcp"
-  version: "1.1.2"
+  version: "1.2.0"
   description: "TelemetryFlow GO MCP Server - Claude AI Integration"
   timeout: 30s
 
 # Claude API Configuration
 claude:
-  api_key: ""  # Use TELEMETRYFLOW_MCP_CLAUDE_API_KEY environment variable
+  api_key: "" # Use TELEMETRYFLOW_MCP_CLAUDE_API_KEY environment variable
   base_url: "https://api.anthropic.com"
   model: "claude-sonnet-4-20250514"
   max_tokens: 4096
@@ -272,7 +272,7 @@ logging:
 telemetry:
   enabled: false
   service_name: "tfo-mcp"
-  service_version: "1.1.2"
+  service_version: "1.2.0"
   environment: "development"
   endpoint: "localhost:4317"
   sample_rate: 1.0
@@ -327,21 +327,21 @@ flowchart LR
 
 ### Complete Environment Variables Reference
 
-| Variable | Config Path | Type | Default | Description |
-|----------|-------------|------|---------|-------------|
-| `TELEMETRYFLOW_MCP_CLAUDE_API_KEY` | `claude.api_key` | string | "" | Claude API key (required) |
-| `TELEMETRYFLOW_MCP_CLAUDE_BASE_URL` | `claude.base_url` | string | "https://api.anthropic.com" | Claude API base URL |
-| `TELEMETRYFLOW_MCP_CLAUDE_MODEL` | `claude.model` | string | "claude-sonnet-4-20250514" | Default Claude model |
-| `TELEMETRYFLOW_MCP_CLAUDE_MAX_TOKENS` | `claude.max_tokens` | int | 4096 | Maximum response tokens |
-| `TELEMETRYFLOW_MCP_CLAUDE_TEMPERATURE` | `claude.temperature` | float | 0.7 | Response temperature |
-| `TELEMETRYFLOW_MCP_SERVER_NAME` | `server.name` | string | "tfo-mcp" | Server name |
-| `TELEMETRYFLOW_MCP_SERVER_TIMEOUT` | `server.timeout` | duration | "30s" | Request timeout |
-| `TELEMETRYFLOW_MCP_LOG_LEVEL` | `logging.level` | string | "info" | Log level |
-| `TELEMETRYFLOW_MCP_LOG_FORMAT` | `logging.format` | string | "json" | Log format |
-| `TELEMETRYFLOW_MCP_TELEMETRY_ENABLED` | `telemetry.enabled` | bool | false | Enable telemetry |
-| `TELEMETRYFLOW_MCP_TELEMETRY_ENDPOINT` | `telemetry.endpoint` | string | "localhost:4317" | OTLP endpoint |
-| `TELEMETRYFLOW_MCP_RATE_LIMIT_ENABLED` | `security.rate_limit.enabled` | bool | true | Enable rate limiting |
-| `TELEMETRYFLOW_MCP_RATE_LIMIT_RPM` | `security.rate_limit.requests_per_minute` | int | 60 | Requests per minute |
+| Variable                               | Config Path                               | Type     | Default                     | Description               |
+| -------------------------------------- | ----------------------------------------- | -------- | --------------------------- | ------------------------- |
+| `TELEMETRYFLOW_MCP_CLAUDE_API_KEY`     | `claude.api_key`                          | string   | ""                          | Claude API key (required) |
+| `TELEMETRYFLOW_MCP_CLAUDE_BASE_URL`    | `claude.base_url`                         | string   | "https://api.anthropic.com" | Claude API base URL       |
+| `TELEMETRYFLOW_MCP_CLAUDE_MODEL`       | `claude.model`                            | string   | "claude-sonnet-4-20250514"  | Default Claude model      |
+| `TELEMETRYFLOW_MCP_CLAUDE_MAX_TOKENS`  | `claude.max_tokens`                       | int      | 4096                        | Maximum response tokens   |
+| `TELEMETRYFLOW_MCP_CLAUDE_TEMPERATURE` | `claude.temperature`                      | float    | 0.7                         | Response temperature      |
+| `TELEMETRYFLOW_MCP_SERVER_NAME`        | `server.name`                             | string   | "tfo-mcp"                   | Server name               |
+| `TELEMETRYFLOW_MCP_SERVER_TIMEOUT`     | `server.timeout`                          | duration | "30s"                       | Request timeout           |
+| `TELEMETRYFLOW_MCP_LOG_LEVEL`          | `logging.level`                           | string   | "info"                      | Log level                 |
+| `TELEMETRYFLOW_MCP_LOG_FORMAT`         | `logging.format`                          | string   | "json"                      | Log format                |
+| `TELEMETRYFLOW_MCP_TELEMETRY_ENABLED`  | `telemetry.enabled`                       | bool     | false                       | Enable telemetry          |
+| `TELEMETRYFLOW_MCP_TELEMETRY_ENDPOINT` | `telemetry.endpoint`                      | string   | "localhost:4317"            | OTLP endpoint             |
+| `TELEMETRYFLOW_MCP_RATE_LIMIT_ENABLED` | `security.rate_limit.enabled`             | bool     | true                        | Enable rate limiting      |
+| `TELEMETRYFLOW_MCP_RATE_LIMIT_RPM`     | `security.rate_limit.requests_per_minute` | int      | 60                          | Requests per minute       |
 
 ### Setting Environment Variables
 
@@ -375,7 +375,7 @@ export TELEMETRYFLOW_MCP_RATE_LIMIT_RPM="120"
 flowchart TB
     subgraph ServerConfig["Server Configuration"]
         NAME["name: tfo-mcp"]
-        VERSION["version: 1.1.2"]
+        VERSION["version: 1.2.0"]
         DESC["description: TelemetryFlow GO MCP Server"]
         TIMEOUT["timeout: 30s"]
     end
@@ -397,19 +397,19 @@ flowchart TB
 
 ### Server Configuration Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `name` | string | "tfo-mcp" | Server identifier |
-| `version` | string | "1.1.2" | Server version |
-| `description` | string | "TelemetryFlow GO MCP Server" | Human-readable description |
-| `timeout` | duration | "30s" | Default request timeout |
+| Option        | Type     | Default                       | Description                |
+| ------------- | -------- | ----------------------------- | -------------------------- |
+| `name`        | string   | "tfo-mcp"                     | Server identifier          |
+| `version`     | string   | "1.2.0"                       | Server version             |
+| `description` | string   | "TelemetryFlow GO MCP Server" | Human-readable description |
+| `timeout`     | duration | "30s"                         | Default request timeout    |
 
 ### Server Configuration Example
 
 ```yaml
 server:
   name: "tfo-mcp"
-  version: "1.1.2"
+  version: "1.2.0"
   description: "TelemetryFlow GO MCP Server - Claude AI Integration"
   timeout: 30s
 ```
@@ -456,19 +456,19 @@ flowchart TB
 
 ### Claude Configuration Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `api_key` | string | "" | Claude API key (required) |
-| `base_url` | string | "https://api.anthropic.com" | API base URL |
-| `model` | string | "claude-sonnet-4-20250514" | Default model |
-| `max_tokens` | int | 4096 | Maximum response tokens |
-| `temperature` | float | 0.7 | Response randomness (0-1) |
-| `top_p` | float | 0.9 | Nucleus sampling threshold |
-| `top_k` | int | 40 | Top-k sampling |
-| `retry.max_attempts` | int | 3 | Maximum retry attempts |
-| `retry.initial_delay` | duration | "1s" | Initial retry delay |
-| `retry.max_delay` | duration | "30s" | Maximum retry delay |
-| `retry.multiplier` | float | 2.0 | Backoff multiplier |
+| Option                | Type     | Default                     | Description                |
+| --------------------- | -------- | --------------------------- | -------------------------- |
+| `api_key`             | string   | ""                          | Claude API key (required)  |
+| `base_url`            | string   | "https://api.anthropic.com" | API base URL               |
+| `model`               | string   | "claude-sonnet-4-20250514"  | Default model              |
+| `max_tokens`          | int      | 4096                        | Maximum response tokens    |
+| `temperature`         | float    | 0.7                         | Response randomness (0-1)  |
+| `top_p`               | float    | 0.9                         | Nucleus sampling threshold |
+| `top_k`               | int      | 40                          | Top-k sampling             |
+| `retry.max_attempts`  | int      | 3                           | Maximum retry attempts     |
+| `retry.initial_delay` | duration | "1s"                        | Initial retry delay        |
+| `retry.max_delay`     | duration | "30s"                       | Maximum retry delay        |
+| `retry.multiplier`    | float    | 2.0                         | Backoff multiplier         |
 
 ### Supported Models
 
@@ -504,7 +504,7 @@ flowchart LR
 
 ```yaml
 claude:
-  api_key: ""  # Use TELEMETRYFLOW_MCP_CLAUDE_API_KEY env var
+  api_key: "" # Use TELEMETRYFLOW_MCP_CLAUDE_API_KEY env var
   base_url: "https://api.anthropic.com"
   model: "claude-sonnet-4-20250514"
   max_tokens: 4096
@@ -547,15 +547,15 @@ flowchart TB
 
 ### MCP Configuration Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `protocol_version` | string | "2024-11-05" | MCP protocol version |
-| `capabilities.tools` | bool | true | Enable tools capability |
-| `capabilities.resources` | bool | true | Enable resources capability |
-| `capabilities.prompts` | bool | true | Enable prompts capability |
-| `capabilities.logging` | bool | true | Enable logging capability |
-| `transport.type` | string | "stdio" | Transport type |
-| `transport.buffer_size` | int | 65536 | Buffer size in bytes |
+| Option                   | Type   | Default      | Description                 |
+| ------------------------ | ------ | ------------ | --------------------------- |
+| `protocol_version`       | string | "2024-11-05" | MCP protocol version        |
+| `capabilities.tools`     | bool   | true         | Enable tools capability     |
+| `capabilities.resources` | bool   | true         | Enable resources capability |
+| `capabilities.prompts`   | bool   | true         | Enable prompts capability   |
+| `capabilities.logging`   | bool   | true         | Enable logging capability   |
+| `transport.type`         | string | "stdio"      | Transport type              |
+| `transport.buffer_size`  | int    | 65536        | Buffer size in bytes        |
 
 ### MCP Configuration Example
 
@@ -605,13 +605,13 @@ flowchart LR
 
 ### Logging Configuration Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `level` | string | "info" | Log level (trace/debug/info/warn/error/fatal) |
-| `format` | string | "json" | Output format (json/text) |
-| `output` | string | "stderr" | Output destination (stderr/stdout/file path) |
-| `caller` | bool | false | Include caller information |
-| `timestamp_format` | string | RFC3339 | Timestamp format |
+| Option             | Type   | Default  | Description                                   |
+| ------------------ | ------ | -------- | --------------------------------------------- |
+| `level`            | string | "info"   | Log level (trace/debug/info/warn/error/fatal) |
+| `format`           | string | "json"   | Output format (json/text)                     |
+| `output`           | string | "stderr" | Output destination (stderr/stdout/file path)  |
+| `caller`           | bool   | false    | Include caller information                    |
+| `timestamp_format` | string | RFC3339  | Timestamp format                              |
 
 ### Log Output Formats
 
@@ -694,15 +694,15 @@ flowchart TB
 
 ### Telemetry Configuration Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `enabled` | bool | false | Enable telemetry |
-| `service_name` | string | "tfo-mcp" | Service name for traces |
-| `service_version` | string | "1.1.2" | Service version |
-| `environment` | string | "development" | Deployment environment |
-| `endpoint` | string | "localhost:4317" | OTLP endpoint |
-| `sample_rate` | float | 1.0 | Trace sampling rate (0-1) |
-| `export_timeout` | duration | "30s" | Export timeout |
+| Option            | Type     | Default          | Description               |
+| ----------------- | -------- | ---------------- | ------------------------- |
+| `enabled`         | bool     | false            | Enable telemetry          |
+| `service_name`    | string   | "tfo-mcp"        | Service name for traces   |
+| `service_version` | string   | "1.2.0"          | Service version           |
+| `environment`     | string   | "development"    | Deployment environment    |
+| `endpoint`        | string   | "localhost:4317" | OTLP endpoint             |
+| `sample_rate`     | float    | 1.0              | Trace sampling rate (0-1) |
+| `export_timeout`  | duration | "30s"            | Export timeout            |
 
 ### Telemetry Configuration Example
 
@@ -710,10 +710,10 @@ flowchart TB
 telemetry:
   enabled: true
   service_name: "tfo-mcp"
-  service_version: "1.1.2"
+  service_version: "1.2.0"
   environment: "production"
   endpoint: "otel-collector:4317"
-  sample_rate: 0.1  # 10% sampling
+  sample_rate: 0.1 # 10% sampling
   export_timeout: 30s
 ```
 
@@ -767,14 +767,14 @@ flowchart TB
 
 ### Security Configuration Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `rate_limit.enabled` | bool | true | Enable rate limiting |
-| `rate_limit.requests_per_minute` | int | 60 | Max requests per minute |
-| `rate_limit.burst_size` | int | 10 | Burst allowance |
-| `cors.enabled` | bool | false | Enable CORS |
-| `cors.allowed_origins` | []string | ["*"] | Allowed origins |
-| `api_key_validation` | bool | true | Validate API keys |
+| Option                           | Type     | Default | Description             |
+| -------------------------------- | -------- | ------- | ----------------------- |
+| `rate_limit.enabled`             | bool     | true    | Enable rate limiting    |
+| `rate_limit.requests_per_minute` | int      | 60      | Max requests per minute |
+| `rate_limit.burst_size`          | int      | 10      | Burst allowance         |
+| `cors.enabled`                   | bool     | false   | Enable CORS             |
+| `cors.allowed_origins`           | []string | ["*"]   | Allowed origins         |
+| `api_key_validation`             | bool     | true    | Validate API keys       |
 
 ### Security Configuration Example
 
@@ -836,13 +836,13 @@ flowchart TB
 
 ### Validation Rules
 
-| Field | Rule | Error Message |
-|-------|------|---------------|
-| `claude.api_key` | Required | "Claude API key is required" |
-| `claude.max_tokens` | > 0 | "max_tokens must be positive" |
-| `claude.temperature` | 0-1 | "temperature must be between 0 and 1" |
-| `logging.level` | Valid level | "invalid log level" |
-| `telemetry.sample_rate` | 0-1 | "sample_rate must be between 0 and 1" |
+| Field                   | Rule        | Error Message                         |
+| ----------------------- | ----------- | ------------------------------------- |
+| `claude.api_key`        | Required    | "Claude API key is required"          |
+| `claude.max_tokens`     | > 0         | "max_tokens must be positive"         |
+| `claude.temperature`    | 0-1         | "temperature must be between 0 and 1" |
+| `logging.level`         | Valid level | "invalid log level"                   |
+| `telemetry.sample_rate` | 0-1         | "sample_rate must be between 0 and 1" |
 
 ### Validating Configuration
 
@@ -867,17 +867,17 @@ tfo-mcp validate --config /path/to/config.yaml
 # Development configuration
 server:
   name: "tfo-mcp-dev"
-  version: "1.1.2"
+  version: "1.2.0"
   timeout: 60s
 
 claude:
-  model: "claude-3-5-haiku-20241022"  # Fast model for development
+  model: "claude-3-5-haiku-20241022" # Fast model for development
   max_tokens: 2048
   temperature: 0.9
 
 logging:
   level: "debug"
-  format: "text"  # Human-readable format
+  format: "text" # Human-readable format
   caller: true
 
 telemetry:
@@ -885,7 +885,7 @@ telemetry:
 
 security:
   rate_limit:
-    enabled: false  # Disable for development
+    enabled: false # Disable for development
 ```
 
 ### Production Configuration
@@ -894,7 +894,7 @@ security:
 # Production configuration
 server:
   name: "tfo-mcp"
-  version: "1.1.2"
+  version: "1.2.0"
   timeout: 30s
 
 claude:
@@ -931,7 +931,7 @@ security:
 ```yaml
 # Minimal configuration - only required settings
 claude:
-  api_key: ""  # Set via TELEMETRYFLOW_MCP_CLAUDE_API_KEY
+  api_key: "" # Set via TELEMETRYFLOW_MCP_CLAUDE_API_KEY
 ```
 
 ### Docker Configuration
@@ -943,12 +943,12 @@ server:
   timeout: 30s
 
 claude:
-  api_key: ""  # Injected via environment
+  api_key: "" # Injected via environment
 
 logging:
   level: "info"
   format: "json"
-  output: "stdout"  # Docker-friendly
+  output: "stdout" # Docker-friendly
 
 telemetry:
   enabled: true
@@ -996,6 +996,7 @@ flowchart TB
 ### Security Best Practices
 
 1. **Never commit secrets**
+
    ```bash
    # Use .gitignore
    echo "config.local.yaml" >> .gitignore
@@ -1003,11 +1004,13 @@ flowchart TB
    ```
 
 2. **Use environment variables for secrets**
+
    ```bash
    export TELEMETRYFLOW_MCP_CLAUDE_API_KEY="sk-ant-api03-..."
    ```
 
 3. **Use secret managers in production**
+
    ```bash
    # AWS Secrets Manager
    TELEMETRYFLOW_MCP_CLAUDE_API_KEY=$(aws secretsmanager get-secret-value --secret-id tfo-mcp/api-key --query SecretString --output text)
@@ -1029,16 +1032,17 @@ flowchart TB
    - Use Opus for complex tasks
 
 2. **Configure appropriate timeouts**
+
    ```yaml
    server:
-     timeout: 30s  # Adjust based on workload
+     timeout: 30s # Adjust based on workload
    ```
 
 3. **Enable telemetry for monitoring**
    ```yaml
    telemetry:
      enabled: true
-     sample_rate: 0.1  # 10% sampling to reduce overhead
+     sample_rate: 0.1 # 10% sampling to reduce overhead
    ```
 
 ---

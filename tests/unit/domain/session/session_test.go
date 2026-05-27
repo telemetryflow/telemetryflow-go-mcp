@@ -267,7 +267,7 @@ func TestSessionConversations(t *testing.T) {
 	t.Run("should create conversation", func(t *testing.T) {
 		session := createReadySession(t)
 
-		conv, err := session.CreateConversation(vo.ModelClaude4Sonnet)
+		conv, err := session.CreateConversation(vo.ModelClaudeSonnet4)
 		require.NoError(t, err)
 		assert.NotNil(t, conv)
 		assert.Len(t, session.ListConversations(), 1)
@@ -276,7 +276,7 @@ func TestSessionConversations(t *testing.T) {
 	t.Run("should get conversation by ID", func(t *testing.T) {
 		session := createReadySession(t)
 
-		conv, err := session.CreateConversation(vo.ModelClaude4Sonnet)
+		conv, err := session.CreateConversation(vo.ModelClaudeSonnet4)
 		require.NoError(t, err)
 
 		retrievedConv, ok := session.GetConversation(conv.ID())

@@ -20,6 +20,7 @@
 ## Overview
 
 TFO-GO-MCP provides two interfaces for interaction:
+
 1. **CLI Commands** - Command-line interface for server management
 2. **MCP Protocol Methods** - JSON-RPC methods for client communication
 
@@ -76,12 +77,12 @@ flowchart LR
 
 ### Available Commands
 
-| Command | Description | Usage |
-|---------|-------------|-------|
-| `run` | Start the MCP server | `tfo-mcp run [flags]` |
-| `version` | Show version information | `tfo-mcp version` |
-| `validate` | Validate configuration | `tfo-mcp validate [flags]` |
-| `help` | Show help information | `tfo-mcp help [command]` |
+| Command    | Description              | Usage                      |
+| ---------- | ------------------------ | -------------------------- |
+| `run`      | Start the MCP server     | `tfo-mcp run [flags]`      |
+| `version`  | Show version information | `tfo-mcp version`          |
+| `validate` | Validate configuration   | `tfo-mcp validate [flags]` |
+| `help`     | Show help information    | `tfo-mcp help [command]`   |
 
 ### run Command
 
@@ -120,12 +121,12 @@ tfo-mcp run --transport stdio
 
 **Flags:**
 
-| Flag | Short | Type | Default | Description |
-|------|-------|------|---------|-------------|
-| `--config` | `-c` | string | "config.yaml" | Configuration file path |
-| `--log-level` | `-l` | string | "info" | Log level (trace/debug/info/warn/error) |
-| `--transport` | `-t` | string | "stdio" | Transport type |
-| `--timeout` | | duration | "30s" | Request timeout |
+| Flag          | Short | Type     | Default       | Description                             |
+| ------------- | ----- | -------- | ------------- | --------------------------------------- |
+| `--config`    | `-c`  | string   | "config.yaml" | Configuration file path                 |
+| `--log-level` | `-l`  | string   | "info"        | Log level (trace/debug/info/warn/error) |
+| `--transport` | `-t`  | string   | "stdio"       | Transport type                          |
+| `--timeout`   |       | duration | "30s"         | Request timeout                         |
 
 ### version Command
 
@@ -139,8 +140,8 @@ tfo-mcp version
 
 ```
 TFO-GO-MCP - TelemetryFlow GO MCP Server
-Version:    1.1.2
-Go Version: go1.24
+Version:    1.2.0
+Go Version: go1.26
 Build Date: 2024-01-15
 Git Commit: abc1234
 Platform:   darwin/arm64
@@ -179,10 +180,10 @@ tfo-mcp validate --verbose
 
 **Flags:**
 
-| Flag | Short | Type | Default | Description |
-|------|-------|------|---------|-------------|
-| `--config` | `-c` | string | "config.yaml" | Configuration file path |
-| `--verbose` | `-v` | bool | false | Verbose output |
+| Flag        | Short | Type   | Default       | Description             |
+| ----------- | ----- | ------ | ------------- | ----------------------- |
+| `--config`  | `-c`  | string | "config.yaml" | Configuration file path |
+| `--verbose` | `-v`  | bool   | false         | Verbose output          |
 
 ---
 
@@ -294,7 +295,7 @@ sequenceDiagram
     },
     "serverInfo": {
       "name": "tfo-mcp",
-      "version": "1.1.2"
+      "version": "1.2.0"
     }
   }
 }
@@ -597,6 +598,7 @@ flowchart TB
         AI["AI Tools"]
         FILE["File Tools"]
         SYSTEM["System Tools"]
+        TELEMETRY["Telemetry Tools"]
     end
 
     subgraph AITools["AI Tools"]
@@ -616,13 +618,21 @@ flowchart TB
         ECHO["echo"]
     end
 
+    subgraph TelemetryTools["Telemetry Tools"]
+        CTX["collect_telemetry_context"]
+        TYPES["list_context_types"]
+        PROMPT["build_system_prompt"]
+    end
+
     AI --> AITools
     FILE --> FileTools
     SYSTEM --> SystemTools
+    TELEMETRY --> TelemetryTools
 
     style AI fill:#e1bee7,stroke:#9c27b0
     style FILE fill:#e3f2fd,stroke:#2196f3
     style SYSTEM fill:#e8f5e9,stroke:#4caf50
+    style TELEMETRY fill:#fff3e0,stroke:#ff9800
 ```
 
 ### claude_conversation
@@ -645,13 +655,13 @@ sequenceDiagram
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `message` | string | Yes | Message to send to Claude |
-| `model` | string | No | Claude model (default: config value) |
-| `system_prompt` | string | No | System prompt for context |
-| `max_tokens` | int | No | Maximum response tokens |
-| `temperature` | float | No | Response temperature (0-1) |
+| Name            | Type   | Required | Description                          |
+| --------------- | ------ | -------- | ------------------------------------ |
+| `message`       | string | Yes      | Message to send to Claude            |
+| `model`         | string | No       | Claude model (default: config value) |
+| `system_prompt` | string | No       | System prompt for context            |
+| `max_tokens`    | int    | No       | Maximum response tokens              |
+| `temperature`   | float  | No       | Response temperature (0-1)           |
 
 **Example:**
 
@@ -673,10 +683,10 @@ Read file contents.
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `path` | string | Yes | File path to read |
-| `encoding` | string | No | File encoding (default: utf-8) |
+| Name       | Type   | Required | Description                    |
+| ---------- | ------ | -------- | ------------------------------ |
+| `path`     | string | Yes      | File path to read              |
+| `encoding` | string | No       | File encoding (default: utf-8) |
 
 **Example:**
 
@@ -695,11 +705,11 @@ Write content to a file.
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `path` | string | Yes | File path to write |
-| `content` | string | Yes | Content to write |
-| `create_dirs` | bool | No | Create parent directories |
+| Name          | Type   | Required | Description               |
+| ------------- | ------ | -------- | ------------------------- |
+| `path`        | string | Yes      | File path to write        |
+| `content`     | string | Yes      | Content to write          |
+| `create_dirs` | bool   | No       | Create parent directories |
 
 **Example:**
 
@@ -720,11 +730,11 @@ List directory contents.
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `path` | string | Yes | Directory path |
-| `recursive` | bool | No | List recursively |
-| `include_hidden` | bool | No | Include hidden files |
+| Name             | Type   | Required | Description          |
+| ---------------- | ------ | -------- | -------------------- |
+| `path`           | string | Yes      | Directory path       |
+| `recursive`      | bool   | No       | List recursively     |
+| `include_hidden` | bool   | No       | Include hidden files |
 
 **Example:**
 
@@ -744,11 +754,11 @@ Search for files matching a pattern.
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `pattern` | string | Yes | Search pattern (glob or regex) |
-| `path` | string | No | Base path (default: current dir) |
-| `type` | string | No | Pattern type: "glob" or "regex" |
+| Name      | Type   | Required | Description                      |
+| --------- | ------ | -------- | -------------------------------- |
+| `pattern` | string | Yes      | Search pattern (glob or regex)   |
+| `path`    | string | No       | Base path (default: current dir) |
+| `type`    | string | No       | Pattern type: "glob" or "regex"  |
 
 **Example:**
 
@@ -788,12 +798,12 @@ flowchart TB
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `command` | string | Yes | Command to execute |
-| `args` | []string | No | Command arguments |
-| `timeout` | string | No | Execution timeout |
-| `working_dir` | string | No | Working directory |
+| Name          | Type     | Required | Description        |
+| ------------- | -------- | -------- | ------------------ |
+| `command`     | string   | Yes      | Command to execute |
+| `args`        | []string | No       | Command arguments  |
+| `timeout`     | string   | No       | Execution timeout  |
+| `working_dir` | string   | No       | Working directory  |
 
 **Example:**
 
@@ -815,9 +825,9 @@ Get system information.
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `include` | []string | No | Info to include (os, cpu, memory, disk) |
+| Name      | Type     | Required | Description                             |
+| --------- | -------- | -------- | --------------------------------------- |
+| `include` | []string | No       | Info to include (os, cpu, memory, disk) |
 
 **Example:**
 
@@ -856,9 +866,9 @@ Echo back the input (useful for testing).
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `message` | string | Yes | Message to echo |
+| Name      | Type   | Required | Description     |
+| --------- | ------ | -------- | --------------- |
+| `message` | string | Yes      | Message to echo |
 
 **Example:**
 
@@ -867,6 +877,73 @@ Echo back the input (useful for testing).
   "name": "echo",
   "arguments": {
     "message": "Hello, TFO-GO-MCP!"
+  }
+}
+```
+
+### collect_telemetry_context
+
+Collect live telemetry data from ClickHouse and PostgreSQL for AI-powered analysis. Requires `database.enabled=true` or `clickhouse.enabled=true`.
+
+**Parameters:**
+
+| Name              | Type   | Required | Description                                       |
+| ----------------- | ------ | -------- | ------------------------------------------------- |
+| `organization_id` | string | Yes      | Organization ID to collect context for            |
+| `context_type`    | string | Yes      | Telemetry context type (see `list_context_types`) |
+| `user_id`         | string | No       | User ID (required for account-\* types)           |
+| `time_range_from` | string | No       | Start time ISO 8601 (default: 1 hour ago)         |
+| `time_range_to`   | string | No       | End time ISO 8601 (default: now)                  |
+| `max_items`       | int    | No       | Maximum items to return (default: 30)             |
+
+**Example:**
+
+```json
+{
+  "name": "collect_telemetry_context",
+  "arguments": {
+    "organization_id": "org-123",
+    "context_type": "metrics",
+    "time_range_from": "2026-05-28T00:00:00Z",
+    "time_range_to": "2026-05-28T23:59:59Z"
+  }
+}
+```
+
+### list_context_types
+
+List all 70+ available telemetry context types organized by category.
+
+**Parameters:** None
+
+**Example:**
+
+```json
+{
+  "name": "list_context_types",
+  "arguments": {}
+}
+```
+
+### build_system_prompt
+
+Generate a context-aware system prompt for a given telemetry context type.
+
+**Parameters:**
+
+| Name            | Type   | Required | Description                       |
+| --------------- | ------ | -------- | --------------------------------- |
+| `context_type`  | string | Yes      | Telemetry context type            |
+| `custom_prompt` | string | No       | Additional instructions to append |
+
+**Example:**
+
+```json
+{
+  "name": "build_system_prompt",
+  "arguments": {
+    "context_type": "db-monitoring-postgresql",
+    "custom_prompt": "Focus on query performance and index usage"
   }
 }
 ```
@@ -902,12 +979,12 @@ flowchart TB
 
 ### Resource URI Schemes
 
-| Scheme | Description | Example |
-|--------|-------------|---------|
-| `file://` | Local file system | `file:///path/to/file.txt` |
-| `http://` | HTTP resource | `http://api.example.com/data` |
-| `https://` | HTTPS resource | `https://api.example.com/data` |
-| `custom://` | Custom handler | `custom://myresource/id` |
+| Scheme      | Description       | Example                        |
+| ----------- | ----------------- | ------------------------------ |
+| `file://`   | Local file system | `file:///path/to/file.txt`     |
+| `http://`   | HTTP resource     | `http://api.example.com/data`  |
+| `https://`  | HTTPS resource    | `https://api.example.com/data` |
+| `custom://` | Custom handler    | `custom://myresource/id`       |
 
 ---
 
@@ -928,12 +1005,12 @@ stateDiagram-v2
 
 ### Built-in Prompts
 
-| Prompt | Description | Arguments |
-|--------|-------------|-----------|
-| `code_review` | Code review assistant | code, language |
-| `explain_code` | Code explanation | code, language, detail_level |
-| `debug_help` | Debugging assistant | error_message, code_context |
-| `write_docs` | Documentation writer | code, doc_type |
+| Prompt         | Description           | Arguments                    |
+| -------------- | --------------------- | ---------------------------- |
+| `code_review`  | Code review assistant | code, language               |
+| `explain_code` | Code explanation      | code, language, detail_level |
+| `debug_help`   | Debugging assistant   | error_message, code_context  |
+| `write_docs`   | Documentation writer  | code, doc_type               |
 
 ---
 
@@ -958,13 +1035,13 @@ stateDiagram-v2
 
 ### Session States
 
-| State | Description | Valid Operations |
-|-------|-------------|------------------|
-| Created | Session created, not initialized | initialize |
-| Initializing | Processing initialize request | - |
-| Ready | Session ready for requests | All MCP methods |
-| Closing | Session shutting down | - |
-| Closed | Session terminated | - |
+| State        | Description                      | Valid Operations |
+| ------------ | -------------------------------- | ---------------- |
+| Created      | Session created, not initialized | initialize       |
+| Initializing | Processing initialize request    | -                |
+| Ready        | Session ready for requests       | All MCP methods  |
+| Closing      | Session shutting down            | -                |
+| Closed       | Session terminated               | -                |
 
 ---
 

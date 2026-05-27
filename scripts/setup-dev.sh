@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # TFO-GO-MCP Development Setup Script
-# Version: 1.1.2
+# Version: 1.2.0
 # Description: Setup development environment for TelemetryFlow GO MCP Server
 # ==============================================================================
 

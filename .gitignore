@@ -98,3 +98,4 @@ secrets.json
 .kiro
 .claude
 .env
+*.env

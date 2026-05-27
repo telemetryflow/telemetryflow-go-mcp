@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # TFO-GO-MCP Release Script
-# Version: 1.1.2
+# Version: 1.2.0
 # Description: Create releases for TelemetryFlow GO MCP Server
 # ==============================================================================
 

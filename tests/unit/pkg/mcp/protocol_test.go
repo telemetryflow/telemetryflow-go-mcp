@@ -1,14 +1,15 @@
-// Package mcp provides tests for Model Context Protocol types
-package mcp
+package mcp_test
 
 import (
 	"encoding/json"
 	"testing"
+
+	"github.com/telemetryflow/telemetryflow-go-mcp/pkg/mcp"
 )
 
 func TestRequest_Marshaling(t *testing.T) {
-	req := Request{
-		JSONRPC: JSONRPCVersion,
+	req := mcp.Request{
+		JSONRPC: mcp.JSONRPCVersion,
 		ID:      1,
 		Method:  "initialize",
 		Params:  json.RawMessage(`{"protocolVersion":"2024-11-05"}`),
@@ -19,13 +20,13 @@ func TestRequest_Marshaling(t *testing.T) {
 		t.Fatalf("Failed to marshal request: %v", err)
 	}
 
-	var decoded Request
+	var decoded mcp.Request
 	if err := json.Unmarshal(data, &decoded); err != nil {
 		t.Fatalf("Failed to unmarshal request: %v", err)
 	}
 
-	if decoded.JSONRPC != JSONRPCVersion {
-		t.Errorf("Expected JSONRPC %s, got %s", JSONRPCVersion, decoded.JSONRPC)
+	if decoded.JSONRPC != mcp.JSONRPCVersion {
+		t.Errorf("Expected JSONRPC %s, got %s", mcp.JSONRPCVersion, decoded.JSONRPC)
 	}
 
 	if decoded.Method != "initialize" {
@@ -35,17 +36,17 @@ func TestRequest_Marshaling(t *testing.T) {
 
 func TestResponse_Success(t *testing.T) {
 	result := map[string]interface{}{
-		"protocolVersion": ProtocolVersion,
+		"protocolVersion": mcp.ProtocolVersion,
 		"serverInfo": map[string]string{
 			"name":    "TelemetryFlow-MCP",
-			"version": "1.1.2",
+			"version": "1.2.0",
 		},
 	}
 
-	resp := NewResponse(1, result)
+	resp := mcp.NewResponse(1, result)
 
-	if resp.JSONRPC != JSONRPCVersion {
-		t.Errorf("Expected JSONRPC %s, got %s", JSONRPCVersion, resp.JSONRPC)
+	if resp.JSONRPC != mcp.JSONRPCVersion {
+		t.Errorf("Expected JSONRPC %s, got %s", mcp.JSONRPCVersion, resp.JSONRPC)
 	}
 
 	if resp.ID != 1 {
@@ -62,11 +63,11 @@ func TestResponse_Success(t *testing.T) {
 }
 
 func TestResponse_Error(t *testing.T) {
-	err := NewInternalError("something went wrong")
-	resp := NewErrorResponse(1, err)
+	err := mcp.NewInternalError("something went wrong")
+	resp := mcp.NewErrorResponse(1, err)
 
-	if resp.JSONRPC != JSONRPCVersion {
-		t.Errorf("Expected JSONRPC %s, got %s", JSONRPCVersion, resp.JSONRPC)
+	if resp.JSONRPC != mcp.JSONRPCVersion {
+		t.Errorf("Expected JSONRPC %s, got %s", mcp.JSONRPCVersion, resp.JSONRPC)
 	}
 
 	if resp.ID != 1 {
@@ -81,21 +82,21 @@ func TestResponse_Error(t *testing.T) {
 		t.Fatal("Error should not be nil")
 	}
 
-	if resp.Error.Code != InternalError {
-		t.Errorf("Expected error code %d, got %d", InternalError, resp.Error.Code)
+	if resp.Error.Code != mcp.InternalError {
+		t.Errorf("Expected error code %d, got %d", mcp.InternalError, resp.Error.Code)
 	}
 }
 
 func TestNotification_Creation(t *testing.T) {
 	params := map[string]string{"key": "value"}
-	notif, err := NewNotification("notifications/message", params)
+	notif, err := mcp.NewNotification("notifications/message", params)
 
 	if err != nil {
 		t.Fatalf("Failed to create notification: %v", err)
 	}
 
-	if notif.JSONRPC != JSONRPCVersion {
-		t.Errorf("Expected JSONRPC %s, got %s", JSONRPCVersion, notif.JSONRPC)
+	if notif.JSONRPC != mcp.JSONRPCVersion {
+		t.Errorf("Expected JSONRPC %s, got %s", mcp.JSONRPCVersion, notif.JSONRPC)
 	}
 
 	if notif.Method != "notifications/message" {
@@ -104,7 +105,7 @@ func TestNotification_Creation(t *testing.T) {
 }
 
 func TestNotification_NilParams(t *testing.T) {
-	notif, err := NewNotification("notifications/cancelled", nil)
+	notif, err := mcp.NewNotification("notifications/cancelled", nil)
 
 	if err != nil {
 		t.Fatalf("Failed to create notification: %v", err)
@@ -116,9 +117,8 @@ func TestNotification_NilParams(t *testing.T) {
 }
 
 func TestError_Interface(t *testing.T) {
-	err := NewError(InvalidParams, "invalid parameter", nil)
+	err := mcp.NewError(mcp.InvalidParams, "invalid parameter", nil)
 
-	// Test error interface
 	var e error = err
 	if e.Error() != "MCP error -32602: invalid parameter" {
 		t.Errorf("Unexpected error string: %s", e.Error())
@@ -126,10 +126,10 @@ func TestError_Interface(t *testing.T) {
 }
 
 func TestNewParseError(t *testing.T) {
-	err := NewParseError("invalid JSON")
+	err := mcp.NewParseError("invalid JSON")
 
-	if err.Code != ParseError {
-		t.Errorf("Expected code %d, got %d", ParseError, err.Code)
+	if err.Code != mcp.ParseError {
+		t.Errorf("Expected code %d, got %d", mcp.ParseError, err.Code)
 	}
 
 	if err.Message != "invalid JSON" {
@@ -138,18 +138,18 @@ func TestNewParseError(t *testing.T) {
 }
 
 func TestNewInvalidRequestError(t *testing.T) {
-	err := NewInvalidRequestError("missing method")
+	err := mcp.NewInvalidRequestError("missing method")
 
-	if err.Code != InvalidRequest {
-		t.Errorf("Expected code %d, got %d", InvalidRequest, err.Code)
+	if err.Code != mcp.InvalidRequest {
+		t.Errorf("Expected code %d, got %d", mcp.InvalidRequest, err.Code)
 	}
 }
 
 func TestNewMethodNotFoundError(t *testing.T) {
-	err := NewMethodNotFoundError("unknown/method")
+	err := mcp.NewMethodNotFoundError("unknown/method")
 
-	if err.Code != MethodNotFound {
-		t.Errorf("Expected code %d, got %d", MethodNotFound, err.Code)
+	if err.Code != mcp.MethodNotFound {
+		t.Errorf("Expected code %d, got %d", mcp.MethodNotFound, err.Code)
 	}
 
 	if err.Message != "method not found: unknown/method" {
@@ -158,26 +158,26 @@ func TestNewMethodNotFoundError(t *testing.T) {
 }
 
 func TestNewInvalidParamsError(t *testing.T) {
-	err := NewInvalidParamsError("missing required field")
+	err := mcp.NewInvalidParamsError("missing required field")
 
-	if err.Code != InvalidParams {
-		t.Errorf("Expected code %d, got %d", InvalidParams, err.Code)
+	if err.Code != mcp.InvalidParams {
+		t.Errorf("Expected code %d, got %d", mcp.InvalidParams, err.Code)
 	}
 }
 
 func TestNewInternalError(t *testing.T) {
-	err := NewInternalError("database connection failed")
+	err := mcp.NewInternalError("database connection failed")
 
-	if err.Code != InternalError {
-		t.Errorf("Expected code %d, got %d", InternalError, err.Code)
+	if err.Code != mcp.InternalError {
+		t.Errorf("Expected code %d, got %d", mcp.InternalError, err.Code)
 	}
 }
 
 func TestNewSessionNotFoundError(t *testing.T) {
-	err := NewSessionNotFoundError("abc-123")
+	err := mcp.NewSessionNotFoundError("abc-123")
 
-	if err.Code != SessionNotFound {
-		t.Errorf("Expected code %d, got %d", SessionNotFound, err.Code)
+	if err.Code != mcp.SessionNotFound {
+		t.Errorf("Expected code %d, got %d", mcp.SessionNotFound, err.Code)
 	}
 
 	if err.Message != "session not found: abc-123" {
@@ -186,10 +186,10 @@ func TestNewSessionNotFoundError(t *testing.T) {
 }
 
 func TestNewToolNotFoundError(t *testing.T) {
-	err := NewToolNotFoundError("unknown_tool")
+	err := mcp.NewToolNotFoundError("unknown_tool")
 
-	if err.Code != ToolNotFound {
-		t.Errorf("Expected code %d, got %d", ToolNotFound, err.Code)
+	if err.Code != mcp.ToolNotFound {
+		t.Errorf("Expected code %d, got %d", mcp.ToolNotFound, err.Code)
 	}
 
 	if err.Message != "tool not found: unknown_tool" {
@@ -198,10 +198,10 @@ func TestNewToolNotFoundError(t *testing.T) {
 }
 
 func TestNewResourceNotFoundError(t *testing.T) {
-	err := NewResourceNotFoundError("file:///missing")
+	err := mcp.NewResourceNotFoundError("file:///missing")
 
-	if err.Code != ResourceNotFound {
-		t.Errorf("Expected code %d, got %d", ResourceNotFound, err.Code)
+	if err.Code != mcp.ResourceNotFound {
+		t.Errorf("Expected code %d, got %d", mcp.ResourceNotFound, err.Code)
 	}
 
 	if err.Message != "resource not found: file:///missing" {
@@ -210,10 +210,10 @@ func TestNewResourceNotFoundError(t *testing.T) {
 }
 
 func TestNewPromptNotFoundError(t *testing.T) {
-	err := NewPromptNotFoundError("unknown_prompt")
+	err := mcp.NewPromptNotFoundError("unknown_prompt")
 
-	if err.Code != PromptNotFound {
-		t.Errorf("Expected code %d, got %d", PromptNotFound, err.Code)
+	if err.Code != mcp.PromptNotFound {
+		t.Errorf("Expected code %d, got %d", mcp.PromptNotFound, err.Code)
 	}
 
 	if err.Message != "prompt not found: unknown_prompt" {
@@ -226,7 +226,7 @@ func TestError_WithData(t *testing.T) {
 		"field":  "name",
 		"reason": "too short",
 	}
-	err := NewError(InvalidParams, "validation failed", data)
+	err := mcp.NewError(mcp.InvalidParams, "validation failed", data)
 
 	if err.Data == nil {
 		t.Error("Data should not be nil")
@@ -243,12 +243,12 @@ func TestError_WithData(t *testing.T) {
 }
 
 func TestConstants(t *testing.T) {
-	if ProtocolVersion != "2024-11-05" {
-		t.Errorf("Unexpected ProtocolVersion: %s", ProtocolVersion)
+	if mcp.ProtocolVersion != "2024-11-05" {
+		t.Errorf("Unexpected ProtocolVersion: %s", mcp.ProtocolVersion)
 	}
 
-	if JSONRPCVersion != "2.0" {
-		t.Errorf("Unexpected JSONRPCVersion: %s", JSONRPCVersion)
+	if mcp.JSONRPCVersion != "2.0" {
+		t.Errorf("Unexpected JSONRPCVersion: %s", mcp.JSONRPCVersion)
 	}
 }
 
@@ -258,17 +258,17 @@ func TestErrorCodes(t *testing.T) {
 		code     int
 		expected int
 	}{
-		{"ParseError", ParseError, -32700},
-		{"InvalidRequest", InvalidRequest, -32600},
-		{"MethodNotFound", MethodNotFound, -32601},
-		{"InvalidParams", InvalidParams, -32602},
-		{"InternalError", InternalError, -32603},
-		{"ServerError", ServerError, -32000},
-		{"SessionNotFound", SessionNotFound, -32001},
-		{"ToolNotFound", ToolNotFound, -32002},
-		{"ResourceNotFound", ResourceNotFound, -32003},
-		{"PromptNotFound", PromptNotFound, -32004},
-		{"InvalidSessionState", InvalidSessionState, -32005},
+		{"ParseError", mcp.ParseError, -32700},
+		{"InvalidRequest", mcp.InvalidRequest, -32600},
+		{"MethodNotFound", mcp.MethodNotFound, -32601},
+		{"InvalidParams", mcp.InvalidParams, -32602},
+		{"InternalError", mcp.InternalError, -32603},
+		{"ServerError", mcp.ServerError, -32000},
+		{"SessionNotFound", mcp.SessionNotFound, -32001},
+		{"ToolNotFound", mcp.ToolNotFound, -32002},
+		{"ResourceNotFound", mcp.ResourceNotFound, -32003},
+		{"PromptNotFound", mcp.PromptNotFound, -32004},
+		{"InvalidSessionState", mcp.InvalidSessionState, -32005},
 	}
 
 	for _, tt := range tests {
@@ -287,7 +287,7 @@ func BenchmarkNewResponse(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = NewResponse(i, result)
+		_ = mcp.NewResponse(i, result)
 	}
 }
 
@@ -296,12 +296,12 @@ func BenchmarkNewNotification(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = NewNotification("test/method", params)
+		_, _ = mcp.NewNotification("test/method", params)
 	}
 }
 
 func BenchmarkError_Error(b *testing.B) {
-	err := NewInternalError("test error")
+	err := mcp.NewInternalError("test error")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

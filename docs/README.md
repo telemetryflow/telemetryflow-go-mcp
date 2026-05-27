@@ -1,24 +1,24 @@
 # TelemetryFlow GO MCP Server Documentation
 
-- **Version:** 1.1.2
+- **Version:** 1.2.0
 - **MCP Protocol:** 2024-11-05
-- **Last Updated:** January 2026
+- **Last Updated:** May 2026
 - **Status:** Production Ready
 
 ---
 
 ## Documentation Index
 
-| Document | Description |
-|----------|-------------|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | System architecture, DDD patterns, component overview |
-| [ERD.md](ERD.md) | Entity Relationship Diagrams, database schemas |
-| [DFD.md](DFD.md) | Data Flow Diagrams, state machines, sequence diagrams |
-| [CONFIGURATION.md](CONFIGURATION.md) | Complete configuration reference |
-| [COMMANDS.md](COMMANDS.md) | CLI commands and usage |
-| [DEVELOPMENT.md](DEVELOPMENT.md) | Development guide, coding standards, testing |
-| [INSTALLATION.md](INSTALLATION.md) | Installation and deployment guide |
-| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions |
+| Document                                 | Description                                           |
+| ---------------------------------------- | ----------------------------------------------------- |
+| [ARCHITECTURE.md](ARCHITECTURE.md)       | System architecture, DDD patterns, component overview |
+| [ERD.md](ERD.md)                         | Entity Relationship Diagrams, database schemas        |
+| [DFD.md](DFD.md)                         | Data Flow Diagrams, state machines, sequence diagrams |
+| [CONFIGURATION.md](CONFIGURATION.md)     | Complete configuration reference                      |
+| [COMMANDS.md](COMMANDS.md)               | CLI commands and usage                                |
+| [DEVELOPMENT.md](DEVELOPMENT.md)         | Development guide, coding standards, testing          |
+| [INSTALLATION.md](INSTALLATION.md)       | Installation and deployment guide                     |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions                           |
 
 ---
 
@@ -90,9 +90,9 @@ graph TB
 
 ## Version History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.1.2 | January 2026 | Initial release with full MCP support |
+| Version | Date     | Changes                                     |
+| ------- | -------- | ------------------------------------------- |
+| 1.2.0   | May 2026 | Go 1.26, mcp-go, otel v1.43.0, vuln patches |
 
 ---
 

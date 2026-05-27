@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # TFO-GO-MCP Build Script
-# Version: 1.1.2
+# Version: 1.2.0
 # Description: Build TelemetryFlow GO MCP Server for various platforms
 # ==============================================================================
 
@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 BINARY_NAME="tfo-mcp"
-VERSION="${VERSION:-1.1.2}"
+VERSION="${VERSION:-1.2.0}"
 COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 BUILD_DIR="${BUILD_DIR:-build}"

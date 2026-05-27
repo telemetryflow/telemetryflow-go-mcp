@@ -13,23 +13,42 @@ import (
 
 // Config holds all configuration for the MCP server
 type Config struct {
-	// Server configuration
-	Server ServerConfig `mapstructure:"server"`
+	Server     ServerConfig     `mapstructure:"server"`
+	Claude     ClaudeConfig     `mapstructure:"claude"`
+	MCP        MCPConfig        `mapstructure:"mcp"`
+	Logging    LoggingConfig    `mapstructure:"logging"`
+	Telemetry  TelemetryConfig  `mapstructure:"telemetry"`
+	Security   SecurityConfig   `mapstructure:"security"`
+	Database   DatabaseConfig   `mapstructure:"database"`
+	Clickhouse ClickHouseConfig `mapstructure:"clickhouse"`
+}
 
-	// Claude API configuration
-	Claude ClaudeConfig `mapstructure:"claude"`
+type DatabaseConfig struct {
+	Enabled      bool   `mapstructure:"enabled"`
+	URL          string `mapstructure:"url"`
+	Host         string `mapstructure:"host"`
+	Port         int    `mapstructure:"port"`
+	User         string `mapstructure:"user"`
+	Password     string `mapstructure:"password"`
+	Database     string `mapstructure:"database"`
+	SSLMode      string `mapstructure:"sslmode"`
+	MaxOpenConns int    `mapstructure:"max_open_conns"`
+	MaxIdleConns int    `mapstructure:"max_idle_conns"`
+	AutoMigrate  bool   `mapstructure:"auto_migrate"`
+	SeedData     bool   `mapstructure:"seed_data"`
+}
 
-	// MCP configuration
-	MCP MCPConfig `mapstructure:"mcp"`
-
-	// Logging configuration
-	Logging LoggingConfig `mapstructure:"logging"`
-
-	// Telemetry configuration
-	Telemetry TelemetryConfig `mapstructure:"telemetry"`
-
-	// Security configuration
-	Security SecurityConfig `mapstructure:"security"`
+type ClickHouseConfig struct {
+	Enabled     bool   `mapstructure:"enabled"`
+	URL         string `mapstructure:"url"`
+	Host        string `mapstructure:"host"`
+	Port        int    `mapstructure:"port"`
+	Database    string `mapstructure:"database"`
+	Username    string `mapstructure:"username"`
+	Password    string `mapstructure:"password"`
+	Compression string `mapstructure:"compression"`
+	Secure      bool   `mapstructure:"secure"`
+	AutoMigrate bool   `mapstructure:"auto_migrate"`
 }
 
 // ServerConfig holds server-related configuration
@@ -133,7 +152,7 @@ func DefaultConfig() *Config {
 	return &Config{
 		Server: ServerConfig{
 			Name:            "TelemetryFlow-MCP",
-			Version:         "1.1.2",
+			Version:         "1.2.0",
 			Host:            "localhost",
 			Port:            8080,
 			Transport:       "stdio",
@@ -144,7 +163,7 @@ func DefaultConfig() *Config {
 		},
 		Claude: ClaudeConfig{
 			BaseURL:        "https://api.anthropic.com",
-			DefaultModel:   "claude-sonnet-4-20250514",
+			DefaultModel:   "claude-opus-4-7",
 			MaxTokens:      4096,
 			Temperature:    1.0,
 			TopP:           1.0,
@@ -191,6 +210,28 @@ func DefaultConfig() *Config {
 			RateLimitPerMinute: 100,
 			CORSEnabled:        true,
 			CORSAllowedOrigins: []string{"*"},
+		},
+		Database: DatabaseConfig{
+			Enabled:      false,
+			Host:         "localhost",
+			Port:         5432,
+			User:         "telemetryflow",
+			Database:     "telemetryflow_mcp",
+			SSLMode:      "disable",
+			MaxOpenConns: 25,
+			MaxIdleConns: 5,
+			AutoMigrate:  true,
+			SeedData:     true,
+		},
+		Clickhouse: ClickHouseConfig{
+			Enabled:     false,
+			Host:        "localhost",
+			Port:        9000,
+			Database:    "telemetryflow_analytics",
+			Username:    "default",
+			Compression: "lz4",
+			Secure:      false,
+			AutoMigrate: true,
 		},
 	}
 }
@@ -243,6 +284,15 @@ func Load(configPath string) (*Config, error) {
 		config.Claude.APIKey = apiKey
 	}
 
+	if dbURL := os.Getenv("TELEMETRYFLOW_MCP_POSTGRES_URL"); dbURL != "" && config.Database.URL == "" {
+		config.Database.URL = dbURL
+		config.Database.Enabled = true
+	}
+	if chURL := os.Getenv("TELEMETRYFLOW_MCP_CLICKHOUSE_URL"); chURL != "" && config.Clickhouse.URL == "" {
+		config.Clickhouse.URL = chURL
+		config.Clickhouse.Enabled = true
+	}
+
 	// Validate configuration
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("config validation failed: %w", err)
@@ -272,6 +322,28 @@ func bindEnvVars(v *viper.Viper) {
 	_ = v.BindEnv("telemetry.enabled", "TELEMETRYFLOW_MCP_TELEMETRY_ENABLED")
 	_ = v.BindEnv("telemetry.otlp_endpoint", "TELEMETRYFLOW_ENDPOINT", "TELEMETRYFLOW_MCP_OTLP_ENDPOINT")
 	_ = v.BindEnv("telemetry.service_name", "TELEMETRYFLOW_SERVICE_NAME", "TELEMETRYFLOW_MCP_SERVICE_NAME")
+
+	// Database (PostgreSQL)
+	_ = v.BindEnv("database.enabled", "TELEMETRYFLOW_MCP_DATABASE_ENABLED")
+	_ = v.BindEnv("database.url", "TELEMETRYFLOW_MCP_POSTGRES_URL")
+	_ = v.BindEnv("database.host", "TELEMETRYFLOW_MCP_POSTGRES_HOST")
+	_ = v.BindEnv("database.port", "TELEMETRYFLOW_MCP_POSTGRES_PORT")
+	_ = v.BindEnv("database.user", "TELEMETRYFLOW_MCP_POSTGRES_USER")
+	_ = v.BindEnv("database.password", "TELEMETRYFLOW_MCP_POSTGRES_PASSWORD")
+	_ = v.BindEnv("database.database", "TELEMETRYFLOW_MCP_POSTGRES_DATABASE")
+	_ = v.BindEnv("database.sslmode", "TELEMETRYFLOW_MCP_POSTGRES_SSLMODE")
+	_ = v.BindEnv("database.auto_migrate", "TELEMETRYFLOW_MCP_POSTGRES_AUTO_MIGRATE")
+	_ = v.BindEnv("database.seed_data", "TELEMETRYFLOW_MCP_POSTGRES_SEED_DATA")
+
+	// ClickHouse
+	_ = v.BindEnv("clickhouse.enabled", "TELEMETRYFLOW_MCP_CLICKHOUSE_ENABLED")
+	_ = v.BindEnv("clickhouse.url", "TELEMETRYFLOW_MCP_CLICKHOUSE_URL")
+	_ = v.BindEnv("clickhouse.host", "TELEMETRYFLOW_MCP_CLICKHOUSE_HOST")
+	_ = v.BindEnv("clickhouse.port", "TELEMETRYFLOW_MCP_CLICKHOUSE_PORT")
+	_ = v.BindEnv("clickhouse.database", "TELEMETRYFLOW_MCP_CLICKHOUSE_DATABASE")
+	_ = v.BindEnv("clickhouse.username", "TELEMETRYFLOW_MCP_CLICKHOUSE_USERNAME")
+	_ = v.BindEnv("clickhouse.password", "TELEMETRYFLOW_MCP_CLICKHOUSE_PASSWORD")
+	_ = v.BindEnv("clickhouse.auto_migrate", "TELEMETRYFLOW_MCP_CLICKHOUSE_AUTO_MIGRATE")
 }
 
 // Validate validates the configuration
