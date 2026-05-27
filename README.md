@@ -1115,5 +1115,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <p align="center">
   <strong>Built with Go and Claude AI integration for the TelemetryFlow Platform</strong>
   <br/>
-  <sub>Copyright © 2024-2026 TelemetryFlow. All rights reserved.</sub>
+  <sub>Copyright © 2024-2026 Telemetri Data Indonesia. All rights reserved.</sub>
 </p>
