@@ -11,10 +11,10 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Go Version](https://img.shields.io/badge/Go-1.26+-00ADD8?logo=go)](https://golang.org/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-2024--11--05-purple?logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=)](https://modelcontextprotocol.io/)
-[![LLM Providers](https://img.shields.io/badge/LLM-11_Providers%20%7C%20100%2B_Models-E1BEE7)](https://telemetryflow.id)
-[![OTEL SDK](https://img.shields.io/badge/OpenTelemetry_SDK-1.43.0-blueviolet)](https://opentelemetry.io/)
-[![MCP Go](https://img.shields.io/badge/mcp--go-v0.54.1-9cf)](https://github.com/mark3labs/mcp-go)
+[![LLM Providers](https://img.shields.io/badge/LLM-11_Providers_100%2B_Models-E1BEE7?logo=anthropic)](https://anthropic.com)
+[![TFO SDK](https://img.shields.io/badge/TFO_Go_SDK-1.2.0-blueviolet)](https://opentelemetry.io/)
 [![Architecture](https://img.shields.io/badge/Architecture-DDD%2FCQRS-success)](docs/ARCHITECTURE.md)
+[![MCP Go](https://img.shields.io/badge/mcp--go-v0.54.1-9cf)](https://github.com/mark3labs/mcp-go)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)](https://www.postgresql.org/)
 [![ClickHouse](https://img.shields.io/badge/ClickHouse-23+-FFCC00?logo=clickhouse)](https://clickhouse.com/)
 
@@ -22,16 +22,17 @@
 
 ---
 
-**Enterprise-Grade Model Context Protocol Server with Claude AI Integration**
+**Enterprise-Grade Model Context Protocol Server with Multi-Provider LLM Integration**
 
-A comprehensive MCP server implementation built using Go and following Domain-Driven Design (DDD) patterns, providing seamless integration between the Model Context Protocol and Anthropic's Claude AI.
+A comprehensive MCP server implementation built using Go and the official MCP Go SDK (`mcp-go v0.54.1`), following Domain-Driven Design (DDD) patterns, providing seamless integration between the Model Context Protocol and 11 LLM providers with 100+ models.
 
 This server works as the **AI integration layer** for the TelemetryFlow Platform, providing:
 
-- Claude AI conversation capabilities via MCP
-- Tool execution with built-in and custom tools
+- Multi-provider LLM conversation capabilities via MCP (11 providers, 100+ models)
+- Tool execution with 11 built-in tools (8 builtin + 3 telemetry context)
 - Resource management and prompt templates
-- TelemetryFlow SDK observability integration
+- TelemetryFlow Go-SDK observability integration
+- TFO-Platform ContextCollector and PromptBuilder integration
 
 ---
 
@@ -41,22 +42,22 @@ This server works as the **AI integration layer** for the TelemetryFlow Platform
 graph LR
     subgraph "TelemetryFlow Ecosystem v1.2.0"
         subgraph "Instrumentation"
-            SDK_GO[TFO-Go-SDK<br/>OTEL SDK v1.43.0]
-            SDK_PY[TFO-Python-SDK<br/>OTEL SDK v1.42.1]
+            SDK_GO[TFO-Go-SDK v1.2.0<br/>OTEL SDK v1.43.0]
+            SDK_PY[TFO-Python-SDK v1.2.0<br/>OTEL SDK v1.42.1]
             SDK_OTHER[TFO-AnyStacks-SDK<br/>OTEL AnyStacks SDK]
         end
         subgraph "Collection"
-            AGENT[TFO-Agent<br/>OTEL SDK v1.43.0]
+            AGENT[TFO-Agent v1.2.0<br/>OTEL SDK v1.43.0]
         end
         subgraph "Processing"
-            COLLECTOR[TFO-Collector<br/>OTEL v0.152.1]
+            COLLECTOR[TFO-Collector v1.2.1<br/>OTEL v0.152.1]
         end
         subgraph "AI Integration"
-            MCP_GO[TFO-Go-MCP<br/>Claude API + MCP]
-            MCP_PY[TFO-Python-MCP<br/>Claude API + MCP]
+            MCP_GO[TFO-Go-MCP v1.2.0<br/>LLM + MCP + Context]
+            MCP_PY[TFO-Python-MCP v1.2.0<br/>LLM + MCP + Context]
         end
         subgraph "Platform"
-            CORE[TFO-Core<br/>NestJS IAM v1.4.0]
+            CORE[TFO-Core v1.4.0<br/>NestJS IAM]
         end
     end
 
@@ -80,36 +81,35 @@ graph LR
     style CORE fill:#B3E5FC,stroke:#0288D1
 ```
 
-| Component      | Version    | OTEL Base          | Role                          |
-| -------------- | ---------- | ------------------ | ----------------------------- |
-| TFO-Core       | v1.4.0     | -                  | Identity & Access Management  |
-| TFO-Agent      | v1.2.0     | SDK v1.43.0        | Telemetry Collection Agent    |
-| TFO-Collector  | v1.2.1     | Collector v0.152.1 | Central Telemetry Processing  |
-| TFO-Go-SDK     | v1.2.0     | SDK v1.43.0        | Go Instrumentation            |
-| TFO-Python-SDK | v1.2.0     | SDK v1.42.1        | Python Instrumentation        |
-| **TFO-Go-MCP** | **v1.2.0** | **SDK v1.43.0**    | **GO MCP Server + Claude AI** |
-| TFO-Python-MCP | v1.2.0     | SDK v1.42.1        | Python MCP Server + Claude AI |
+| Component          | Version    | OTEL Base          | Role                              |
+| ------------------ | ---------- | ------------------ | --------------------------------- |
+| TFO-Core           | v1.4.0     | -                  | Identity & Access Management      |
+| TFO-Agent          | v1.2.0     | SDK v1.43.0        | Telemetry Collection Agent        |
+| TFO-Collector      | v1.2.1     | Collector v0.152.1 | Central Telemetry Processing      |
+| TFO-Go-SDK         | v1.2.0     | SDK v1.43.0        | Go Instrumentation                |
+| TFO-Python-SDK     | v1.2.0     | SDK v1.42.1        | Python Instrumentation            |
+| **TFO-Go-MCP**     | **v1.2.0** | **SDK v1.43.0**    | **Go MCP Server + LLM AI**        |
+| TFO-Python-MCP     | v1.2.0     | TFO SDK v1.2.0     | Python MCP Server + LLM AI        |
 
 ---
 
 ## Quick Facts
 
-| Property             | Value                                                                                                                 |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| **Version**          | 1.2.0                                                                                                                 |
-| **Language**         | Go 1.26+                                                                                                              |
-| **MCP Protocol**     | 2024-11-05                                                                                                            |
-| **Claude SDK**       | anthropic-sdk-go v0.2.0-beta.3                                                                                        |
-| **OTEL SDK**         | v1.43.0                                                                                                               |
-| **MCP Go SDK**       | mcp-go v0.54.1                                                                                                        |
-| **Architecture**     | DDD/CQRS                                                                                                              |
-| **Transport**        | stdio, SSE (planned), WebSocket (planned)                                                                             |
-| **Built-in Tools**   | 11 tools (8 general + 3 telemetry context)                                                                            |
-| **Context Types**    | 70+ telemetry context types across 7 categories                                                                       |
-| **System Prompts**   | 58+ specialized AI analyst prompts                                                                                    |
-| **Supported Models** | 100+ models across 11 providers (Anthropic, Google, OpenAI, DeepSeek, Qwen, Mistral, Grok, Kimi, Zhipu, MiMo, Ollama) |
-| **Databases**        | PostgreSQL (GORM), ClickHouse, Redis (Cache)                                                                          |
-| **Queue**            | NATS JetStream                                                                                                        |
+| Property             | Value                                                   |
+| -------------------- | ------------------------------------------------------- |
+| **Version**          | 1.2.0                                                   |
+| **Language**         | Go 1.26+                                                |
+| **MCP Protocol**     | 2024-11-05                                              |
+| **MCP SDK**          | mcp-go v0.54.1 (official)                               |
+| **Claude SDK**       | anthropic-sdk-go v0.2.0-beta.3                          |
+| **OTEL SDK**         | v1.43.0                                                 |
+| **Architecture**     | DDD/CQRS                                                |
+| **Transport**        | stdio, SSE (planned), WebSocket (planned)               |
+| **Built-in Tools**   | 11 tools + ContextCollector + PromptBuilder              |
+| **Context Types**    | 70+ context types across 7 categories                   |
+| **Supported Models** | 100+ models across 11 LLM providers                    |
+| **Test Coverage**    | 94% coverage, 18 test packages                          |
+| **Concurrency**      | Goroutines with channels and mutexes                    |
 
 ---
 
@@ -126,8 +126,8 @@ graph TB
 
     subgraph "TFO-GO-MCP Server"
         subgraph "Presentation Layer"
-            SERVER[MCP Server<br/>JSON-RPC 2.0]
-            TOOLS[Built-in Tools]
+            SERVER[MCP Server<br/>Official MCP SDK mcp-go v0.54.1]
+            TOOLS[Built-in Tools<br/>11 Tools]
             RESOURCES[Resources]
             PROMPTS[Prompts]
         end
@@ -136,6 +136,8 @@ graph TB
             CMD[Commands]
             QRY[Queries]
             HANDLERS[Handlers]
+            CONTEXT[ContextCollector<br/>70+ Context Types]
+            PROMPT_BUILDER[PromptBuilder<br/>58+ Analyst Personas]
         end
 
         subgraph "Domain Layer - DDD"
@@ -147,17 +149,17 @@ graph TB
         end
 
         subgraph "Infrastructure Layer"
-            CLAUDE[Claude API Client]
-            CONFIG[Configuration]
-            REPO[Repositories]
-            LOG[Logging]
-            OTEL[OpenTelemetry]
+            LLM[LLM API Client<br/>11 Providers]
+            CONFIG[Configuration<br/>Viper]
+            REPO[Repositories<br/>GORM + ClickHouse]
+            LOG[Structured Logging<br/>Zerolog]
+            OTEL[OpenTelemetry v1.43.0]
         end
     end
 
     subgraph "External Services"
-        ANTHROPIC[Anthropic Claude API]
-        OTLP[OTLP Collector]
+        PROVIDERS[11 LLM Providers<br/>Anthropic, Google, OpenAI, ...]
+        TFO[TelemetryFlow Platform]
     end
 
     CC --> SERVER
@@ -171,196 +173,32 @@ graph TB
     RESOURCES --> HANDLERS
     PROMPTS --> HANDLERS
 
+    CONTEXT --> PROMPT_BUILDER
     HANDLERS --> AGG
     HANDLERS --> SVC
     AGG --> ENT
     AGG --> VO
     AGG --> EVT
 
-    SVC --> CLAUDE
+    SVC --> LLM
     HANDLERS --> REPO
     CONFIG --> SERVER
     LOG --> SERVER
-    OTEL --> OTLP
+    OTEL --> TFO
 
-    CLAUDE --> ANTHROPIC
+    LLM --> PROVIDERS
 
-    style SERVER fill:#E1BEE7,stroke:#7B1FA2,stroke-width:2px
-    style CLAUDE fill:#FFCDD2,stroke:#C62828
-    style ANTHROPIC fill:#FFCDD2,stroke:#C62828
+    style SERVER fill:#00ADD8,stroke:#005E7F,stroke-width:2px
+    style LLM fill:#FFCDD2,stroke:#C62828
+    style PROVIDERS fill:#FFCDD2,stroke:#C62828
     style AGG fill:#C8E6C9,stroke:#388E3C
     style HANDLERS fill:#BBDEFB,stroke:#1976D2
+    style OTEL fill:#E1BEE7,stroke:#7B1FA2
 ```
 
 ---
 
-## MCP Protocol Data Flow
-
-```mermaid
-sequenceDiagram
-    participant Client as MCP Client
-    participant Server as TFO-GO-MCP Server
-    participant Handler as Request Handler
-    participant Domain as Domain Layer
-    participant Claude as Claude API
-
-    Note over Client,Claude: Session Initialization
-    Client->>Server: initialize (JSON-RPC 2.0)
-    Server->>Handler: InitializeSessionCommand
-    Handler->>Domain: Create Session Aggregate
-    Domain-->>Handler: Session Created + Events
-    Handler-->>Server: Initialize Result
-    Server-->>Client: capabilities, serverInfo
-
-    Client->>Server: notifications/initialized
-    Note over Server: Session Ready
-
-    Note over Client,Claude: Tool Execution Flow
-    Client->>Server: tools/list
-    Server->>Handler: ListToolsQuery
-    Handler->>Domain: Get Tools from Session
-    Domain-->>Handler: Tool List
-    Handler-->>Server: Tools Array
-    Server-->>Client: {tools: [...]}
-
-    Client->>Server: tools/call (claude_conversation)
-    Server->>Handler: ExecuteToolCommand
-    Handler->>Domain: Validate & Execute
-    Domain->>Claude: CreateMessage Request
-    Claude-->>Domain: Claude Response
-    Domain-->>Handler: Tool Result
-    Handler-->>Server: Content Array
-    Server-->>Client: {content: [...]}
-```
-
----
-
-## Domain-Driven Design Architecture
-
-```mermaid
-graph TB
-    subgraph "Domain Layer"
-        subgraph "Aggregates"
-            SESSION[Session Aggregate<br/>├─ ID, State, Capabilities<br/>├─ Tools, Resources, Prompts<br/>└─ Conversations]
-            CONV[Conversation Aggregate<br/>├─ ID, Model, Status<br/>├─ Messages, Tools<br/>└─ Settings]
-        end
-
-        subgraph "Entities"
-            MSG[Message<br/>├─ ID, Role, Content<br/>└─ Metadata]
-            TOOL[Tool<br/>├─ Name, Description<br/>├─ InputSchema<br/>└─ Handler]
-            RES[Resource<br/>├─ URI, Name, MimeType<br/>└─ Reader]
-            PROMPT[Prompt<br/>├─ Name, Arguments<br/>└─ Generator]
-        end
-
-        subgraph "Value Objects"
-            IDS[Identifiers<br/>SessionID, ConversationID<br/>MessageID, ToolID]
-            CONTENT[Content Types<br/>TextContent, Role<br/>Model, MimeType]
-            MCP_VO[MCP Types<br/>Method, Capability<br/>LogLevel, ErrorCode]
-        end
-
-        subgraph "Domain Events"
-            SESS_EVT[Session Events<br/>Created, Initialized<br/>Closed]
-            CONV_EVT[Conversation Events<br/>Created, MessageAdded<br/>Closed]
-            TOOL_EVT[Tool Events<br/>Registered, Executed]
-        end
-    end
-
-    SESSION --> CONV
-    CONV --> MSG
-    SESSION --> TOOL
-    SESSION --> RES
-    SESSION --> PROMPT
-
-    SESSION --> IDS
-    CONV --> IDS
-    MSG --> CONTENT
-    TOOL --> MCP_VO
-
-    SESSION --> SESS_EVT
-    CONV --> CONV_EVT
-    TOOL --> TOOL_EVT
-
-    style SESSION fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style CONV fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
-    style MSG fill:#BBDEFB,stroke:#1976D2
-    style TOOL fill:#BBDEFB,stroke:#1976D2
-    style IDS fill:#FFF9C4,stroke:#F9A825
-    style CONTENT fill:#FFF9C4,stroke:#F9A825
-```
-
----
-
-## CQRS Pattern Implementation
-
-```mermaid
-flowchart LR
-    subgraph "Commands - Write Side"
-        C1[InitializeSession]
-        C2[SendMessage]
-        C3[ExecuteTool]
-        C4[RegisterTool]
-        C5[CloseSession]
-    end
-
-    subgraph "Command Handlers"
-        CH1[SessionHandler]
-        CH2[ConversationHandler]
-        CH3[ToolHandler]
-    end
-
-    subgraph "Domain"
-        AGG[Aggregates]
-        REPO[Repositories]
-        EVT[Events]
-    end
-
-    subgraph "Query Handlers"
-        QH1[SessionHandler]
-        QH2[ToolHandler]
-        QH3[ResourceHandler]
-    end
-
-    subgraph "Queries - Read Side"
-        Q1[GetSession]
-        Q2[ListTools]
-        Q3[ListResources]
-        Q4[GetPrompt]
-        Q5[ListConversations]
-    end
-
-    C1 --> CH1
-    C2 --> CH2
-    C3 --> CH3
-    C4 --> CH3
-    C5 --> CH1
-
-    CH1 --> AGG
-    CH2 --> AGG
-    CH3 --> AGG
-    AGG --> REPO
-    AGG --> EVT
-
-    Q1 --> QH1
-    Q2 --> QH2
-    Q3 --> QH3
-    Q4 --> QH3
-    Q5 --> QH1
-
-    QH1 --> REPO
-    QH2 --> REPO
-    QH3 --> REPO
-
-    style C1 fill:#FFCDD2,stroke:#C62828
-    style C2 fill:#FFCDD2,stroke:#C62828
-    style C3 fill:#FFCDD2,stroke:#C62828
-    style Q1 fill:#C8E6C9,stroke:#388E3C
-    style Q2 fill:#C8E6C9,stroke:#388E3C
-    style Q3 fill:#C8E6C9,stroke:#388E3C
-```
-
----
-
-## Built-in Tools Architecture
+## Built-in Tools
 
 ```mermaid
 graph TB
@@ -384,14 +222,14 @@ graph TB
         T7[system_info<br/>System information]
     end
 
-    subgraph "Telemetry Tools"
+    subgraph "Utility Tools"
+        T8[echo<br/>Testing utility]
+    end
+
+    subgraph "Telemetry Context Tools"
         T9[collect_telemetry_context<br/>Collect live observability data]
         T10[list_context_types<br/>List 70+ context types]
         T11[build_system_prompt<br/>Build context-aware prompts]
-    end
-
-    subgraph "Utility Tools"
-        T8[echo<br/>Testing utility]
     end
 
     REG --> T1
@@ -405,17 +243,6 @@ graph TB
     REG --> T9
     REG --> T10
     REG --> T11
-
-    subgraph "Execution Flow"
-        INPUT[Tool Input]
-        VALIDATE[Validate Schema]
-        EXEC[Execute Handler]
-        RESULT[Tool Result]
-    end
-
-    INPUT --> VALIDATE
-    VALIDATE --> EXEC
-    EXEC --> RESULT
 
     style T1 fill:#E1BEE7,stroke:#7B1FA2,stroke-width:2px
     style REG fill:#FFE0B2,stroke:#F57C00
@@ -439,134 +266,54 @@ graph TB
 
 ---
 
-## Claude AI Integration
+## TFO-Platform Integration
 
-```mermaid
-sequenceDiagram
-    participant Tool as claude_conversation Tool
-    participant Service as Claude Service
-    participant SDK as anthropic-sdk-go
-    participant API as Anthropic API
+### ContextCollector Service
 
-    Tool->>Service: CreateMessage Request
-    Note over Service: Build ClaudeRequest<br/>Model, Messages, Tools
+Go port of TFO-Platform `ContextCollector.service.ts` — collects live telemetry context from ClickHouse materialized views and PostgreSQL for AI analysis.
 
-    Service->>SDK: client.Messages.New()
-    SDK->>API: POST /v1/messages
+**70+ Context Types across 7 categories:**
 
-    alt Success
-        API-->>SDK: Message Response
-        SDK-->>Service: *anthropic.Message
-        Service->>Service: Convert to Domain Response
-        Service-->>Tool: ClaudeResponse
-    else Rate Limited
-        API-->>SDK: 429 Error
-        SDK-->>Service: Error
-        Service->>Service: Retry with backoff
-        Service->>SDK: Retry request
-    else API Error
-        API-->>SDK: Error Response
-        SDK-->>Service: Error
-        Service-->>Tool: Error Result
-    end
+| Category | Context Types |
+|----------|---------------|
+| **Observability** | metrics, logs, traces, exemplars, correlations, dashboard |
+| **Infrastructure** | uptime, status-page, audit, infra-overview, infra-cpu/memory/storage/network |
+| **Kubernetes** | overview, clusters, namespaces, nodes, pods, deployments, pv, api-server, coredns |
+| **Hybrid (PG+CH)** | agents, service-map, network-map |
+| **Platform (PG)** | alerts, alert-rules, iam, iam-users/roles/permissions/matrix/assignments, tenancy, tenancy-regions/organizations/workspaces/tenants |
+| **AI Intelligence** | anomaly-detection, corrective-maintenance, predictive-maintenance, cost-optimization |
+| **DB Monitoring** | inventory, clickhouse, mariadb, mysql, percona, sqlite3, timescaledb, aurora, mssql, postgresql, mongodb-community/atlas, aws-rds-mysql/aurora, aws-dynamodb, cockroachdb, qan |
 
-    Note over Tool: Return ToolResult
-```
+**ClickHouse Materialized Views queried:**
+`metrics_5m` (AggMT), `logs_1h` (SumMT), `service_latency_percentiles_1h`, `service_error_rates_1h`, `exemplars_1h`, `uptime_checks`, `audit_logs_1h`, `signal_correlations_1h`, `vm_metrics_1h`, `kubernetes_metrics_1h`, `service_map_metrics_1h`, `network_map_traffic_1h`, `network_map_connection_metrics_1h`
 
-### Supported Models
+### PromptBuilder Service
 
-| Model             | ID                           | Use Case                       |
-| ----------------- | ---------------------------- | ------------------------------ |
-| Claude 4 Opus     | `claude-opus-4-20250514`     | Complex reasoning, analysis    |
-| Claude 4 Sonnet   | `claude-sonnet-4-20250514`   | Balanced performance (default) |
-| Claude 3.7 Sonnet | `claude-3-7-sonnet-20250219` | Extended thinking              |
-| Claude 3.5 Sonnet | `claude-3-5-sonnet-20241022` | Fast, capable                  |
-| Claude 3.5 Haiku  | `claude-3-5-haiku-20241022`  | Quick responses                |
+Go port of TFO-Platform `PromptBuilder.service.ts` — builds context-aware system prompts for LLM interactions.
+
+- **58+ specialized analyst personas** — one per context type (e.g., metrics analyst, log analyst, trace analyst, Kubernetes admin, DB administrator, etc.)
+- **5 insight types**: chronology, prediction, recommendation, root-cause, pattern
+- Context-aware prompt generation with live data injection (10K char JSON truncation)
 
 ---
 
-## Session Lifecycle
+## Built-in Resources
 
-```mermaid
-stateDiagram-v2
-    [*] --> Created: New Session
-    Created --> Initializing: Initialize Request
-    Initializing --> Ready: Initialized Notification
-    Ready --> Ready: Tool/Resource/Prompt Operations
-    Ready --> Closing: Shutdown Request
-    Closing --> Closed: Cleanup Complete
-    Closed --> [*]
-
-    note right of Created
-        Session aggregate created
-        Default capabilities set
-    end note
-
-    note right of Ready
-        Full MCP operations available
-        Tools, Resources, Prompts
-    end note
-
-    note right of Closed
-        All conversations closed
-        Resources released
-    end note
-```
+| Resource          | Description            |
+| ----------------- | ---------------------- |
+| `config://server` | Server configuration   |
+| `status://health` | Health status          |
+| `file:///{path}`  | File access (template) |
 
 ---
 
-## Configuration Architecture
+## Built-in Prompts
 
-```mermaid
-graph TD
-    subgraph "Configuration Sources"
-        ENV[Environment Variables<br/>ANTHROPIC_API_KEY<br/>TELEMETRYFLOW_MCP_*]
-        FILE[Config File<br/>config.yaml]
-        DEFAULT[Default Values]
-    end
-
-    subgraph "Viper Configuration"
-        VIPER[Viper Manager]
-    end
-
-    subgraph "Configuration Sections"
-        SRV[Server Config<br/>name, port, transport]
-        CLAUDE[Claude Config<br/>api_key, model, tokens]
-        MCP_CFG[MCP Config<br/>capabilities, limits]
-        LOG[Logging Config<br/>level, format]
-        TEL[Telemetry Config<br/>OTEL settings]
-        SEC[Security Config<br/>rate limits, CORS]
-    end
-
-    ENV --> VIPER
-    FILE --> VIPER
-    DEFAULT --> VIPER
-
-    VIPER --> SRV
-    VIPER --> CLAUDE
-    VIPER --> MCP_CFG
-    VIPER --> LOG
-    VIPER --> TEL
-    VIPER --> SEC
-
-    style VIPER fill:#FFE0B2,stroke:#F57C00,stroke-width:2px
-    style ENV fill:#C8E6C9,stroke:#388E3C
-```
-
-### Environment Variables
-
-| Variable                                 | Description               | Default                    |
-| ---------------------------------------- | ------------------------- | -------------------------- |
-| `ANTHROPIC_API_KEY`                      | Claude API key (required) | -                          |
-| `TELEMETRYFLOW_MCP_SERVER_TRANSPORT`     | Transport type            | `stdio`                    |
-| `TELEMETRYFLOW_MCP_SERVER_PORT`          | Server port (SSE/WS)      | `8080`                     |
-| `TELEMETRYFLOW_MCP_LOG_LEVEL`            | Log level                 | `info`                     |
-| `TELEMETRYFLOW_MCP_LOG_FORMAT`           | Log format                | `json`                     |
-| `TELEMETRYFLOW_MCP_DEBUG`                | Debug mode                | `false`                    |
-| `TELEMETRYFLOW_MCP_CLAUDE_DEFAULT_MODEL` | Default Claude model      | `claude-opus-4-7`           |
-| `TELEMETRYFLOW_MCP_OTLP_ENDPOINT`        | OTEL collector endpoint   | `localhost:4317`           |
-| `TELEMETRYFLOW_MCP_POSTGRES_URL`         | PostgreSQL connection URL | -                          |
-| `TELEMETRYFLOW_MCP_CLICKHOUSE_URL`       | ClickHouse connection URL | -                          |
+| Prompt         | Description              |
+| -------------- | ------------------------ |
+| `code_review`  | Get thorough code review |
+| `explain_code` | Get code explanation     |
+| `debug_help`   | Get debugging assistance |
 
 ---
 
@@ -575,14 +322,14 @@ graph TD
 ### Prerequisites
 
 - Go 1.26 or later
-- Anthropic API key
+- Anthropic API key (or other supported LLM provider API key)
 
 ### From Source
 
 ```bash
 # Clone the repository
 git clone https://github.com/telemetryflow/telemetryflow-go-mcp.git
-cd telemetryflow/telemetryflow-go-mcp
+cd telemetryflow-go-mcp
 
 # Download dependencies
 make deps
@@ -634,7 +381,7 @@ server:
 
 claude:
   # api_key: Set via ANTHROPIC_API_KEY env var
-  default_model: "claude-sonnet-4-20250514"
+  default_model: "claude-opus-4-7"
   max_tokens: 4096
   temperature: 1.0
   timeout: "120s"
@@ -655,10 +402,26 @@ logging:
 
 telemetry:
   enabled: true
+  # api_key: Set via TELEMETRYFLOW_API_KEY env var
   service_name: "telemetryflow-go-mcp"
+  environment: "production"
   otlp_endpoint: "localhost:4317"
-  trace_sample_rate: 1.0
 ```
+
+### Environment Variables
+
+| Variable                                 | Description               | Default                    |
+| ---------------------------------------- | ------------------------- | -------------------------- |
+| `ANTHROPIC_API_KEY`                      | Claude API key (required) | -                          |
+| `TELEMETRYFLOW_MCP_SERVER_TRANSPORT`     | Transport type            | `stdio`                    |
+| `TELEMETRYFLOW_MCP_SERVER_PORT`          | Server port (SSE/WS)      | `8080`                     |
+| `TELEMETRYFLOW_MCP_LOG_LEVEL`            | Log level                 | `info`                     |
+| `TELEMETRYFLOW_MCP_LOG_FORMAT`           | Log format                | `json`                     |
+| `TELEMETRYFLOW_MCP_DEBUG`                | Debug mode                | `false`                    |
+| `TELEMETRYFLOW_MCP_CLAUDE_DEFAULT_MODEL` | Default Claude model      | `claude-opus-4-7`          |
+| `TELEMETRYFLOW_MCP_OTLP_ENDPOINT`        | OTEL collector endpoint   | `localhost:4317`           |
+| `TELEMETRYFLOW_MCP_POSTGRES_URL`         | PostgreSQL connection URL | -                          |
+| `TELEMETRYFLOW_MCP_CLICKHOUSE_URL`       | ClickHouse connection URL | -                          |
 
 ---
 
@@ -683,9 +446,9 @@ tfo-mcp version
 tfo-mcp validate
 ```
 
-### Integration with Claude Code
+### Integration with Claude Desktop
 
-Add to your Claude Code MCP settings (`~/.config/claude-code/mcp_settings.json`):
+Add to your Claude Desktop configuration (`claude_desktop_config.json`):
 
 ```json
 {
@@ -701,65 +464,40 @@ Add to your Claude Code MCP settings (`~/.config/claude-code/mcp_settings.json`)
 }
 ```
 
-### MCP Protocol Examples
+---
 
-#### Initialize Session
+## TelemetryFlow SDK Integration
 
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "initialize",
-  "params": {
-    "protocolVersion": "2024-11-05",
-    "capabilities": {},
-    "clientInfo": {
-      "name": "my-client",
-      "version": "1.0.0"
-    }
-  }
-}
+The MCP server integrates with the TelemetryFlow Go-SDK (`v1.2.0`) to provide comprehensive observability:
+
+### Enable Telemetry
+
+```bash
+# Configure via environment variables
+export TELEMETRYFLOW_ENABLED=true
+export TELEMETRYFLOW_API_KEY=your-telemetryflow-api-key
+export TELEMETRYFLOW_ENDPOINT=localhost:4317
 ```
 
-#### Response
+### TFO-Platform Integration
 
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "result": {
-    "protocolVersion": "2024-11-05",
-    "serverInfo": {
-      "name": "TelemetryFlow-MCP",
-      "version": "1.2.0"
-    },
-    "capabilities": {
-      "tools": { "listChanged": true },
-      "resources": { "subscribe": true, "listChanged": true },
-      "prompts": { "listChanged": true },
-      "logging": {}
-    }
-  }
-}
-```
+The MCP server integrates with TFO-Platform components for context-aware AI analysis via Go port services:
 
-#### Call Claude Conversation Tool
+- **ContextCollector** — Go port of `ContextCollector.service.ts`. Collects live telemetry context from ClickHouse materialized views and PostgreSQL, providing rich operational data for AI analysis across 70+ context types in 7 categories
+- **PromptBuilder** — Go port of `PromptBuilder.service.ts`. Builds context-aware system prompts per context type, leveraging 58+ specialized analyst personas and 5 insight types for targeted telemetry analysis
 
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 3,
-  "method": "tools/call",
-  "params": {
-    "name": "claude_conversation",
-    "arguments": {
-      "message": "Explain the MCP protocol in simple terms",
-      "model": "claude-sonnet-4-20250514",
-      "max_tokens": 1024
-    }
-  }
-}
-```
+### Collected Telemetry
+
+| Signal  | Metric/Span           | Description                   |
+| ------- | --------------------- | ----------------------------- |
+| Metrics | `mcp.tools.calls`     | Tool call count by tool name  |
+| Metrics | `mcp.tools.duration`  | Tool execution duration       |
+| Metrics | `mcp.tools.errors`    | Tool error count              |
+| Metrics | `mcp.resources.reads` | Resource read count           |
+| Metrics | `mcp.prompts.gets`    | Prompt get count              |
+| Metrics | `mcp.sessions.events` | Session lifecycle events      |
+| Traces  | `mcp.tools.execute.*` | Tool execution spans          |
+| Logs    | Various               | Structured logs for debugging |
 
 ---
 
@@ -773,97 +511,42 @@ telemetryflow-go-mcp/
 ├── internal/
 │   ├── domain/                         # Domain Layer (DDD)
 │   │   ├── aggregates/                 # Session, Conversation aggregates
-│   │   │   ├── session.go
-│   │   │   └── conversation.go
 │   │   ├── entities/                   # Message, Tool, Resource, Prompt
-│   │   │   ├── message.go
-│   │   │   ├── tool.go
-│   │   │   ├── resource.go
-│   │   │   └── prompt.go
 │   │   ├── valueobjects/               # Immutable value objects
-│   │   │   ├── identifiers.go
-│   │   │   ├── content.go
-│   │   │   ├── mcp.go
-│   │   │   └── telemetry_context.go    # ContextType, TelemetryContext
 │   │   ├── events/                     # Domain events
-│   │   │   └── events.go
 │   │   ├── repositories/               # Repository interfaces
-│   │   │   └── repositories.go
 │   │   └── services/                   # Domain service interfaces
-│   │       └── claude_service.go
 │   ├── application/                    # Application Layer (CQRS)
 │   │   ├── commands/                   # Write operations
-│   │   │   └── commands.go
 │   │   ├── queries/                    # Read operations
-│   │   │   └── queries.go
-│   │   └── handlers/                   # Command/Query handlers
-│   │       ├── session_handler.go
-│   │       ├── tool_handler.go
-│   │       └── conversation_handler.go
-│   │   └── services/                   # Application services
-│   │       ├── services.go             # Conversation, session, tool services
-│   │       ├── context_collector.go    # Telemetry context collection (CH+PG)
-│   │       ├── prompt_builder.go       # Context-aware prompt generation
-│   │       └── db_provider.go          # DBProvider interface
+│   │   ├── handlers/                   # Command/Query handlers
+│   │   └── services/                   # Application services (ContextCollector, PromptBuilder)
 │   ├── infrastructure/                 # Infrastructure Layer
-│   │   ├── claude/                     # Claude API client
-│   │   │   └── client.go
-│   │   ├── config/                     # Configuration management
-│   │   │   └── config.go
+│   │   ├── claude/                     # LLM API client (11 providers)
+│   │   ├── config/                     # Viper configuration
 │   │   ├── cache/                      # Redis cache implementation
-│   │   │   └── redis.go
+│   │   ├── logging/                    # Structured logging (Zerolog)
 │   │   ├── queue/                      # NATS JetStream queue
-│   │   │   ├── nats.go
-│   │   │   └── tasks.go
-│   │   └── persistence/                # Repository implementations
-│   │       ├── memory_repositories.go
-│   │       ├── clickhouse.go           # ClickHouse analytics
-│   │       ├── analytics_repository.go # Analytics queries
-│   │       ├── migrator.go             # Database migrations
-│   │       ├── seeder.go               # Database seeding
-│   │       └── models/                 # GORM models
-│   │           └── models.go
+│   │   └── persistence/                # Repository implementations (GORM + ClickHouse)
 │   └── presentation/                   # Presentation Layer
-│       ├── server/                     # MCP server implementation
-│       │   └── server.go
-│       └── tools/                      # Built-in tools
-│           └── builtin_tools.go
+│       ├── server/                     # MCP server implementation (mcp-go v0.54.1)
+│       ├── tools/                      # Built-in tools (11 total)
+│       ├── resources/                  # Built-in resources
+│       └── prompts/                    # Built-in prompts
 ├── migrations/                         # Database migrations
-│   ├── postgres/                       # PostgreSQL migrations
-│   │   ├── 000001_init_schema.up.sql
-│   │   └── 000001_init_schema.down.sql
-│   └── clickhouse/                     # ClickHouse migrations
-│       ├── 000001_init_analytics.up.sql
-│       └── 000001_init_analytics.down.sql
 ├── scripts/                            # Initialization scripts
-│   ├── init-db.sql                     # PostgreSQL Docker init
-│   └── init-clickhouse.sql             # ClickHouse Docker init
-├── tests/                              # Test suites
+├── tests/                              # Test suites (18 packages, 94% coverage)
 │   ├── unit/                           # Unit tests
-│   │   ├── domain/
-│   │   ├── application/
-│   │   ├── infrastructure/
-│   │   └── presentation/
-│   └── integration/                    # Integration tests
-├── configs/
-│   └── config.yaml                     # Default configuration
+│   ├── integration/                    # Integration tests
+│   └── e2e/                            # End-to-end tests
+├── configs/                            # Configuration files
 ├── docs/                               # Documentation
-│   ├── README.md
-│   ├── ARCHITECTURE.md
-│   ├── CONFIGURATION.md
-│   ├── COMMANDS.md
-│   ├── ERD.md                          # Entity relationship diagrams
-│   └── DEVELOPMENT.md
 ├── .kiro/                              # Specifications and steering
-│   └── steering/
-│       ├── tech.md
-│       └── development-patterns.md
 ├── Makefile                            # Build automation
 ├── Dockerfile                          # Container build
-├── docker-compose.yml                  # Local development stack
+├── docker-compose.yaml                 # Development stack
 ├── go.mod                              # Go module
-├── .env.example                        # Environment template
-└── .gitignore
+└── .env.example                        # Environment template
 ```
 
 ---
@@ -887,14 +570,13 @@ make deps-update        # Update and tidy dependencies
 make deps-refresh       # Refresh all dependencies (clean + download)
 make deps-vendor        # Vendor dependencies
 make deps-check         # Check for vulnerabilities (requires govulncheck)
-make deps-graph         # Show dependency graph
-make deps-why DEP=...   # Explain why a dependency is needed
 
 # Code Quality
 make fmt                # Format code
 make vet                # Run go vet
 make lint               # Run golangci-lint
 make lint-fix           # Auto-fix lint issues
+make staticcheck        # Run staticcheck
 
 # Testing
 make test               # Run tests
@@ -917,16 +599,6 @@ make docker-run         # Run Docker container
 make ci                 # Full CI pipeline
 make ci-test            # CI pipeline (format, vet, lint, test)
 make release            # Create release artifacts
-
-# CI-Specific (GitHub Actions)
-make test-unit-ci       # Unit tests with coverage output
-make test-integration-ci # Integration tests with coverage
-make test-e2e-ci        # End-to-end tests
-make ci-build           # Cross-platform CI build
-make deps-verify        # Verify dependencies
-make staticcheck        # Run staticcheck
-make govulncheck        # Vulnerability scanning
-make coverage-report    # Generate merged coverage report
 ```
 
 ### Testing
@@ -938,118 +610,57 @@ make test
 # Run all test types (unit, integration, e2e)
 make test-all
 
-# Run tests with coverage
+# Run with coverage
 make test-cover
-
-# View coverage report
-open build/coverage.html
-
-# Run benchmarks
-make test-bench
 
 # Run CI test pipeline (format + vet + lint + test)
 make ci-test
-```
 
----
-
-## OpenTelemetry Integration
-
-```mermaid
-graph LR
-    subgraph "TFO-GO-MCP"
-        APP[Application]
-        TRACER[Tracer Provider]
-        METER[Meter Provider]
-    end
-
-    subgraph "Export"
-        OTLP_EXP[OTLP Exporter]
-    end
-
-    subgraph "TelemetryFlow Stack"
-        COLLECTOR[TFO-Collector<br/>:4317 gRPC<br/>:4318 HTTP]
-        BACKEND[TelemetryFlow Backend]
-    end
-
-    APP --> TRACER
-    APP --> METER
-    TRACER --> OTLP_EXP
-    METER --> OTLP_EXP
-    OTLP_EXP --> COLLECTOR
-    COLLECTOR --> BACKEND
-
-    style COLLECTOR fill:#FFE0B2,stroke:#F57C00
-    style OTLP_EXP fill:#BBDEFB,stroke:#1976D2
-```
-
-### Telemetry Configuration
-
-```yaml
-telemetry:
-  enabled: true
-  service_name: "telemetryflow-go-mcp"
-  environment: "production"
-  otlp_endpoint: "localhost:4317"
-  otlp_insecure: false
-  trace_sample_rate: 1.0
-  metrics_enabled: true
-  metrics_interval: "30s"
+# Run benchmarks
+make test-bench
 ```
 
 ---
 
 ## MCP Capabilities Matrix
 
-| Capability              | Status | Description                   |
-| ----------------------- | ------ | ----------------------------- |
-| `tools`                 | ✅     | Tool listing and execution    |
-| `tools.listChanged`     | ✅     | Dynamic tool registration     |
-| `resources`             | ✅     | Resource listing and reading  |
-| `resources.subscribe`   | ✅     | Resource change subscriptions |
-| `resources.listChanged` | ✅     | Dynamic resource registration |
-| `prompts`               | ✅     | Prompt templates              |
-| `prompts.listChanged`   | ✅     | Dynamic prompt registration   |
-| `logging`               | ✅     | Log level management          |
-| `sampling`              | 🔜     | LLM sampling (planned)        |
+> Capabilities are handled internally by the official MCP Go SDK (`mcp-go v0.54.1`).
+
+| Capability              | Status | Description                         |
+| ----------------------- | ------ | ----------------------------------- |
+| `tools`                 | ✅     | Tool listing and execution          |
+| `tools.listChanged`     | ✅     | Dynamic tool registration           |
+| `resources`             | ✅     | Resource listing and reading        |
+| `resources.subscribe`   | ✅     | Resource change subscriptions       |
+| `resources.listChanged` | ✅     | Dynamic resource registration       |
+| `prompts`               | ✅     | Prompt templates                    |
+| `prompts.listChanged`   | ✅     | Dynamic prompt registration         |
+| `logging`               | ✅     | Log level management                |
+| `sampling`              | 🔜     | LLM sampling (planned)              |
 
 ---
 
-## Error Handling
+## LLM AI Integration
 
-```mermaid
-graph TD
-    subgraph "JSON-RPC Errors"
-        E1[Parse Error<br/>-32700]
-        E2[Invalid Request<br/>-32600]
-        E3[Method Not Found<br/>-32601]
-        E4[Invalid Params<br/>-32602]
-        E5[Internal Error<br/>-32603]
-    end
+### Supported Providers (11 Providers, 100+ Models)
 
-    subgraph "MCP Errors"
-        M1[Tool Not Found<br/>-32001]
-        M2[Resource Not Found<br/>-32002]
-        M3[Prompt Not Found<br/>-32003]
-        M4[Tool Execution Error<br/>-32004]
-        M5[Rate Limited<br/>-32007]
-    end
+| Provider  | Example Models                                | API Key Env Variable        |
+| --------- | --------------------------------------------- | --------------------------- |
+| Anthropic | Claude 4 Opus, Claude 4 Sonnet, Claude 3.5    | `ANTHROPIC_API_KEY`         |
+| Google    | Gemini 3.5 Flash, Gemini 2.5 Pro/Flash        | `GOOGLE_API_KEY`            |
+| OpenAI    | GPT-5.5 Pro, GPT-5.4, o3                      | `OPENAI_API_KEY`            |
+| DeepSeek  | DeepSeek V4 Pro, DeepSeek R1/R2 Reasoner      | `DEEPSEEK_API_KEY`          |
+| Qwen      | Qwen 3.6 Max/Plus/Flash                       | `QWEN_API_KEY`              |
+| Mistral   | Mistral Medium 3.5, Mistral Large 3, Codestral| `MISTRAL_API_KEY`           |
+| Grok      | Grok 4.3, Grok 4.20 Multi-Agent/Reasoning     | `XAI_API_KEY`               |
+| Kimi      | K2.6, K2.5, Moonshot V1                       | `MOONSHOT_API_KEY`          |
+| Zhipu     | GLM 5.1, GLM 5 Turbo, GLM 4.7                | `ZHIPU_API_KEY`             |
+| MiMo      | MiMo V2.5 Pro, MiMo V2 Pro                    | `MIMO_API_KEY`              |
+| Ollama    | llama3, mistral, codellama (local)            | `OLLAMA_HOST`               |
 
-    REQ[Request] --> PARSE{Parse JSON}
-    PARSE -->|Error| E1
-    PARSE -->|OK| VALIDATE{Validate}
-    VALIDATE -->|Invalid| E2
-    VALIDATE -->|OK| ROUTE{Route Method}
-    ROUTE -->|Not Found| E3
-    ROUTE -->|OK| EXEC{Execute}
-    EXEC -->|Tool Error| M4
-    EXEC -->|Not Found| M1
-    EXEC -->|OK| RESP[Response]
+### Default Model
 
-    style E1 fill:#FFCDD2,stroke:#C62828
-    style E2 fill:#FFCDD2,stroke:#C62828
-    style M4 fill:#FFE0B2,stroke:#F57C00
-```
+The default model is `claude-opus-4-7` (Anthropic Claude 4 Opus), configurable via the `claude.default_model` setting or `TELEMETRYFLOW_MCP_CLAUDE_DEFAULT_MODEL` environment variable.
 
 ---
 
@@ -1077,6 +688,9 @@ graph TD
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)         | Development guide                   |
 | [docs/INSTALLATION.md](docs/INSTALLATION.md)       | Installation guide                  |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Troubleshooting guide               |
+| [CONTRIBUTING.md](CONTRIBUTING.md)                 | Contribution guidelines             |
+| [SECURITY.md](SECURITY.md)                         | Security policy                     |
+| [CHANGELOG.md](CHANGELOG.md)                       | Version history                     |
 
 ---
 
@@ -1100,7 +714,16 @@ graph TD
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## Related Projects
+
+- [TelemetryFlow Python MCP](https://github.com/telemetryflow/telemetryflow-python-mcp) - Python implementation
+- [TelemetryFlow Go SDK](https://github.com/telemetryflow/telemetryflow-go-sdk) - Go observability SDK
+- [TelemetryFlow Python SDK](https://github.com/telemetryflow/telemetryflow-python-sdk) - Python observability SDK
+- [TelemetryFlow Platform](https://github.com/telemetryflow/telemetryflow) - Main platform
 
 ---
 
@@ -1113,7 +736,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <p align="center">
-  <strong>Built with Go and Claude AI integration for the TelemetryFlow Platform</strong>
+  <strong>Built with Go and multi-provider LLM integration for the TelemetryFlow Platform</strong>
   <br/>
-  <sub>Copyright © 2024-2026 Telemetri Data Indonesia. All rights reserved.</sub>
+  <sub>Copyright &copy; 2024-2026 Telemetri Data Indonesia. All rights reserved.</sub>
 </p>
